@@ -1,4 +1,30 @@
-NOTE: `.git`, `package.json` and `requirements.txt` will all be created in the project root (outside client and server folders)
+# Git Branching Strategy
+
+```text
+main
+ |__dev
+     |__frontend
+            |__ frontend-login
+            |__ frontend-login-test
+     |__backend
+            |__ backend-login
+            |__ backend-login-test
+```
+
+Get remote repo
+```Bash
+git clone <git-URL>
+```
+
+Get specific branch 
+```Bash
+git pull origin <branch-name>
+```
+
+Push branch back into remote repo
+```Bash
+git push 
+```
 
 # Git Setup
 
