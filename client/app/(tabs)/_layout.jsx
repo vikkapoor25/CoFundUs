@@ -1,28 +1,36 @@
-import { Tabs } from 'expo-router';
+import { Tabs, useRouter } from 'expo-router'
+import { Image } from 'react-native'
 
-
-// Specifies each tab in nav bar with custom name and order
 export default function TabsLayout() {
+  const router = useRouter()
+
   return (
-    <Tabs tabBar={(props) => <tabBar {...props} />}>
-        <Tabs.Screen
-        name="accounts"
-        options={{ title: "Accounts" }}
-      />
-        <Tabs.Screen
+    <Tabs screenOptions={{ headerShown: false }}>
+      <Tabs.Screen name="accounts" options={{ title: "Accounts" }} />
+      <Tabs.Screen name="bills" options={{ title: "Bills" }} />
+      <Tabs.Screen
         name="index"
-        options={{ title: "Home" }}
+        options={{
+          title: "",
+          tabBarIcon: () => (
+            <Image
+              source={require('../../assets/images/logo.png')}
+              style={{ width: 40, height: 40, resizeMode: 'contain' }}
+            />
+          ),
+        }}
       />
+      <Tabs.Screen name="goals" options={{ title: "Goals" }} />
       <Tabs.Screen
-        name="bills"
-        options={{ title: "Bills" }}
+        name="logout"
+        options={{ title: "Logout" }}
+        listeners={{
+          tabPress: (e) => {
+            e.preventDefault()
+            router.replace('/login')
+          },
+        }}
       />
-      <Tabs.Screen
-        name="goals"
-        options={{ title: "Goals" }}
-      />
-      
     </Tabs>
-    
   )
 }
