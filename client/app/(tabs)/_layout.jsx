@@ -4,7 +4,7 @@ import { Tabs } from 'expo-router';
 // Specifies each tab in nav bar with custom name and order
 export default function TabsLayout() {
   return (
-    <Tabs screenOptions={{ headerShown: false }}>
+    <Tabs tabBar={(props) => <tabBar {...props} />}>
         <Tabs.Screen
         name="accounts"
         options={{ title: "Accounts" }}
