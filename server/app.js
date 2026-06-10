@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const userRouter = require('./routes/user');
+const householdRouter = require('./routes/household');
 
 const app = express();
 
@@ -14,6 +14,6 @@ app.get("/", (req, res) => {
     })
 })
 
-app.use("/users", userRouter);
+app.use("/users", householdRouter);
 
 module.exports = app;
