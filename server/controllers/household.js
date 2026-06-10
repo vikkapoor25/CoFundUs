@@ -33,7 +33,9 @@ async function login(req, res) {
             if(err){ throw new Error('Error in token generation') }
             res.status(200).json({
                 success: true,
-                token: token,
+                jwt_token: token,
+                name_1: household.name_1,
+                name_2: household.name_2
             });
         }
 
