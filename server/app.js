@@ -9,8 +9,8 @@ app.use(express.json());
 
 app.get("/", (req, res) => {
     res.json({
-        name: "Discretion",
-        description: "Send and receive private messages."
+        name: "",
+        description: ""
     })
 })
 
