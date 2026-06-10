@@ -15,7 +15,7 @@ export default function TabsLayout() {
           tabBarIcon: () => (
             <Image
               source={require('../../assets/images/logo.png')}
-              style={{ width: 40, height: 40, resizeMode: 'contain' }}
+              style={{ width: 48, height: 48, resizeMode: 'contain' }}
             />
           ),
         }}
