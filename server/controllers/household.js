@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const User = require('../models/User');
+const Household = require('../models/Household');
 
 async function register(req, res) {
     try {
@@ -11,9 +11,8 @@ async function register(req, res) {
       const salt = await bcrypt.genSalt(parseInt(process.env.BCRYPT_SALT_ROUNDS));
   
       // Hash the password
-      data["password"] = await bcrypt.hash(data.password, salt);
-      console.log(data)
-      const result = await User.create(data);
+      data["household_password"] = await bcrypt.hash(data.household_password, salt);
+      const result = await Household.create(data);
   
       res.status(201).send(result);
     } catch (err) {
@@ -24,12 +23,12 @@ async function register(req, res) {
 async function login(req, res) {
     const data = req.body;
     try {
-      const user = await User.getOneByUsername(data.username);
-      if(!user) { throw new Error('No user with this username') }
-      const match = await bcrypt.compare(data.password, user.password);
+      const household = await Household.getOneByUsername(data.household_username);
+      if(!household) { throw new Error('No household with this username') }
+      const match = await bcrypt.compare(data.household_password, household.household_password);
   
       if (match) {
-        const payload = { username: user.username }
+        const payload = { household_username: household.household_username }
         const sendToken = (err, token) => {
             if(err){ throw new Error('Error in token generation') }
             res.status(200).json({
@@ -41,7 +40,7 @@ async function login(req, res) {
         jwt.sign(payload, process.env.SECRET_TOKEN, { expiresIn: 3600 }, sendToken);
 
       } else {
-        throw new Error('User could not be authenticated')  
+        throw new Error('Household could not be authenticated')  
       }
     } catch (err) {
       res.status(401).json({ error: err.message });
