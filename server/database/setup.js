@@ -2,7 +2,7 @@ require("dotenv").config();
 const fs = require("fs");
 const db = require("./connect");
 
-const sql = fs.readFileSync("./server/database/setup.sql").toString();
+const sql = fs.readFileSync("./database/cofundus.sql").toString();
 
 db.query(sql)
   .then(() => {
