@@ -3,7 +3,7 @@ import { BASE_URL } from '../constants/api'
 // Calls the backend /user router.
 
 export async function login(household_name, password) {
-  const res = await fetch(`${BASE_URL}/user/login`, {
+  const res = await fetch(`${BASE_URL}/users/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ household_name, password }),
@@ -12,7 +12,7 @@ export async function login(household_name, password) {
 }
 
 export async function register(details) {
-  const res = await fetch(`${BASE_URL}/user/register`, {
+  const res = await fetch(`${BASE_URL}/users/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(details),
