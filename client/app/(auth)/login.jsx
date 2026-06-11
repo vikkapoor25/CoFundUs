@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { View, Text, TextInput, Pressable, Image, StyleSheet } from 'react-native'
 import { useRouter } from 'expo-router'
 import Svg, { Path } from 'react-native-svg'
+import colours from '../../constants/colours'
 
 export default function login() {
   const router = useRouter()
@@ -61,7 +62,7 @@ export default function login() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#7e9fd6' },
+  container: { flex: 1, backgroundColor: colours.navBackground },
   top: { height: 250, alignItems: 'center', justifyContent: 'center', gap: 12 },
   logo: { width: 90, height: 90, resizeMode: 'contain' },
   tagline: { color: '#fff', fontSize: 15, fontWeight: '600' },
@@ -70,7 +71,7 @@ const styles = StyleSheet.create({
   heading: { fontSize: 30, fontWeight: '800', color: '#3a4a63', marginBottom: 24 },
   label: { fontSize: 13, color: '#55626d', marginBottom: 6, fontWeight: '600' },
   input: { borderBottomWidth: 1, borderBottomColor: '#d7dee6', height: 44, marginBottom: 18, fontSize: 14 },
-  btn: { backgroundColor: '#7e9fd6', borderRadius: 10, height: 48, alignItems: 'center', justifyContent: 'center', marginTop: 8 },
+  btn: { backgroundColor: colours.navBackground, borderRadius: 10, height: 48, alignItems: 'center', justifyContent: 'center', marginTop: 8 },
   btnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
   links: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 18 },
   link: { color: '#4a7ec2', fontWeight: '600', fontSize: 13 },
