@@ -1,5 +1,4 @@
-import { ScrollView, View, Text, StyleSheet, Alert, Modal, Pressable} from 'react-native'
-import {SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context';
+import { ScrollView, View, Text, StyleSheet, Modal} from 'react-native'
 import {useState} from 'react';
 import colours from '../../constants/colours'
 import Card from '../../components/Card'
@@ -52,6 +51,7 @@ export default function accounts() {
       </ScrollView>
 
       <AddModal
+        title="Add A Bank Account"
         visible={modalVisible}
         setVisible={setModalVisible}
       />

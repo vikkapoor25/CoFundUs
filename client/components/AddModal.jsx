@@ -1,9 +1,9 @@
-import { View, Text, StyleSheet, Modal,Pressable } from 'react-native'
+import { View, Text, StyleSheet, Modal, Pressable } from 'react-native'
 import colours from '../constants/colours'
 
 
 
-export default function AddModal({ visible, setVisible, children }) {
+export default function AddModal({ title, visible, setVisible, children }) {
   return (
     <Modal
         visible={visible}
@@ -12,11 +12,11 @@ export default function AddModal({ visible, setVisible, children }) {
     >
         <View style={styles.centeredView}>
             <View style={styles.modalView}>
-              <Text style={styles.modalText}>Hello World!</Text>
+              <Text style={styles.modalText}>{title}</Text>
               <Pressable
                 style={[styles.button, styles.buttonClose]}
                 onPress={() => setVisible(!visible)}>
-                <Text style={styles.textStyle}>Hide Modal</Text>
+                <Text style={styles.textStyle}>Close</Text>
               </Pressable>
             </View>
           </View>
