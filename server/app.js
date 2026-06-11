@@ -1,11 +1,13 @@
-const express = require('express');
-const cors = require('cors');
+const express = require("express");
 const householdRouter = require('./routes/household');
+const accountsController = require("./controllers/accounts");
+
+const cors = require('cors');
 
 const app = express();
 
-app.use(cors());
 app.use(express.json());
+app.use(cors());
 
 app.get("/", (req, res) => {
     res.json({
@@ -13,6 +15,9 @@ app.get("/", (req, res) => {
         description: ""
     })
 })
+
+app.post("/bank-accounts/new", accountsController.createBankAccount);
+app.delete("/bank-accounts/delete", accountsController.deleteBankAccount);
 
 app.use("/users", householdRouter);
 
