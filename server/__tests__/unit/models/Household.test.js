@@ -100,4 +100,46 @@ describe('Household', () => {
     });
   })
 
+  // Test suite for Household.create() ---------------------------------------
+  describe('create', () => {
+
+    // Tests successful creation of a household account
+    it('resolves with household on successful creation', async () => {
+        
+      // ARRANGE --------------------------------------------------------
+      // Fake household data used for testing
+      const mockHousehold = { household_username: 'Doe', household_password: 'password1', name_1: 'John', name_2: 'Alice', email_1: 'john@mail.com', email_2: 'alice@mail.com' };
+
+      // Fake database row returned after Household.getOneById()
+      const createdHousehold = { household_id: 1, household_username: 'Doe', household_password: 'password1', name_1: 'John', name_2: 'Alice', email_1: 'john@mail.com', email_2: 'alice@mail.com' };
+
+      // Creates spy of db.query
+      const querySpy = jest.spyOn(db, 'query');
+      // First mock handles the INSERT query
+      querySpy.mockResolvedValueOnce({ rows: [{ household_id: 1 }] });
+      // Second mock handles the SELECT query inside Household.getOneById()
+      querySpy.mockResolvedValueOnce({ rows: [createdHousehold] });
+
+      // ACT ------------------------------------------------------------
+      // Runs Household.create()
+      const result = await Household.create(mockHousehold);
+
+      // ASSERT --------------------------------------------------------
+      // Checks a Household object was returned
+      expect(result).toBeInstanceOf(Household);
+      // Checks returned household has the correct household_id
+      expect(result).toHaveProperty('household_id', 1);
+      // Checks returned household has the correct household_username
+      expect(result).toHaveProperty('household_username', 'Doe');
+      // Checks returned household's password matches
+      expect(result).toHaveProperty('household_password', 'password1');
+
+      // Checks INSERT query was used with correct household data
+      expect(querySpy).toHaveBeenNthCalledWith(1, "INSERT INTO household (household_username, household_password, name_1, name_2, email_1, email_2) VALUES ($1, $2, $3, $4, $5, $6) RETURNING household_id;", ['Doe', 'password1', 'John', 'Alice', 'john@mail.com', 'alice@mail.com']);
+      
+      // Checks SELECT query was used to retrieve the newly created household
+      expect(querySpy).toHaveBeenNthCalledWith(2, "SELECT * FROM household WHERE household_id = $1", [1]);
+    });
+  })
+
 })
