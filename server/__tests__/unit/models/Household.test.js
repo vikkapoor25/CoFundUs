@@ -3,8 +3,8 @@ const Household = require('../../../models/Household')
 // Import Database Connection for testing
 const db = require('../../../database/connect')
 
-// Main test suite for Explanation model ---------------------------------------
-xdescribe('Explanation', () => {
+// Main test suite for Household model ---------------------------------------
+describe('Household', () => {
 
   // Runs before each test
   // Clears mock call history between tests
@@ -14,41 +14,41 @@ xdescribe('Explanation', () => {
   afterAll(() => jest.resetAllMocks())
 
 
-  // Test suite for Explanation.getAllExplanations() ---------------------------------------
-  describe ('getAllExplanations', () => {
+  // Test suite for Household.getOneById() ---------------------------------------
+  describe ('getOneById', () => {
 
-    // Tests successful retrieval of explanations
-    it('resolves with explanations on successful db query', async () => {
+    // Tests successful retrieval of household account using household_id
+    it('resolves with household account using the household_id on successful db query', async () => {
 
       // ARRANGE --------------------------------------------------------
       // Fake database rows used for testing
-      const mockExplanations = [
-        { question_id: 1, answer: 'Fred', category: 1 , initial_setting: 'hello', explanation: 'yo'},
-        { question_id: 2, answer: 'George', category: 1 , initial_setting: 'hello', explanation: 'yo'},
-        { question_id: 3, answer: 'Ron', category: 1 , initial_setting: 'hello', explanation: 'yo'},
+      const mockHousehold = [
+        { household_id: 1, household_username: 'Doe', household_password: 'password1', name_1: 'John', name_2: 'Alice', email_1: 'john@mail.com', email_2: 'alice@mail.com'},
+        { household_id: 2, household_username: 'Snow', household_password: 'asoiafgrrm', name_1: 'John', name_2: 'Ygritte', email_1: 'john.snow@mail.com', email_2: 'ygritte@mail.com'},
+        { household_id: 3, household_username: 'Bing', household_password: 'friends', name_1: 'Chandler', name_2: 'Monica', email_1: 'chandler@mail.com', email_2: 'monica@mail.com'}
 
       ];
       // Mocks db.query() to return fake rows once
-      jest.spyOn(db, 'query').mockResolvedValueOnce({ rows: mockExplanations });
+      jest.spyOn(db, 'query').mockResolvedValueOnce({ rows: mockHousehold });
 
       // ACT ------------------------------------------------------------
-      // Runs Explanation.getAllExplanations()
-      const explanations = await Explanation.getAllExplanations();
+      // Runs Household.getOneById()
+      const household = await Household.getOneById(1);
 
       // ASSERT --------------------------------------------------------
-      // Checks 3 explanations were returned
-      expect(explanations).toHaveLength(3);
-      // Checks first explanation contains question_id
-      expect(explanations[0]).toHaveProperty('question_id');
-      // Checks first explanation answer
-      expect(explanations[0].answer).toBe('Fred');
+      // Checks 1 household was returned
+      expect(household).toHaveLength(1);
+      // Checks second household contains household_username
+      expect(household[1]).toHaveProperty('household_username');
+      // Checks second household's password matches
+      expect(household[1].household_password).toBe('asoiafgrrm');
       // Checks correct SQL query was used
-      expect(db.query).toHaveBeenCalledWith('SELECT q.question_id, q.answer, s.category, s.initial_setting, q.explanation FROM questions q LEFT JOIN scenarios s ON (q.scenario_id = s.scenario_id)');
+      expect(db.query).toHaveBeenCalledWith('SELECT * FROM household WHERE household_id = 2');
     });
 
 
-    // Tests error when no explanations are found
-    it('should throw an Error when no explanations are found', async () => {
+    // Tests error when no household is found
+    it('should throw an Error when no household is found', async () => {
 
       // ARRANGE --------------------------------------------------------
       // Mocks empty database response
@@ -56,7 +56,7 @@ xdescribe('Explanation', () => {
 
       // ACT & ASSERT ---------------------------------------------------
       // Expects Explanation.getAllExplanations() to throw error
-      await expect(Explanation.getAllExplanations()).rejects.toThrow('No explanation available.');
+      await expect(Household.getOneById()).rejects.toThrow('Unable to locate household.');
     });
   })
   
