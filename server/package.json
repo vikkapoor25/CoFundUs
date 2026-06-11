@@ -11,6 +11,7 @@
       "coverage": "jest --coverage --testPathPattern=/unit/",
       "dev": "nodemon -L ./index.js",
       "start": "node ./index.js",
+      "setup-test-db": "NODE_ENV=test node ./database/setup.js",
       "setup-db": "node ./database/setup.js"
   },
   "keywords": [],
