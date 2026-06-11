@@ -13,6 +13,7 @@ export default function AddModal({ title, visible, setVisible, children }) {
         <View style={styles.centeredView}>
             <View style={styles.modalView}>
               <Text style={styles.modalText}>{title}</Text>
+              <View>{children}</View>
               <Pressable
                 style={[styles.button, styles.buttonClose]}
                 onPress={() => setVisible(!visible)}>

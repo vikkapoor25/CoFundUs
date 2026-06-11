@@ -1,14 +1,18 @@
-import { ScrollView, View, Text, StyleSheet, Modal} from 'react-native'
+import { ScrollView, View, Text, StyleSheet, Modal, TextInput} from 'react-native'
 import {useState} from 'react';
 import colours from '../../constants/colours'
 import Card from '../../components/Card'
 import AddButton from '../../components/AddButton'
 import AddModal from '../../components/AddModal'
+import Field from '../../components/Field';
 
 
 export default function accounts() {
 
   const [modalVisible, setModalVisible] = useState(false);
+  const [accountName, setAccountName] = useState('')
+  const [accountBalanace, setAccountBalanace] = useState('')
+  const [accountType, setAccountType] = useState('')
 
   return (
     <View style={{ flex: 1 }}>
@@ -54,8 +58,29 @@ export default function accounts() {
         title="Add A Bank Account"
         visible={modalVisible}
         setVisible={setModalVisible}
-      />
-
+      >
+        <Field
+          label="Account Name"
+          placeholder="Enter your bank account name"
+          keyboardType="default"
+          value={accountName}
+          onChangeText={setAccountName}
+        />
+        <Field
+          label="Account Balance"
+          placeholder="Enter your balance"
+          keyboardType="default"
+          value={accountName}
+          onChangeText={setAccountName}
+        />
+        <Field
+          label="Account Type"
+          placeholder="Enter your bank type"
+          keyboardType="default"
+          value={accountType}
+          onChangeText={setAccountType}
+        />
+      </AddModal>
     </View>
   )
 }
