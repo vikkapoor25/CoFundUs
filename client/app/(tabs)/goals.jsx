@@ -1,4 +1,6 @@
 import { ScrollView, View, Text, StyleSheet } from 'react-native'
+import colours from '../../constants/colours'
+
 
 export default function goals() {
   return (
@@ -30,11 +32,11 @@ export default function goals() {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#eef2f7' },
+  screen: { flex: 1, backgroundColor: colours.background },
   body: { padding: 16, paddingTop: 60 },
-  heading: { fontSize: 24, fontWeight: '800', color: '#2f4f7a' },
+  heading: { fontSize: 24, fontWeight: '800', color: colours.pageHeader },
   sub: { fontSize: 13, color: '#7a8794', marginBottom: 16, marginTop: 4 },
-  card: { backgroundColor: '#fff', borderRadius: 16, padding: 16, marginBottom: 14 },
-  cardTitle: { fontSize: 15, fontWeight: '700', color: '#4a7ec2', marginBottom: 12 },
+  card: { backgroundColor: colours.cardBackground, borderRadius: 16, padding: 16, marginBottom: 14 },
+  cardTitle: { fontSize: 15, fontWeight: '700', color: colours.cardTitle, marginBottom: 12 },
   line: { fontSize: 13, color: '#3f4856', paddingVertical: 6, lineHeight: 18 },
 })
