@@ -1,14 +1,15 @@
 import { ScrollView, View, Text, StyleSheet } from 'react-native'
 import colours from '../../constants/colours'
+import Card from '../../components/Card'
+
 
 
 export default function bills() {
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.body}>
-      <Text style={styles.heading}>Payments</Text>
+      <Text style={styles.heading}>Bills</Text>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Upcoming Payments</Text>
+      <Card title="Upcoming Bills">
         <View style={styles.row}>
           <Text style={[styles.cell, styles.head]}>Days Left</Text>
           <Text style={[styles.cell, styles.head]}>Payment</Text>
@@ -21,10 +22,9 @@ export default function bills() {
           <Text style={styles.cell}>Sam</Text>
           <Text style={[styles.cell, styles.rightCell]}>£16</Text>
         </View>
-      </View>
+      </Card>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Subscriptions</Text>
+      <Card title="Subscriptions">
         <View style={styles.row}>
           <Text style={[styles.cell, styles.head]}>Payment</Text>
           <Text style={[styles.cell, styles.head]}>Amount</Text>
@@ -55,10 +55,9 @@ export default function bills() {
           <Text style={styles.cell}>Alex</Text>
           <Text style={[styles.cell, styles.rightCell]}>03/06</Text>
         </View>
-      </View>
+      </Card>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>One-Time Payments</Text>
+      <Card title="One-Time Bills">
         <View style={styles.row}>
           <Text style={[styles.cell, styles.head]}>Payment</Text>
           <Text style={[styles.cell, styles.head]}>Amount</Text>
@@ -77,7 +76,7 @@ export default function bills() {
           <Text style={styles.cell}>Alex</Text>
           <Text style={[styles.cell, styles.rightCell]}>20/06</Text>
         </View>
-      </View>
+      </Card>
     </ScrollView>
   )
 }
@@ -86,8 +85,6 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colours.background },
   body: { padding: 16, paddingTop: 60 },
   heading: { fontSize: 24, fontWeight: '800', color: colours.pageHeader, marginBottom: 16 },
-  card: { backgroundColor: colours.cardBackground, borderRadius: 16, padding: 16, marginBottom: 14 },
-  cardTitle: { fontSize: 15, fontWeight: '700', color: colours.cardTitle, marginBottom: 12 },
   row: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#eef1f5' },
   cell: { flex: 1, fontSize: 12, color: '#3f4856' },
   head: { fontWeight: '700', color: '#7a8794', fontSize: 11 },
