@@ -56,8 +56,41 @@ describe('Household API Endpoints', () => {
     });
 });
 
+describe('POST /user/login', () => {
 
+    it('should return success, name_1, name_2 and jwt_token on successful login with status code 200', async () => {
 
+        // ARRANGE
+        const newHousehold = { household_username: 'Stark', household_password: 'RedWedding', name_1: 'Rob', name_2: 'Catalyn', email_1: 'rob@mail.com', email_2: 'catalyn@mail.com' };
 
+        await request(api).post('/user/register').send(newHousehold);
+
+        // ACT
+        const response = await request(api).post('/user/login').send({ household_username: 'Stark', household_password: 'RedWedding' });
+
+        // ASSERT
+        expect(response.status).toBe(200);
+        expect(response.body.success).toBe(true);
+        expect(response.body.jwt_token).toEqual(expect.any(String));
+        expect(response.body.name_1).toBe('Rob');
+        expect(response.body.name_2).toBe('Catalyn');
+    });
+
+    it('should return an error upon unsuccessful login with status code 401', async () => {
+
+        // ARRANGE
+        const newHousehold = { household_username: 'Stark', household_password: 'RedWedding', name_1: 'Rob', name_2: 'Catalyn', email_1: 'rob@mail.com', email_2: 'catalyn@mail.com' };
+
+        await request(api).post('/user/register').send(newHousehold);
+
+        // ACT
+        const response = await request(api).post('/user/login').send({ household_username: 'Stark', household_password: 'wrongPassword' });
+
+        // ASSERT
+        expect(response.status).toBe(401);
+        expect(response.body).toEqual({ error: 'Household could not be authenticated' });
+    });
+
+});
   
 })
