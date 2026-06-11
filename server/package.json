@@ -9,9 +9,9 @@
       "unitTests": "jest --testPathPattern=/unit/ --watchAll --verbose",
       "integrationTests": "jest --testPathPattern=/integration/ --watchAll --detectOpenHandles --runInBand --verbose",
       "coverage": "jest --coverage --testPathPattern=/unit/",
-      "dev": "nodemon -L server/index.js",
-      "start": "node server/index.js",
-      "setup-db": ""
+      "dev": "nodemon -L ./index.js",
+      "start": "node ./index.js",
+      "setup-db": "node ./database/setup.js"
   },
   "keywords": [],
   "author": "",
