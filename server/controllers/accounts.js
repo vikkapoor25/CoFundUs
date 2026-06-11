@@ -23,13 +23,13 @@ async function deleteBankAccount(req, res) {
     });
   } catch (err) {
     if (err.message.includes("violates foreign key constraint")) {
-  return res.status(400).json({
-    error: "This account cannot be deleted because it still has income or bills assigned to it.",
-  });
-}
+      return res.status(400).json({
+        error: "This account cannot be deleted because it still has income or bills assigned to it.",
+      });
     }
 
     res.status(500).json({ error: err.message });
   }
+}
 
 module.exports = { createBankAccount, deleteBankAccount };
