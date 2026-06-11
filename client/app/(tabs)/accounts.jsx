@@ -1,49 +1,68 @@
-import { ScrollView, View, Text, StyleSheet } from 'react-native'
+import { ScrollView, View, Text, StyleSheet, Alert, Modal, Pressable} from 'react-native'
+import {SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context';
+import {useState} from 'react';
 import colours from '../../constants/colours'
 import Card from '../../components/Card'
+import AddButton from '../../components/AddButton'
+import AddModal from '../../components/AddModal'
 
 
 export default function accounts() {
+
+  const [modalVisible, setModalVisible] = useState(false);
+
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.body}>
+    <View style={{ flex: 1 }}>
+      <ScrollView style={styles.screen} contentContainerStyle={styles.body}>
+        <Text style={styles.heading}>Accounts</Text>
+        {/* add account button */}
+        <View style={styles.container}>
+          <AddButton onPress={() => setModalVisible(true)} />
+        </View>
+          
+        
+          <Card title="My Account">
+            <View style={styles.row}>
+              <Text style={styles.label}>Total Balance</Text>
+              <Text style={styles.value}>£11,000</Text>
+            </View>
+          </Card>
 
-      <Text style={styles.heading}>Accounts</Text>
-      
-        <Card title="My Account">
-          <View style={styles.row}>
-            <Text style={styles.label}>Total Balance</Text>
-            <Text style={styles.value}>£11,000</Text>
-          </View>
-        </Card>
+          <Card title="Personal Goals">
+            <View style={styles.row}>
+              <Text style={styles.label}>iPhone 16</Text>
+              <Text style={styles.value}>£200 / £1,600</Text>
+            </View>
+            <View style={styles.track}>
+              <View style={[styles.fill, { width: '13%' }]} />
+            </View>
+          </Card>
 
-        <Card title="Personal Goals">
-          <View style={styles.row}>
-            <Text style={styles.label}>iPhone 16</Text>
-            <Text style={styles.value}>£200 / £1,600</Text>
-          </View>
-          <View style={styles.track}>
-            <View style={[styles.fill, { width: '13%' }]} />
-          </View>
-        </Card>
+          <Card title="Monthly Breakdown">
+            <View style={styles.row}>
+              <Text style={styles.label}>Income</Text>
+              <Text style={styles.value}>£2,500</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.label}>Spending</Text>
+              <Text style={styles.value}>£500</Text>
+            </View>
+            <Text style={styles.net}>Net Gain   +£2,000</Text>
+          </Card>
+      </ScrollView>
 
-        <Card title="Monthly Breakdown">
-          <View style={styles.row}>
-            <Text style={styles.label}>Income</Text>
-            <Text style={styles.value}>£2,500</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>Spending</Text>
-            <Text style={styles.value}>£500</Text>
-          </View>
-          <Text style={styles.net}>Net Gain   +£2,000</Text>
-        </Card>
-    </ScrollView>
-    
+      <AddModal
+        visible={modalVisible}
+        setVisible={setModalVisible}
+      />
+
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colours.background },
+  container: {left: 305,bottom: 30},
   body: { padding: 16, paddingTop: 60 },
   heading: { fontSize: 24, fontWeight: '800', color: colours.pageHeader, marginBottom: 16 },
   row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8 },
