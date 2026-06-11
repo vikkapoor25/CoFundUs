@@ -2,11 +2,31 @@ import { useState } from 'react'
 import { View, Text, TextInput, Pressable, Image, StyleSheet } from 'react-native'
 import { useRouter } from 'expo-router'
 import Svg, { Path } from 'react-native-svg'
+import { login as apiLogin } from '../../api/user'
 
 export default function login() {
   const router = useRouter()
-  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  async function handleLogin() {
+    setError('')
+    setLoading(true)
+    try {
+      const data = await apiLogin(username, password)
+      if (data && data.jwt_token) {
+        router.replace('/')
+      } else {
+        setError(data?.error || 'Invalid login details')
+      }
+    } catch (e) {
+      setError('Could not reach the server')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -22,15 +42,14 @@ export default function login() {
       <View style={styles.bottom}>
         <Text style={styles.heading}>Login</Text>
 
-        <Text style={styles.label}>Email</Text>
+        <Text style={styles.label}>Username</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter your email"
+          placeholder="Enter your household username"
           placeholderTextColor="#9aa3b0"
-          value={email}
-          onChangeText={setEmail}
+          value={username}
+          onChangeText={setUsername}
           autoCapitalize="none"
-          keyboardType="email-address"
         />
 
         <Text style={styles.label}>Password</Text>
@@ -43,8 +62,10 @@ export default function login() {
           secureTextEntry
         />
 
-        <Pressable style={styles.btn} onPress={() => router.replace('/')}>
-          <Text style={styles.btnText}>Login</Text>
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+
+        <Pressable style={styles.btn} onPress={handleLogin} disabled={loading}>
+          <Text style={styles.btnText}>{loading ? 'Logging in...' : 'Login'}</Text>
         </Pressable>
 
         <View style={styles.links}>
@@ -70,6 +91,7 @@ const styles = StyleSheet.create({
   heading: { fontSize: 30, fontWeight: '800', color: '#3a4a63', marginBottom: 24 },
   label: { fontSize: 13, color: '#55626d', marginBottom: 6, fontWeight: '600' },
   input: { borderBottomWidth: 1, borderBottomColor: '#d7dee6', height: 44, marginBottom: 18, fontSize: 14 },
+  error: { color: '#e5484d', fontSize: 13, marginBottom: 10 },
   btn: { backgroundColor: '#7e9fd6', borderRadius: 10, height: 48, alignItems: 'center', justifyContent: 'center', marginTop: 8 },
   btnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
   links: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 18 },
