@@ -14,6 +14,6 @@ app.get("/", (req, res) => {
     })
 })
 
-app.use("/users", householdRouter);
+app.use("/user", householdRouter);
 
 module.exports = app;

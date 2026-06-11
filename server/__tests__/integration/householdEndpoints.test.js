@@ -2,7 +2,7 @@ const request = require('supertest')
 const app = require('../../app')
 const { resetTestDB } = require('./config')
 
-describe('TARDIS API Endpoints', () => {
+describe('Household API Endpoints', () => {
   let api
 
   beforeEach(async () => {
@@ -20,37 +20,41 @@ describe('TARDIS API Endpoints', () => {
     api.close(done)
   })
 
-  describe('GET /', () => {
-    it('responds to GET / with a message and a description', async () => {
-      const response = await request(api).get('/')
-  
-      expect(response.statusCode).toBe(200)
-      expect(response.body.title).toBe('TARDIS API')
-      expect(response.body.description).toBe('Historical deduction game API')
-    })
-  });
+  describe('POST /user/register', () => {
+    it('should create household with encrypted password and return status code 201', async () => {
+        
+        // ARRANGE
+        const newHousehold = { household_username: 'Stark', household_password: 'RedWedding', name_1: 'Rob', name_2: 'Catalyn', email_1: 'rob@mail.com', email_2: 'catalyn@mail.com' };
+        
+        // ACT
+        const response = await request(api).post('/user/register').send(newHousehold);
 
-  describe('GET /scenarios', () => {
-    it('should return all scenario with a status code 200', async () => {
-      const response = await request(api).get('/scenarios');
-
-      expect(response.statusCode).toBe(200);
-      expect(response.body.data).toBeInstanceOf(Array);
-      expect(response.body.data.length).toBeGreaterThan(0);
+        // ASSERT
+        expect(response.status).toBe(201)
+        expect(response.body.household_username).toBe('Stark')
+        expect(response.body.name_1).toBe('Rob')
+        expect(response.body.name_2).toBe('Catalyn')
+        expect(response.body.email_1).toBe('rob@mail.com')
+        expect(response.body.email_2).toBe('catalyn@mail.com')
+        expect(response.body.household_password).not.toBe('RedWedding') // Because it would be encrypted on successful registration
     });
-  })
 
+    it('should return an error upon unsuccessful registration with status code 400', async () => {
+        
+        // ARRANGE
+        // NOTE: This is only invalid if it has been created beforehand into the database
+        const invalidHousehold = { household_username: 'test', household_password: 'test123', name_1: 'test1', name_2: 'test2', email_1: 'test1@mail.com', email_2: 'test2@mail.com' }
 
-    describe('GET /explanations', () => {
-    it('should return all explanations with a status code 200', async () => {
-      const response = await request(api).get('/explanations');
+        // ACT
+        const response = await request(api).post('/user/register').send(invalidHousehold);
 
-      expect(response.status).toBe(200);
-      expect(response.body.data).toBeInstanceOf(Array);
-      expect(response.body.data.length).toBeGreaterThan(0);
-
+        // ASSERT
+        expect(response.status).toBe(400);
+        expect(response.body).toEqual({ error: 'Unable to create household.' })
     });
-  });
+});
+
+
 
 
   
