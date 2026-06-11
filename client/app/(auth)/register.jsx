@@ -11,8 +11,8 @@ export default function register() {
     email_1: '',
     name_2: '',
     email_2: '',
-    household_name: '',
-    password: '',
+    household_username: '',
+    household_password: '',
   })
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -71,11 +71,11 @@ export default function register() {
 
         <Text style={styles.label}>Household Username</Text>
         <TextInput style={styles.input} placeholder="choose a unique username" placeholderTextColor="#9aa3b0"
-          value={form.household_name} onChangeText={set('household_name')} autoCapitalize="none" />
+          value={form.household_username} onChangeText={set('household_username')} autoCapitalize="none" />
 
         <Text style={styles.label}>Household Password</Text>
         <TextInput style={styles.input} placeholder="choose a password" placeholderTextColor="#9aa3b0"
-          value={form.password} onChangeText={set('password')} secureTextEntry />
+          value={form.household_password} onChangeText={set('household_password')} secureTextEntry />
 
         {success ? <Text style={styles.success}>{success}</Text> : null}
         {error ? <Text style={styles.error}>{error}</Text> : null}

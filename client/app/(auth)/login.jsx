@@ -19,7 +19,7 @@ export default function login() {
       if (data && data.jwt_token) {
         router.replace('/')
       } else {
-        setError('Invalid login details')
+        setError(data?.error || 'Invalid login details')
       }
     } catch (e) {
       setError('Could not reach the server')
