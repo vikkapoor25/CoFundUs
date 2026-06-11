@@ -2,6 +2,10 @@
 const Household = require('../../../models/Household')
 // Import Household Controller for testing
 const householdController = require('../../../controllers/household')
+// Importing bcrypt
+const bcrypt = require('bcrypt')
+// Importing JSON webtoken capabilities
+const jwt = require('jsonwebtoken')
 
 // Mocking response methods
 const mockSend = jest.fn()
@@ -38,6 +42,8 @@ describe('Household Controller', () => {
           const mockReq = { body: { household_username: 'Doe', household_password: 'password1', name_1: 'John', name_2: 'Alice', email_1: 'john@mail.com', email_2: 'alice@mail.com' } };
           const testRegister = { household_id: 1, household_username: 'Doe', household_password: 'hashedPassword', name_1: 'John', name_2: 'Alice', email_1: 'john@mail.com', email_2: 'alice@mail.com' };
 
+          jest.spyOn(bcrypt, 'genSalt').mockResolvedValue('fakeSalt')
+          jest.spyOn(bcrypt, 'hash').mockResolvedValue('hashedPassword')
           jest.spyOn(Household, 'create').mockResolvedValue(testRegister)
 
           // ACT ------------------------------------------------------------
@@ -55,6 +61,8 @@ describe('Household Controller', () => {
           // ARRANGE --------------------------------------------------------
           const mockReq = { body: { household_username: 'Doe', household_password: 'password1', name_1: 'John', name_2: 'Alice', email_1: 'john@mail.com', email_2: 'alice@mail.com' }};
 
+          jest.spyOn(bcrypt, 'genSalt').mockResolvedValue('fakeSalt')
+          jest.spyOn(bcrypt, 'hash').mockResolvedValue('hashedPassword')
           jest.spyOn(Household, 'create').mockRejectedValue(new Error('Unable to create household.'))
           // ACT ------------------------------------------------------------
           await householdController.register(mockReq, mockRes)
@@ -66,6 +74,52 @@ describe('Household Controller', () => {
       })
   })
 
+    // Test suite for login
+    describe('login', () => {
 
+      // Tests successful login
+      it('should return success, name_1, name_2 and jwt_token on successful login with status code 200', async () => {
+
+          // ARRANGE --------------------------------------------------------
+          const mockReq = { body: { household_username: 'Doe', household_password: 'password1' } };
+          const mockHousehold = { household_id: 1, household_username: 'Doe', household_password: 'hashedPassword', name_1: 'John', name_2: 'Alice'
+          };
+
+          jest.spyOn(Household, 'getOneByUsername').mockResolvedValue(mockHousehold);
+          jest.spyOn(bcrypt, 'compare').mockResolvedValue(true);
+          jest.spyOn(jwt, 'sign').mockImplementation((payload, secret, options, callback) => { callback(null, 'fakeJwtToken'); });
+
+          // ACT ------------------------------------------------------------
+          await householdController.login(mockReq, mockRes);
+            
+          // ASSERT ---------------------------------------------------------
+          expect(Household.getOneByUsername).toHaveBeenCalledWith('Doe');
+          expect(bcrypt.compare).toHaveBeenCalledWith('password1', 'hashedPassword');
+          expect(jwt.sign).toHaveBeenCalledWith( { household_username: 'Doe' }, process.env.SECRET_TOKEN, { expiresIn: 3600 }, expect.any(Function));
+          expect(mockStatus).toHaveBeenCalledWith(200);
+          expect(mockJson).toHaveBeenCalledWith({ success: true, jwt_token: 'fakeJwtToken', name_1: 'John', name_2: 'Alice' });
+      });
+
+
+      // Tests unsuccessful login
+      it('should return an error upon unsuccessful login with status code 401', async () => {
+
+          // ARRANGE --------------------------------------------------------
+          const mockReq = { body: { household_username: 'Doe', household_password: 'wrongPassword' } };
+          const mockHousehold = { household_id: 1, household_username: 'Doe', household_password: 'hashedPassword', name_1: 'John', name_2: 'Alice' };
+
+          jest.spyOn(Household, 'getOneByUsername').mockResolvedValue(mockHousehold);
+          jest.spyOn(bcrypt, 'compare').mockResolvedValue(false);
+
+          // ACT ------------------------------------------------------------
+          await householdController.login(mockReq, mockRes);
+            
+          // ASSERT ---------------------------------------------------------
+          expect(Household.getOneByUsername).toHaveBeenCalledWith('Doe');
+          expect(bcrypt.compare).toHaveBeenCalledWith('wrongPassword', 'hashedPassword');
+          expect(mockStatus).toHaveBeenCalledWith(401);
+          expect(mockJson).toHaveBeenCalledWith({ error: 'Household could not be authenticated' });
+      });
+    });
 
 })
