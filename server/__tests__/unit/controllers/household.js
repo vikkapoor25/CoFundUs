@@ -70,7 +70,7 @@ describe('Household Controller', () => {
           // ASSERT ---------------------------------------------------------
           expect(Household.create).toHaveBeenCalledTimes(1)
           expect(mockStatus).toHaveBeenCalledWith(400)
-          expect(mockJson).toHaveBeenCalledWith({ error: 'Unable to create household.' })
+          expect(mockJson).toHaveBeenCalledWith({ error: "Unable to create household. Username already exists or fields are missing." })
       })
   })
 

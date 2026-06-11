@@ -2,6 +2,8 @@ const request = require('supertest')
 const app = require('../../app')
 const { resetTestDB } = require('./config')
 
+// Before Proceeding Ensure Table Structures are in Supabase
+
 describe('Household API Endpoints', () => {
   let api
 
@@ -50,7 +52,7 @@ describe('Household API Endpoints', () => {
 
         // ASSERT
         expect(response.status).toBe(400);
-        expect(response.body).toEqual({ error: 'Unable to create household.' })
+        expect(response.body).toEqual({ error: 'Unable to create household. Username already exists or fields are missing.' })
     });
 });
 
