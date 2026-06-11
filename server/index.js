@@ -1,13 +1,8 @@
-// Loads variables from .env into process.env
 require("dotenv").config();
-
-// Imports configured Express app
 const app = require("./app");
 
-// Uses environment PORT
-const port = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 
-// Starts server
-app.listen(port, () => {
-    console.log(`Server listening on port ${port}`);
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
