@@ -1,12 +1,29 @@
 import { Tabs, useRouter } from 'expo-router'
 import { Image } from 'react-native'
+import colours from '../../constants/colours'
 
 export default function TabsLayout() {
   const router = useRouter()
 
   return (
     <Tabs 
-      screenOptions={{ headerShown: false }}>
+      screenOptions={{ 
+
+        //hide header
+        headerShown: false,
+
+        //add navbar background colour
+        tabBarStyle: {
+          backgroundColor: colours.navBackground,
+        },
+        // inactive tab text colour
+         tabBarInactiveTintColor: colours.inactiveTab,
+        // active  tab text colour
+        tabBarActiveTintColor: colours.activeTab,
+        //
+        
+        
+        }}>
       <Tabs.Screen name="accounts" options={{ title: "Accounts" }} />
       <Tabs.Screen name="bills" options={{ title: "Bills" }} />
       <Tabs.Screen
