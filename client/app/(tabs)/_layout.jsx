@@ -5,7 +5,8 @@ export default function TabsLayout() {
   const router = useRouter()
 
   return (
-    <Tabs screenOptions={{ headerShown: false }}>
+    <Tabs 
+      screenOptions={{ headerShown: false }}>
       <Tabs.Screen name="accounts" options={{ title: "Accounts" }} />
       <Tabs.Screen name="bills" options={{ title: "Bills" }} />
       <Tabs.Screen
