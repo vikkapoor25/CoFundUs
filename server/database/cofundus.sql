@@ -6,7 +6,7 @@ DROP TABLE IF EXISTS household;
 
 CREATE TABLE household (
     household_id INT GENERATED ALWAYS AS IDENTITY,
-    household_username VARCHAR(50) NOT NULL,
+    household_username VARCHAR(50) NOT NULL UNIQUE,
     household_password VARCHAR(100) NOT NULL,
     name_1 VARCHAR(30) NOT NULL,
     name_2 VARCHAR(30) NOT NULL,
