@@ -1,18 +1,29 @@
-import { ScrollView, View, Text, StyleSheet, Modal, TextInput} from 'react-native'
+import { ScrollView, View, Text, StyleSheet, Modal, Pressable, TextInput} from 'react-native'
 import {useState} from 'react';
 import colours from '../../constants/colours'
 import Card from '../../components/Card'
 import AddButton from '../../components/AddButton'
 import AddModal from '../../components/AddModal'
 import Field from '../../components/Field';
+import { createAccount, getAccounts, deleteAccount } from '../../api/bank-accounts';
 
 
 export default function accounts() {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [accountName, setAccountName] = useState('')
-  const [accountBalanace, setAccountBalanace] = useState('')
+  const [accountBalance, setAccountBalance] = useState('')
   const [accountType, setAccountType] = useState('')
+
+
+  async function handleAddAccount() {
+    await createAccount({
+      household_id: 1,
+      account_name: accountName,
+      account_balance: accountBalance,
+      account_type: accountType,
+    });
+  }
 
   return (
     <View style={{ flex: 1 }}>
@@ -69,9 +80,9 @@ export default function accounts() {
         <Field
           label="Account Balance"
           placeholder="Enter your balance"
-          keyboardType="default"
-          value={accountName}
-          onChangeText={setAccountName}
+          keyboardType="numeric"
+          value={accountBalance}
+          onChangeText={setAccountBalance}
         />
         <Field
           label="Account Type"
@@ -80,6 +91,9 @@ export default function accounts() {
           value={accountType}
           onChangeText={setAccountType}
         />
+        <Pressable onPress={handleAddAccount}>
+          <Text>Add Account</Text>
+        </Pressable>
       </AddModal>
     </View>
   )

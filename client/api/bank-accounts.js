@@ -1,4 +1,4 @@
-import { BASE_URL } from '../constants/api'
+const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
 
 // Calls the backend /bank-accounts router.
 
@@ -8,6 +8,7 @@ export async function getAccounts(householdId) {
 }
 
 export async function createAccount(body) {
+  console.log("BASE_URL:", BASE_URL);
   // body: { household_id, account_name, account_balance, account_type }
   const res = await fetch(`${BASE_URL}/bank-accounts/new`, {
     method: 'POST',
