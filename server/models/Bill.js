@@ -2,9 +2,10 @@ const db = require('../database/connect');
 
 class Bill {
 
-    constructor({ household_id, bill_id, account_id, bill_amount, bill_due_date, category, category_type, repeat_bill, payment_frequency, bill_repeat_date, paid, }) {
+    constructor({ household_id, bill_id, bill_name, account_id, bill_amount, bill_due_date, category, category_type, repeat_bill, payment_frequency, bill_repeat_date, paid, }) {
         this.household_id = household_id;
         this.bill_id = bill_id;
+        this.bill_name = bill_name;
         this.account_id = account_id;
         this.bill_amount = bill_amount;
         this.bill_due_date = bill_due_date;
@@ -23,6 +24,7 @@ class Bill {
             SELECT  a.household_id,
                     b.account_id,
                     b.bill_id,
+                    b.bill_name,
                     b.bill_amount,
                     b.bill_due_date,
                     b.category,
@@ -50,6 +52,7 @@ class Bill {
         const response = await db.query(`
             SELECT  b.account_id,
                     b.bill_id,
+                    b.bill_name,
                     b.bill_amount,
                     b.bill_due_date,
                     b.category,
@@ -69,19 +72,20 @@ class Bill {
         return response.rows.map(row => new Bill(row));
     }
 
-    // Creates a new bill
-    static async createBill(data) {
+    // Creates a new bill using account_id
+    static async createBill(request_body) {
+        const today = new Date().toISOString().split("T")[0];
         // Destructures request body
-        const { account_id, bill_name, bill_amount, bill_due_date, category, category_type, repeat_bill, payment_frequency, bill_repeat_date, paid } = data
-        // Checks if bank account exists befoe adding bill
+        const { account_id, bill_name, bill_amount, bill_due_date = today, category, category_type = null, repeat_bill, payment_frequency, bill_repeat_date = null } = request_body
+        // Checks if bank account exists before adding bill
         const existingBankAccount = await db.query("SELECT * FROM accounts WHERE account_id = $1", [account_id]);
         if (existingBankAccount.rows.length === 1) {
             // Creates bill for the bank account using account_id
             const response = await db.query(`
-                INSERT INTO bills (account_id, bill_name, bill_amount, bill_due_date, category, category_type, repeat_bill, payment_frequency, bill_repeat_date, paid) 
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+                INSERT INTO bills (account_id, bill_name, bill_amount, bill_due_date, category, category_type, repeat_bill, payment_frequency, bill_repeat_date) 
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
                 RETURNING *;`, 
-                [account_id, bill_name, bill_amount, bill_due_date, category, category_type, repeat_bill, payment_frequency, bill_repeat_date, paid]);
+                [account_id, bill_name, bill_amount, bill_due_date, category, category_type, repeat_bill, payment_frequency, bill_repeat_date]);
             // Returns created bill
             return new Bill(response.rows[0]);
         } else {
@@ -89,35 +93,48 @@ class Bill {
         }
     }
 
-    // Updates a Bill
-    async updateBill(bill_id) {
+    // Updates a Bill using bill_id
+    static async updateBill(request_body) {
+        const today = new Date().toISOString().split("T")[0];
+        // Destructures request body
+        const { bill_id, bill_name, bill_amount, bill_due_date = today, bill_repeat_date = null } = request_body
         // Updates capital using SQL UPDATE
         const response = await db.query(`UPDATE bills
-            SET account_id = $1,
+            SET bill_name = $1,
                 bill_amount = $2,
                 bill_due_date = $3,
-                category = $4,
-                category_type = $5,
-                repeat_bill = $6,
-                payment_frequency = $7,
-                bill_repeat_date = $8,
-                paid = $9
-            WHERE bill_id = $10
-            RETURNING *;`, [this.account_id, this.bill_amount, this.bill_due_date, this.category, this.category_type, this.repeat_bill, this.payment_frequency, this.bill_repeat_date, this.paid, bill_id.bill_id ]);
+                bill_repeat_date = $4
+            WHERE bill_id = $5
+            RETURNING *;`, [bill_name, bill_amount, bill_due_date, bill_repeat_date, bill_id ]);
         if (response.rows.length !== 1) {
             throw new Error("Unable to update bill.");
         }
         return new Bill(response.rows[0]);
     }
 
-    // Deletes a Bill
-    async deleteBill() {
-        // Deletes country from database
-        const response = await db.query("DELETE FROM country WHERE name = $1 RETURNING *;", [this.name]);
+    static async billPaid(request_body) {
+        const { bill_id } = request_body
+        const response = await db.query(`UPDATE bills
+            SET paid = true
+            WHERE bill_id = $1
+            RETURNING paid;`, [bill_id ]);
         if (response.rows.length !== 1) {
-            throw new Error("Unable to delete country.");
+            throw new Error("Unable to mark bill as paid.");
         }
-        return new Country(response.rows[0]);
+        return response.rows[0];
     }
 
+    // Deletes a Bill using bill_id
+    static async deleteBill(data) {
+        const { bill_id } = data
+        // Deletes bill from database
+        const response = await db.query("DELETE FROM bills WHERE bill_id = $1 RETURNING *;", [bill_id]);
+        if (response.rows.length !== 1) {
+            throw new Error("Unable to delete bill.");
+        }
+        return new Bill(response.rows[0]);
+    }
 }
+
+// Exports Bill class
+module.exports = Bill;
