@@ -9,9 +9,9 @@ const Bill = require("../models/Bill");
 async function getAllHouseholdBillsController(req, res) {
     try {
         // Gets all Bills from a household with getAllHouseholdBills() from models
-        const Bills = await Bill.getAllHouseholdBills(req.body);
+        const bills = await Bill.getAllHouseholdBills(req.body);
         // Sends success response
-        res.status(200).json(Bills);
+        res.status(200).json(bills);
     } catch (err) {
         // Sends server error response
         res.status(500).json({ error: err.message });
@@ -26,9 +26,9 @@ async function getAllHouseholdBillsController(req, res) {
 async function getAllBankAccountBillsController(req, res) {
     try {
         // Gets all Bills from an account with getAllBankAccountBills() from models
-        const Bills = await Bill.getAllBankAccountBills(req.body);
+        const bills = await Bill.getAllBankAccountBills(req.body);
         // Sends success response
-        res.status(200).json(Bills);
+        res.status(200).json(bills);
     } catch (err) {
         // Sends server error response
         res.status(500).json({ error: err.message });
@@ -118,7 +118,7 @@ async function billPaidController(req, res) {
 //              }
 async function deleteBillController(req, res) {
     try {
-        // Updates paid in specific bill as true with billPaid() from models
+        // Deletes bill with deleteBill from models
         const deleteBill = await Bill.deleteBill(req.body);
         // Sends success response with no body
         res.status(204).end();
@@ -128,4 +128,10 @@ async function deleteBillController(req, res) {
 }
 
 // Exports controller functions
-module.exports = { getAllHouseholdBillsController, getAllBankAccountBillsController, createBillController, updateBillController, deleteBillController };
+module.exports = { 
+    getAllHouseholdBillsController, 
+    getAllBankAccountBillsController, 
+    createBillController, 
+    updateBillController, 
+    billPaidController, 
+    deleteBillController };
