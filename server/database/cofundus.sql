@@ -21,7 +21,7 @@ CREATE TABLE accounts (
     account_name VARCHAR(50) NOT NULL,
     account_balance INT NOT NULL,
     account_type VARCHAR(50) NOT NULL,
-    allocated_to_goal INT NOT NULL,
+    allocated_to_goal INT,
     PRIMARY KEY (account_id),
     FOREIGN KEY (household_id) REFERENCES household(household_id)
 );
@@ -32,7 +32,7 @@ CREATE TABLE goals (
     goal_name VARCHAR(50) NOT NULL,
     goal_amount INT NOT NULL,
     current_value INT NOT NULL,
-    target_date DATE NOT NULL,
+    target_date DATE,
     PRIMARY KEY (goal_id),
     FOREIGN KEY (household_id) REFERENCES household(household_id)
 );
@@ -58,8 +58,8 @@ CREATE TABLE bills (
     category VARCHAR(50) NOT NULL,
     category_type VARCHAR(50) NOT NULL,
     repeat_bill BOOLEAN NOT NULL,
-    payment_frequency VARCHAR(50) NOT NULL,
-    bill_repeat_date DATE NOT NULL,
+    payment_frequency VARCHAR(50),
+    bill_repeat_date DATE,
     paid BOOLEAN NOT NULL,
     PRIMARY KEY (bill_id),
     FOREIGN KEY (account_id) REFERENCES accounts(account_id)
@@ -93,6 +93,12 @@ INSERT INTO accounts (
     20000,
     'shared',
     200
+), (
+    1,
+    'savings',
+    5000,
+    'personal',
+    0
 );
 
 INSERT INTO goals (

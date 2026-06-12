@@ -1,6 +1,7 @@
-const express = require('express');
+const express = require("express");
 const cors = require('cors');
-const householdRouter = require('./routes/household');
+const householdRouter = require("./routes/household");
+const accountsRouter = require("./routes/accounts");
 
 const app = express();
 
@@ -15,5 +16,6 @@ app.get("/", (req, res) => {
 })
 
 app.use("/user", householdRouter);
+app.use("/bank-accounts", accountsRouter);
 
 module.exports = app;
