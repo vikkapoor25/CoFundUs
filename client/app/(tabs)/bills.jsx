@@ -1,112 +1,196 @@
-import { ScrollView, View, Text, StyleSheet, Modal} from 'react-native'
-import {useState} from 'react';
+import { ScrollView, View, Text, StyleSheet, Pressable } from 'react-native'
+import { useState } from 'react'
 import colours from '../../constants/colours'
 import Card from '../../components/Card'
 import AddButton from '../../components/AddButton'
 import AddModal from '../../components/AddModal'
+import Field from '../../components/Field'
 
+const SECTIONS = [
+  { key: 'recurring', title: 'Recurring Bills' },
+  { key: 'subscription', title: 'Subscriptions' },
+  { key: 'one-time', title: 'One-Time Bills' },
+]
 
+const SEED_BILLS = [
+  { bill_id: 1, account: 'Sam', bill_name: 'EE Phone Bill', bill_amount: 16, bill_due_date: '14/06', category_type: 'recurring', paid: false },
+  { bill_id: 2, account: 'Shared', bill_name: 'Rent', bill_amount: 1500, bill_due_date: '01/07', category_type: 'recurring', paid: false },
+  { bill_id: 3, account: 'Shared', bill_name: 'Electricity & Gas', bill_amount: 120, bill_due_date: '02/07', category_type: 'recurring', paid: false },
+  { bill_id: 4, account: 'Alex', bill_name: 'Netflix', bill_amount: 10, bill_due_date: '11/06', category_type: 'subscription', paid: false },
+  { bill_id: 5, account: 'Alex', bill_name: 'Spotify', bill_amount: 12, bill_due_date: '03/06', category_type: 'subscription', paid: true },
+  { bill_id: 6, account: 'Shared', bill_name: 'Concert Tickets', bill_amount: 120, bill_due_date: '14/07', category_type: 'one-time', paid: false },
+  { bill_id: 7, account: 'Alex', bill_name: 'Car Repair', bill_amount: 180, bill_due_date: '20/06', category_type: 'one-time', paid: false },
+]
 
 export default function bills() {
+  const [bills, setBills] = useState(SEED_BILLS)
+  const [modalVisible, setModalVisible] = useState(false)
 
-  const [modalVisible, setModalVisible] = useState(false);
+  const [billName, setBillName] = useState('')
+  const [amount, setAmount] = useState('')
+  const [account, setAccount] = useState('')
+  const [dueDate, setDueDate] = useState('')
+  const [type, setType] = useState('recurring')
+
+  function resetForm() {
+    setBillName('')
+    setAmount('')
+    setAccount('')
+    setDueDate('')
+    setType('recurring')
+  }
+
+  function handleAddBill() {
+    if (!billName || !amount) return
+    const newBill = {
+      bill_id: Date.now(),
+      account: account || 'Shared',
+      bill_name: billName,
+      bill_amount: Number(amount) || 0,
+      bill_due_date: dueDate || '--/--',
+      category_type: type,
+      paid: false,
+    }
+    setBills((current) => [...current, newBill])
+    resetForm()
+    setModalVisible(false)
+  }
+
+  function togglePaid(bill_id) {
+    setBills((current) =>
+      current.map((b) => (b.bill_id === bill_id ? { ...b, paid: !b.paid } : b))
+    )
+  }
+
+  function removeBill(bill_id) {
+    setBills((current) => current.filter((b) => b.bill_id !== bill_id))
+  }
 
   return (
     <View style={{ flex: 1 }}>
       <ScrollView style={styles.screen} contentContainerStyle={styles.body}>
-        <Text style={styles.heading}>Bills</Text>
-
-        <View style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.heading}>Bills</Text>
           <AddButton onPress={() => setModalVisible(true)} />
         </View>
 
-        <Card title="Upcoming Bills">
-          <View style={styles.row}>
-            <Text style={[styles.cell, styles.head]}>Days Left</Text>
-            <Text style={[styles.cell, styles.head]}>Payment</Text>
-            <Text style={[styles.cell, styles.head]}>Account</Text>
-            <Text style={[styles.cell, styles.head, styles.rightCell]}>Amount</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.cell}>2 days</Text>
-            <Text style={styles.cell}>EE Phone Bill</Text>
-            <Text style={styles.cell}>Sam</Text>
-            <Text style={[styles.cell, styles.rightCell]}>£16</Text>
-          </View>
-        </Card>
-
-        <Card title="Subscriptions">
-          <View style={styles.row}>
-            <Text style={[styles.cell, styles.head]}>Payment</Text>
-            <Text style={[styles.cell, styles.head]}>Amount</Text>
-            <Text style={[styles.cell, styles.head]}>Account</Text>
-            <Text style={[styles.cell, styles.head, styles.rightCell]}>Due</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.cell}>Rent</Text>
-            <Text style={styles.cell}>£1,500</Text>
-            <Text style={styles.cell}>Shared</Text>
-            <Text style={[styles.cell, styles.rightCell]}>01/07</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.cell}>Electricity & Gas</Text>
-            <Text style={styles.cell}>£120</Text>
-            <Text style={styles.cell}>Shared</Text>
-            <Text style={[styles.cell, styles.rightCell]}>02/07</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.cell}>Netflix</Text>
-            <Text style={styles.cell}>£10</Text>
-            <Text style={styles.cell}>Alex</Text>
-            <Text style={[styles.cell, styles.rightCell]}>11/06</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.cell}>Spotify</Text>
-            <Text style={styles.cell}>£12</Text>
-            <Text style={styles.cell}>Alex</Text>
-            <Text style={[styles.cell, styles.rightCell]}>03/06</Text>
-          </View>
-        </Card>
-
-        <Card title="One-Time Bills">
-          <View style={styles.row}>
-            <Text style={[styles.cell, styles.head]}>Payment</Text>
-            <Text style={[styles.cell, styles.head]}>Amount</Text>
-            <Text style={[styles.cell, styles.head]}>Account</Text>
-            <Text style={[styles.cell, styles.head, styles.rightCell]}>Date</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.cell}>Concert Tickets</Text>
-            <Text style={styles.cell}>£120</Text>
-            <Text style={styles.cell}>Shared</Text>
-            <Text style={[styles.cell, styles.rightCell]}>14/07</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.cell}>Car Repair</Text>
-            <Text style={styles.cell}>£180</Text>
-            <Text style={styles.cell}>Alex</Text>
-            <Text style={[styles.cell, styles.rightCell]}>20/06</Text>
-          </View>
-        </Card>
+        {SECTIONS.map((section) => {
+          const sectionBills = bills.filter((b) => b.category_type === section.key)
+          return (
+            <Card key={section.key} title={section.title}>
+              {sectionBills.length === 0 ? (
+                <Text style={styles.empty}>No bills yet</Text>
+              ) : (
+                sectionBills.map((bill) => (
+                  <View key={bill.bill_id} style={styles.bill}>
+                    <View style={styles.billLeft}>
+                      <Text style={[styles.billName, bill.paid && styles.paidText]}>
+                        {bill.bill_name}
+                      </Text>
+                      <Text style={styles.billMeta}>
+                        {bill.account} · due {bill.bill_due_date}
+                        {bill.paid ? ' · Paid' : ''}
+                      </Text>
+                      <View style={styles.actions}>
+                        <Pressable onPress={() => togglePaid(bill.bill_id)}>
+                          <Text style={styles.actionPaid}>
+                            {bill.paid ? 'Mark unpaid' : 'Mark paid'}
+                          </Text>
+                        </Pressable>
+                        <Pressable onPress={() => removeBill(bill.bill_id)}>
+                          <Text style={styles.actionDelete}>Delete</Text>
+                        </Pressable>
+                      </View>
+                    </View>
+                    <Text style={[styles.amount, bill.paid && styles.paidText]}>
+                      £{Number(bill.bill_amount).toLocaleString()}
+                    </Text>
+                  </View>
+                ))
+              )}
+            </Card>
+          )
+        })}
       </ScrollView>
 
-      <AddModal
-        title="Add A Bill"
-        visible={modalVisible}
-        setVisible={setModalVisible}
-      />
+      <AddModal title="Add A Bill" visible={modalVisible} setVisible={setModalVisible}>
+        <View style={styles.form}>
+          <Field
+            label="Bill Name"
+            placeholder="e.g. Netflix"
+            value={billName}
+            onChangeText={setBillName}
+          />
+          <Field
+            label="Amount"
+            placeholder="e.g. 12"
+            keyboardType="numeric"
+            value={amount}
+            onChangeText={setAmount}
+          />
+          <Field
+            label="Account"
+            placeholder="e.g. Alex, Sam, Shared"
+            value={account}
+            onChangeText={setAccount}
+          />
+          <Field
+            label="Due Date"
+            placeholder="DD/MM"
+            value={dueDate}
+            onChangeText={setDueDate}
+          />
 
+          <Text style={styles.typeLabel}>Type</Text>
+          <View style={styles.typeRow}>
+            {SECTIONS.map((s) => (
+              <Pressable
+                key={s.key}
+                onPress={() => setType(s.key)}
+                style={[styles.chip, type === s.key && styles.chipActive]}
+              >
+                <Text style={[styles.chipText, type === s.key && styles.chipTextActive]}>
+                  {s.title}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+
+          <Pressable style={styles.submit} onPress={handleAddBill}>
+            <Text style={styles.submitText}>Add Bill</Text>
+          </Pressable>
+        </View>
+      </AddModal>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colours.background },
-  container: {left: 305,bottom: 30},
   body: { padding: 16, paddingTop: 60 },
-  heading: { fontSize: 24, fontWeight: '800', color: colours.pageHeader, marginBottom: 16 },
-  row: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#eef1f5' },
-  cell: { flex: 1, fontSize: 12, color: '#3f4856' },
-  head: { fontWeight: '700', color: '#7a8794', fontSize: 11 },
-  rightCell: { textAlign: 'right' },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
+  heading: { fontSize: 24, fontWeight: '800', color: colours.pageHeader },
+  empty: { fontSize: 13, color: '#9aa3b0', paddingVertical: 6 },
+
+  bill: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#eef1f5' },
+  billLeft: { flex: 1, paddingRight: 12 },
+  billName: { fontSize: 14, fontWeight: '700', color: '#2f3a48' },
+  billMeta: { fontSize: 12, color: '#7a8794', marginTop: 2 },
+  amount: { fontSize: 14, fontWeight: '700', color: '#2f3a48' },
+  paidText: { color: '#9aa3b0', textDecorationLine: 'line-through' },
+
+  actions: { flexDirection: 'row', gap: 16, marginTop: 6 },
+  actionPaid: { fontSize: 12, fontWeight: '600', color: colours.cardTitle },
+  actionDelete: { fontSize: 12, fontWeight: '600', color: '#d1495b' },
+
+  form: { width: 260 },
+  typeLabel: { fontSize: 12, color: '#55626d', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 },
+  typeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 18 },
+  chip: { borderWidth: 1, borderColor: '#d7dee6', borderRadius: 16, paddingVertical: 6, paddingHorizontal: 12 },
+  chipActive: { backgroundColor: colours.cardTitle, borderColor: colours.cardTitle },
+  chipText: { fontSize: 12, color: '#55626d' },
+  chipTextActive: { color: '#fff', fontWeight: '700' },
+
+  submit: { backgroundColor: colours.cardTitle, borderRadius: 10, height: 46, alignItems: 'center', justifyContent: 'center' },
+  submitText: { color: '#fff', fontWeight: '700', fontSize: 15 },
 })
