@@ -16,7 +16,7 @@ async function register(req, res) {
   
       res.status(201).send(result);
     } catch (err) {
-      res.status(400).json({ error: 'Unable to create household. Username already exists or fields are missing.' });
+      res.status(400).json({ error: 'Unable to create household.' });
     }
 }
 
