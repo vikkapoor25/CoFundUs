@@ -134,4 +134,5 @@ module.exports = {
     createBillController, 
     updateBillController, 
     billPaidController, 
-    deleteBillController };
+    deleteBillController 
+};
