@@ -39,6 +39,7 @@ CREATE TABLE goals (
 
 CREATE TABLE income (
     income_id INT GENERATED ALWAYS AS IDENTITY,
+    income_name VARCHAR(50) NOT NULL,
     account_id INT NOT NULL,
     income_amount INT NOT NULL,
     payment_date DATE NOT NULL,
@@ -52,6 +53,7 @@ CREATE TABLE income (
 
 CREATE TABLE bills (
     bill_id INT GENERATED ALWAYS AS IDENTITY,
+    bill_name VARCHAR(50) NOT NULL,
     account_id INT NOT NULL,
     bill_amount INT NOT NULL,
     bill_due_date DATE NOT NULL,
