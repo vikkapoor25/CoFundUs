@@ -18,7 +18,10 @@ class Bill {
     }
 
     // Gets all bills for a household
-    static async getAllHouseholdBills(household_id) {
+    static async getAllHouseholdBills(request_body) {
+        // Defining request body to take household_id
+        const { household_id } = request_body
+
         // Runs SQL query: Gets all bills for a household by household_id
         const response = await db.query(`
             SELECT  a.household_id,
@@ -47,7 +50,11 @@ class Bill {
     }
 
     // Gets all bills for a bank account
-    static async getAllBankAccountBills(account_id) {
+    static async getAllBankAccountBills(request_body) {
+
+        // Defining request body to take account_id
+        const { account_id } = request_body
+
         // Runs SQL query: Gets all bills for a bank account by account_id
         const response = await db.query(`
             SELECT  b.account_id,
