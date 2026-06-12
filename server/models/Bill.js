@@ -72,16 +72,16 @@ class Bill {
     // Creates a new bill
     static async createBill(data) {
         // Destructures request body
-        const { account_id, bill_amount, bill_due_date, category, category_type, repeat_bill, payment_frequency, bill_repeat_date, paid } = data
+        const { account_id, bill_name, bill_amount, bill_due_date, category, category_type, repeat_bill, payment_frequency, bill_repeat_date, paid } = data
         // Checks if bank account exists befoe adding bill
         const existingBankAccount = await db.query("SELECT * FROM accounts WHERE account_id = $1", [account_id]);
         if (existingBankAccount.rows.length === 1) {
             // Creates bill for the bank account using account_id
             const response = await db.query(`
-                INSERT INTO bills (account_id, bill_amount, bill_due_date, category, category_type, repeat_bill, payment_frequency, bill_repeat_date, paid) 
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                INSERT INTO bills (account_id, bill_name, bill_amount, bill_due_date, category, category_type, repeat_bill, payment_frequency, bill_repeat_date, paid) 
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
                 RETURNING *;`, 
-                [account_id, bill_amount, bill_due_date, category, category_type, repeat_bill, payment_frequency, bill_repeat_date, paid]);
+                [account_id, bill_name, bill_amount, bill_due_date, category, category_type, repeat_bill, payment_frequency, bill_repeat_date, paid]);
             // Returns created bill
             return new Bill(response.rows[0]);
         } else {

@@ -56,13 +56,13 @@ CREATE TABLE bills (
     bill_name VARCHAR(50) NOT NULL,
     account_id INT NOT NULL,
     bill_amount INT NOT NULL,
-    bill_due_date DATE NOT NULL,
+    bill_due_date DATE DEFAULT CURRENT_DATE,
     category VARCHAR(50) NOT NULL,
-    category_type VARCHAR(50) NOT NULL,
+    category_type VARCHAR(50),
     repeat_bill BOOLEAN NOT NULL,
     payment_frequency VARCHAR(50),
     bill_repeat_date DATE,
-    paid BOOLEAN NOT NULL,
+    paid BOOLEAN DEFAULT false,
     PRIMARY KEY (bill_id),
     FOREIGN KEY (account_id) REFERENCES accounts(account_id)
 );
