@@ -3,10 +3,10 @@ import colours from '../constants/colours'
 
 
 
-export default function AddButton({onPress} ) {
+export default function AddButton({onPress, title} ) {
   return (
     <Pressable onPress={onPress} style={styles.button}>
-      <Text style={styles.add}>+</Text>
+      <Text style={styles.add}>{title}</Text>
     </Pressable>
   );
 }

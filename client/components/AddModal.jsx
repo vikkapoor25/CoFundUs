@@ -13,7 +13,7 @@ export default function AddModal({ title, visible, setVisible, children }) {
         <View style={styles.centeredView}>
             <View style={styles.modalView}>
               <Text style={styles.modalText}>{title}</Text>
-              <View>{children}</View>
+              {children}
               <Pressable
                 onPress={() => setVisible(!visible)}>
                 <Text style={styles.textStyle}>Close</Text>
@@ -35,7 +35,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 20,
     padding: 35,
-    alignItems: 'center',
+    width: '90%',
+    alignItems: 'stretch',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,

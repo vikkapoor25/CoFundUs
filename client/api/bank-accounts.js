@@ -1,6 +1,14 @@
 const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
 
 // Calls the backend /bank-accounts router.
+export async function addIncome(bank_account_id) {
+  const res = await fetch(`${BASE_URL}/bank-accounts/?`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+  return res.json()
+}
 
 export async function getAccounts(householdId) {
   const res = await fetch(`${BASE_URL}/bank-accounts/${householdId}`)
@@ -8,7 +16,6 @@ export async function getAccounts(householdId) {
 }
 
 export async function createAccount(body) {
-  console.log("BASE_URL:", BASE_URL);
   // body: { household_id, account_name, account_balance, account_type }
   const res = await fetch(`${BASE_URL}/bank-accounts/new`, {
     method: 'POST',
