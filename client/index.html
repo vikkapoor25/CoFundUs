@@ -1,0 +1,27 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <script>
+    function defineMetabaseConfig(config) {
+      window.metabaseConfig = config;
+    }
+
+    defineMetabaseConfig({
+      theme: {
+        colors: {
+          brand: "hsla(208, 72%, 60%, 1.00)",
+          background: "hsla(0, 0%, 100%, 1.00)"
+        }
+      },
+      isGuest: true,
+      instanceUrl: "https://vivid-abaft.metabaseapp.com"
+    });
+  </script>
+
+  <script defer src="https://vivid-abaft.metabaseapp.com/app/embed.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+</body>
+</html>

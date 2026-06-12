@@ -15,7 +15,6 @@ export default function AddModal({ title, visible, setVisible, children }) {
               <Text style={styles.modalText}>{title}</Text>
               <View>{children}</View>
               <Pressable
-                style={[styles.button, styles.buttonClose]}
                 onPress={() => setVisible(!visible)}>
                 <Text style={styles.textStyle}>Close</Text>
               </Pressable>
@@ -46,16 +45,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
-  button: {
-    borderRadius: 20,
-    padding: 10,
-    elevation: 2,
-  },
-  buttonClose: {
-    backgroundColor: '#2196F3',
-  },
   textStyle: {
-    color: 'white',
     fontWeight: 'bold',
     textAlign: 'center',
   },

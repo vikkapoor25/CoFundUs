@@ -5,6 +5,7 @@ import Card from '../../components/Card'
 import AddButton from '../../components/AddButton'
 import AddModal from '../../components/AddModal'
 import Field from '../../components/Field';
+import MetabaseScreen from '../../components/Data'
 import { createAccount, getAccounts, deleteAccount } from '../../api/bank-accounts';
 
 
@@ -17,12 +18,19 @@ export default function accounts() {
 
 
   async function handleAddAccount() {
+    if (!accountName || !accountBalance || !accountType) {
+      alert("Please fill in all fields");
+      return;
+    }
+
     await createAccount({
       household_id: 1,
       account_name: accountName,
       account_balance: accountBalance,
       account_type: accountType,
     });
+
+    setModalVisible(false);
   }
 
   return (
@@ -41,6 +49,10 @@ export default function accounts() {
               <Text style={styles.value}>£11,000</Text>
             </View>
           </Card>
+
+          <View style={styles.metabaseBox}>
+            <MetabaseScreen />
+          </View>
 
           <Card title="Personal Goals">
             <View style={styles.row}>
@@ -91,8 +103,8 @@ export default function accounts() {
           value={accountType}
           onChangeText={setAccountType}
         />
-        <Pressable onPress={handleAddAccount}>
-          <Text>Add Account</Text>
+        <Pressable style={[styles.button, styles.buttonClose]} onPress={handleAddAccount}>
+          <Text style={styles.textStyle}>Add Account</Text>
         </Pressable>
       </AddModal>
     </View>
@@ -100,6 +112,12 @@ export default function accounts() {
 }
 
 const styles = StyleSheet.create({
+  metabaseBox: {
+    height: 400,  
+    marginVertical: 16,
+    borderRadius: 12,
+    overflow: "hidden"
+  },
   screen: { flex: 1, backgroundColor: colours.background },
   container: {left: 305,bottom: 30},
   body: { padding: 16, paddingTop: 60 },
@@ -110,4 +128,17 @@ const styles = StyleSheet.create({
   net: { color: '#16a34a', fontWeight: '700', marginTop: 8 },
   track: { height: 12, borderRadius: 8, backgroundColor: '#e3e9f0', overflow: 'hidden', marginTop: 8 },
   fill: { height: '100%', backgroundColor: '#4a7ec2', borderRadius: 8 },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+    marginBottom: 20,
+    backgroundColor: '#4a7ec2',
+    alignSelf: 'center'
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  }
 })
