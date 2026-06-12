@@ -1,5 +1,4 @@
 import { View, Text, TextInput, StyleSheet } from 'react-native'
-import { Picker } from '@react-native-picker/picker'
 
 export default function Field({ label, value, onChangeText, placeholder, keyboardType }) {
   return (

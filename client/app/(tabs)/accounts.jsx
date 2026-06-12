@@ -38,7 +38,7 @@ export default function accounts() {
       category: category,
       income_repeat_date: date,
     });
-    setModalVisible(false);
+    setActiveModal(null);
   }
 
   async function handleAddAccount() {
@@ -52,7 +52,7 @@ export default function accounts() {
       account_balance: accountBalance,
       account_type: accountType,
     });
-    setModalVisible(false);
+    setActiveModal(null);
   }
 
   return (
