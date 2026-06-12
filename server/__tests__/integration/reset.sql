@@ -1,4 +1,4 @@
-TRUNCATE TABLE bills, income, goals, accounts, household RESTART IDENTITY;
+TRUNCATE TABLE bills, income, goals, accounts, household RESTART IDENTITY CASCADE;
 
 INSERT INTO household (
     household_username,
