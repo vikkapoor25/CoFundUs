@@ -1,7 +1,7 @@
 const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
 
 // Calls the backend /bank-accounts router.
-export async function addIncome(bank_account_id) {
+export async function addIncome(body) {
   const res = await fetch(`${BASE_URL}/bank-accounts/?`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
