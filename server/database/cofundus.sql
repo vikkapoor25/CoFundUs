@@ -45,7 +45,7 @@ CREATE TABLE income (
     payment_date DATE NOT NULL,
     category VARCHAR(50) NOT NULL,
     repeat_income BOOLEAN NOT NULL,
-    payment_frequency VARCHAR(50) NOT NULL,
+    income_frequency VARCHAR(50) NOT NULL,
     income_repeat_date DATE NOT NULL,
     PRIMARY KEY (income_id),
     FOREIGN KEY (account_id) REFERENCES accounts(account_id)
