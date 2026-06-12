@@ -32,4 +32,17 @@ async function deleteBankAccount(req, res) {
   }
 }
 
-module.exports = { createBankAccount, deleteBankAccount };
+async function getAccountsByHousehold(req, res) {
+  try {
+    const accounts = await BankAccount.getByHouseholdId(req.params.household_id);
+    res.status(200).json(accounts);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
+module.exports = {
+  createBankAccount,
+  deleteBankAccount,
+  getAccountsByHousehold,
+};
