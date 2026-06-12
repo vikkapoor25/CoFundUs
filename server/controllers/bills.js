@@ -6,10 +6,10 @@ const Bill = require("../models/Bill");
 //              { 
 //                  "household_id": 1 
 //              }
-async function index(req, res) {
+async function getAllHouseholdBillsController(req, res) {
     try {
-        // Gets all Bills from model with getAll() from models
-        const Bills = await Bill.getAll();
+        // Gets all Bills from a household with getAllHouseholdBills() from models
+        const Bills = await Bill.getAllHouseholdBills(req.body);
         // Sends success response
         res.status(200).json(Bills);
     } catch (err) {
@@ -23,17 +23,15 @@ async function index(req, res) {
 //              { 
 //                  "account_id":  1 
 //              }
-async function show(req, res) {
+async function getAllBankAccountBillsController(req, res) {
     try {
-        // Gets route parameter
-        const name = req.params.name;
-        // Finds country with getOneCountryByName() from models
-        const country = await Bill.getOneByCountryName(name);
+        // Gets all Bills from an account with getAllBankAccountBills() from models
+        const Bills = await Bill.getAllBankAccountBills(req.body);
         // Sends success response
-        res.status(200).json(country);
+        res.status(200).json(Bills);
     } catch (err) {
-        // Sends not found response
-        res.status(404).json({ error: err.message });
+        // Sends server error response
+        res.status(500).json({ error: err.message });
     }
 }
 
@@ -56,14 +54,12 @@ async function show(req, res) {
 //       - category_type -> null
 //       - bill_repeat_date -> null
 // NOTE: paid is automatically assigned FALSE by the database
-async function create(req, res) {
+async function createBillController(req, res) {
     try {
-        // Gets request body
-        const data = req.body;
-        // Creates country with create() from models
-        const newCountry = await Bill.create(data);
+        // Creates bill with createBill() from models
+        const newBill = await Bill.createBill(req.body);
         // Sends created response
-        res.status(201).json(newCountry);
+        res.status(201).json(newBill);
     } catch (err) {
         // Sends bad request response
         res.status(400).json({ error: err.message });
@@ -83,16 +79,12 @@ async function create(req, res) {
 //       Default Values:
 //       - bill_due_date -> today's date
 //       - bill_repeat_date -> null
-async function update(req, res) {
+async function updateBillController(req, res) {
     try {
-        const name = req.params.name;
-        const data = req.body;
-        // Finds existing country with getOneCountryByName() from models
-        const country = await Bill.getOneByCountryName(name);
-        // Updates country with update() from models
-        const result = await country.update(data);
+        // Updates bill with updateBill() from models
+        const updateBill = await Bill.updateBill(req.body);
         // Sends updated response
-        res.status(200).json(result);
+        res.status(200).json(updateBill);
     } catch (err) {
         res.status(404).json({ error: err.message });
     }
@@ -108,16 +100,12 @@ async function update(req, res) {
 //              {
 //                  "paid": true
 //              }
-async function update(req, res) {
+async function billPaidController(req, res) {
     try {
-        const name = req.params.name;
-        const data = req.body;
-        // Finds existing country with getOneCountryByName() from models
-        const country = await Bill.getOneByCountryName(name);
-        // Updates country with update() from models
-        const result = await country.update(data);
+        // Updates paid in specific bill as true with billPaid() from models
+        const updateBillPaid = await Bill.billPaid(req.body);
         // Sends updated response
-        res.status(200).json(result);
+        res.status(200).json(updateBillPaid);
     } catch (err) {
         res.status(404).json({ error: err.message });
     }
@@ -128,13 +116,10 @@ async function update(req, res) {
 //              {
 //                  "bill_id": 1
 //              }
-async function destroy(req, res) {
+async function deleteBillController(req, res) {
     try {
-        const name = req.params.name;
-        // Finds existing country with getOneCountryByName() from models
-        const country = await Bill.getOneByCountryName(name);
-        // Deletes country with destroy() from models
-        await country.destroy();
+        // Updates paid in specific bill as true with billPaid() from models
+        const deleteBill = await Bill.deleteBill(req.body);
         // Sends success response with no body
         res.status(204).end();
     } catch (err) {
@@ -143,4 +128,4 @@ async function destroy(req, res) {
 }
 
 // Exports controller functions
-module.exports = { index, show, create, update, destroy };
+module.exports = { getAllHouseholdBillsController, getAllBankAccountBillsController, createBillController, updateBillController, deleteBillController };
