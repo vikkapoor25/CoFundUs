@@ -50,7 +50,7 @@ INSERT INTO income (
     payment_date,
     category,
     repeat_income,
-    payment_frequency,
+    income_frequency,
     income_repeat_date
 ) VALUES (
     1,
