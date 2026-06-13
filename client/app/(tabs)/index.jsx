@@ -7,7 +7,6 @@ export default function home() {
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.body}>
       <Text style={styles.heading}>Hi Sam and Alex!</Text>
-
       <Card title="My Account">
         <View style={styles.row}>
           <Text style={styles.label}>Income</Text>

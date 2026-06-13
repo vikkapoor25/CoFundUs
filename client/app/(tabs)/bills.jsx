@@ -14,10 +14,8 @@ export default function bills() {
   return (
     <View style={{ flex: 1 }}>
       <ScrollView style={styles.screen} contentContainerStyle={styles.body}>
-        <Text style={styles.heading}>Bills</Text>
-
         <View style={styles.container}>
-          <AddButton onPress={() => setModalVisible(true)} />
+          <AddButton title="+"onPress={() => setModalVisible(true)} />
         </View>
 
         <Card title="Upcoming Bills">
@@ -104,7 +102,6 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colours.background },
   container: {left: 305,bottom: 30},
   body: { padding: 16, paddingTop: 60 },
-  heading: { fontSize: 24, fontWeight: '800', color: colours.pageHeader, marginBottom: 16 },
   row: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#eef1f5' },
   cell: { flex: 1, fontSize: 12, color: '#3f4856' },
   head: { fontWeight: '700', color: '#7a8794', fontSize: 11 },

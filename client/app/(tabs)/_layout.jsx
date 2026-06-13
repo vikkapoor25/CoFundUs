@@ -1,51 +1,136 @@
-import { Tabs, useRouter } from 'expo-router'
-import { Image } from 'react-native'
-import colours from '../../constants/colours'
+import { Tabs, useRouter } from "expo-router"
+import { Ionicons } from "@expo/vector-icons"
+import { Image } from "react-native"
+import colours from "../../constants/colours"
 
 export default function TabsLayout() {
   const router = useRouter()
 
   return (
-    <Tabs 
-      screenOptions={{ 
+    <Tabs
+      screenOptions={{
+        headerShown: true,
 
-        //hide header
-        headerShown: false,
-
-        //add navbar background colour
-        tabBarStyle: {
-          backgroundColor: colours.navBackground,
+        //header styling
+        headerStyle: {
+          backgroundColor: "white",
+          height: 110,
         },
-        // inactive tab text colour
-         tabBarInactiveTintColor: colours.inactiveTab,
-        // active  tab text colour
+        headerTitleStyle: {
+          color: colours.pageHeader,
+          fontWeight: "700",
+          fontSize: 25,
+        },
+        headerTitleAlign: "center",
+        headerShadowVisible: false,
+        headerTitleContainerStyle: {
+          paddingTop: 8,
+        },
+
+        // tabbar styling
+        tabBarStyle: {
+          backgroundColor: "white",
+          height: 85,
+          shadowColor: "#000",
+          shadowOpacity: 0.06,
+          shadowRadius: 10,
+          elevation: 10,
+          paddingBottom: 12,
+          paddingTop: 10,
+        },
         tabBarActiveTintColor: colours.activeTab,
-        //
-        
-        
-        }}>
-      <Tabs.Screen name="accounts" options={{ title: "Accounts" }} />
-      <Tabs.Screen name="bills" options={{ title: "Bills" }} />
+        tabBarInactiveTintColor: colours.inactiveTab,
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: "600",
+          marginBottom: 2,
+        },
+        tabBarItemStyle: {
+          justifyContent: "center",
+        },
+      }}
+    >
       <Tabs.Screen
-        name="index"
+        name="accounts"
         options={{
-          title: "",
-          tabBarIcon: () => (
-            <Image
-              source={require('../../assets/images/logo.png')}
-              style={{ width: 48, height: 48, resizeMode: 'contain' }}
+          title: "Accounts",
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name="wallet-outline"
+              size={size}
+              color={color}
+              style={{
+                transform: [{ translateY: focused ? -1 : 0 }],
+              }}
             />
           ),
         }}
       />
-      <Tabs.Screen name="goals" options={{ title: "Goals" }} />
+
+      <Tabs.Screen
+        name="bills"
+        options={{
+          title: "Bills",
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name="receipt-outline"
+              size={size}
+              color={color}
+              style={{
+                transform: [{ translateY: focused ? -1 : 0 }],
+              }}
+            />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "",
+          tabBarLabel: () => null,
+          tabBarIcon: () => (
+            <Image
+              source={require("../../assets/images/logo.png")}
+              style={{
+                width: 46,
+                height: 46,
+                resizeMode: "contain",
+              }}
+            />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="goals"
+        options={{
+          title: "Goals",
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name="flag-outline"
+              size={size}
+              color={color}
+              style={{
+                transform: [{ translateY: focused ? -1 : 0 }],
+              }}
+            />
+          ),
+        }}
+      />
+
       <Tabs.Screen
         name="logout"
-        options={{ title: "Logout" }}
+        options={{
+          title: "Logout",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="log-out-outline" size={size} color={color} />
+          ),
+        }}
         listeners={{
           tabPress: (e) => {
             e.preventDefault()
-            router.replace('/login')
+            router.replace("/login")
           },
         }}
       />

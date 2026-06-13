@@ -140,7 +140,6 @@ export default function accounts() {
   return (
     <View style={{ flex: 1 }}>
       <ScrollView style={styles.screen} contentContainerStyle={styles.body}>
-        <Text style={styles.heading}>Accounts</Text>
         {/* add account button */}
         <View style={styles.container}>
           <AddButton title="+" onPress={() => setActiveModal("account")} />
@@ -307,13 +306,13 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8 },
   label: { color: '#55626d' },
   value: { fontWeight: '700' },
-  fill: { height: '100%', backgroundColor: '#4a7ec2', borderRadius: 8 },
+  fill: { height: '100%', backgroundColor: colours.buttonBackground, borderRadius: 8 },
   button: {
     borderRadius: 20,
     padding: 10,
     elevation: 2,
     marginBottom: 20,
-    backgroundColor: '#4a7ec2',
+    backgroundColor: colours.buttonBackground,
     alignSelf: 'center'
   },
   textStyle: {
@@ -334,7 +333,7 @@ const styles = StyleSheet.create({
   bottomButton: {
     flex: 1,
     marginHorizontal: 6,
-    backgroundColor: '#4a7ec2',
+    backgroundColor: colours.buttonBackground,
     padding: 12,
     borderRadius: 16,
     alignItems: 'center',
