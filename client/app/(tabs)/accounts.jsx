@@ -55,7 +55,7 @@ export default function accounts() {
     }
 
     const payload = {
-      account_id: 1,
+      account_id: accountId,
       income_frequency: incomeFrequency,
       income_amount: amount,
       category: category ?? null,
@@ -64,7 +64,7 @@ export default function accounts() {
 
     console.log("PAYLOAD:", payload);
     await addIncome({
-      account_id: 1,
+      account_id: accountId,
       income_frequency: incomeFrequency,
       income_amount: amount,
       category: category ?? null,
@@ -85,6 +85,17 @@ export default function accounts() {
       account_balance: accountBalance,
       account_type: accountType,
     });
+    setActiveModal(null);
+  }
+
+  //delet account by id
+  async function handleDeleteAccount() {
+    if (!accountId) {
+      alert("Please select an account");
+      return;
+    }
+    console.log("PAYLOAD:", accountId);
+    await deleteAccount(accountId);
     setActiveModal(null);
   }
 
@@ -123,7 +134,13 @@ export default function accounts() {
       </ScrollView>
 
       <AddModal
-        title={activeModal === "account" ? "Add A Bank Account" : "Add Income"}
+        title={
+          activeModal === "account"
+            ? "Add A Bank Account"
+            : activeModal === "income"
+            ? "Add Income"
+            : "Delete A Bank Account"
+        }
         visible={activeModal !== null}
         setVisible={() => setActiveModal(null)}
       >
@@ -204,6 +221,24 @@ export default function accounts() {
 
             <Pressable style={styles.button} onPress={handleAddIncome}>
               <Text style={styles.textStyle}>Add Income</Text>
+            </Pressable>
+          </>
+        )}
+        {activeModal === "delete" && (
+          <>
+            <SelectField
+              label="Bank Account"
+              value={accountId}
+              onChange={setAccountId}
+              placeholder="Select Bank Account"
+              options={accountOptions}
+            />
+
+            <Pressable
+              style={styles.button}
+              onPress={handleDeleteAccount}
+            >
+              <Text style={styles.textStyle}>Delete Account</Text>
             </Pressable>
           </>
         )}
