@@ -3,11 +3,11 @@ const billsController = require("../controllers/bills");
 
 const billsRouter = Router();
 
-// GET /Bills 
-billsRouter.get("/:household_id", billsController.getAllHouseholdBillsController);
+// GET /Bills/household/:household_id
+billsRouter.get("/household/:household_id", billsController.getAllHouseholdBillsController);
 
-// GET /Bills 
-billsRouter.get("/:account_id", billsController.getAllBankAccountBillsController);
+// GET /Bills/bank-account/:account_id
+billsRouter.get("/bank-account/:account_id", billsController.getAllBankAccountBillsController);
 
 // POST /Bills
 // Request Body Example:

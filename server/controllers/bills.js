@@ -1,7 +1,7 @@
 // Imports Bill model
 const Bill = require("../models/Bill");
 
-// GET /Bills 
+// GET /Bills/household/:household_id 
 async function getAllHouseholdBillsController(req, res) {
     try {
         // Gets all Bills from a household with getAllHouseholdBills() from models
@@ -14,7 +14,7 @@ async function getAllHouseholdBillsController(req, res) {
     }
 }
 
-// GET /Bills 
+// GET /Bills/bank-account/:account_id
 async function getAllBankAccountBillsController(req, res) {
     try {
         // Gets all Bills from an account with getAllBankAccountBills() from models
