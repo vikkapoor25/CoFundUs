@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ScrollView, View, Text, StyleSheet, Modal, Pressable, Keyboard, TextInput} from 'react-native'
 import {useState, useEffect} from 'react'
 import colours from '../../constants/colours'
@@ -8,13 +9,16 @@ import Field from '../../components/Field'
 import DateField from '../../components/DateField'
 import SelectField from '../../components/SelectField'
 import MetabaseScreen from '../../components/Data'
-import { createAccount, getAccounts, deleteAccount,addIncome } from '../../api/bank-accounts';
+import { createAccount, getAccounts, deleteAccount,addIncome, getBalance } from '../../api/bank-accounts';
 
 
 export default function accounts() {
 
+
+  const [householdId, setHouseholdId] = useState(null)
   const [activeModal, setActiveModal] = useState(null)
   const [accounts, setAccounts] = useState([]) //not in use yet
+  const [balance, setBalance] = useState() //not in use yet
   const [accountName, setAccountName] = useState('')
   const [accountBalance, setAccountBalance] = useState('')
   const [accountType, setAccountType] = useState('')
@@ -32,20 +36,35 @@ export default function accounts() {
   //on page load
   useEffect(() => {
     loadAccounts()
+    loadBalance() //need backend to create route
+    loadHouseholdId()
   }, [])
 
+  //get household id for asyncstorage
+  async function loadHouseholdId() {
+    const id = await AsyncStorage.getItem('household_id');
+    setHouseholdId(Number(id));
+  }
 
   // function to get accounts for household
   async function loadAccounts() {
     try {
-      const data = await getAccounts(1) //update id
+      const data = await getAccounts(1) //replace with householdId when it works
       setAccounts(data)
     } catch (error) {
       console.log("Failed to load accounts:", error)
     }
   }
 
-  
+  // function to retrieve overall balance for all accounts
+  async function loadBalance() {
+    try {
+      const data = await getBalance(1) //replace with householdId when it works
+      setBalance(data.balance)
+    } catch (error) {
+      console.log("Failed to get Balance:", error)
+    }
+  }
 
   // function to add income to account
   async function handleAddIncome() {
@@ -70,6 +89,7 @@ export default function accounts() {
       category: category ?? null,
       date: date,
     });
+    resetIncomeForm()
     setActiveModal(null);
   }
 
@@ -80,11 +100,14 @@ export default function accounts() {
       return;
     }
     await createAccount({
-      household_id: 1, //need to update id
+      household_id: 1, //replace with householdId when it works
       account_name: accountName,
       account_balance: accountBalance,
       account_type: accountType,
     });
+    //reload accounts for updated list
+    await loadAccounts();
+    resetAccountForm()
     setActiveModal(null);
   }
 
@@ -96,7 +119,22 @@ export default function accounts() {
     }
     console.log("PAYLOAD:", accountId);
     await deleteAccount(accountId);
+    //reload accounts for updated list
+    await loadAccounts();
     setActiveModal(null);
+  }
+  //reset form
+  function resetAccountForm() {
+    setAccountName('')
+    setAccountBalance('')
+    setAccountType('')
+  }
+  function resetIncomeForm() {
+    setAccountId('')
+    setAmount('')
+    setCategory(null)
+    setIncomeFrequency('')
+    setDate(new Date())
   }
 
   return (
@@ -113,7 +151,7 @@ export default function accounts() {
           <Card title="My Account">
             <View style={styles.row}>
               <Text style={styles.label}>Total Balance</Text>
-              <Text style={styles.value}>£11,000</Text>
+              <Text style={styles.value}>£{balance}</Text>
             </View>
           </Card>
 

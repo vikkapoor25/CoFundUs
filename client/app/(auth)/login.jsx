@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useState } from 'react'
 import { View, Text, TextInput, Pressable, Image, StyleSheet } from 'react-native'
 import { useRouter } from 'expo-router'
@@ -18,6 +19,13 @@ export default function login() {
     try {
       const data = await apiLogin(username, password)
       if (data && data.jwt_token) {
+
+        //save household id in storage
+        await AsyncStorage.setItem(
+          'household_id',
+          String(data.household_id)
+        )
+      
         router.replace('/')
       } else {
         setError(data?.error || 'Invalid login details')
