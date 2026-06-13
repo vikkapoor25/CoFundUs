@@ -8,12 +8,12 @@ constructor({ household_id, bill_id, bill_name, account_id, bill_amount, bill_du
     this.bill_name = bill_name;
     this.account_id = account_id;
     this.bill_amount = bill_amount;
-    this.bill_due_date = bill_due_date ? new Date(bill_due_date).toISOString().split("T")[0] : null; // So it shows as DATE in API and not DATETIME
+    this.bill_due_date = bill_due_date ? new Date(bill_due_date).toLocaleDateString("en-CA") : null; // So it shows as DATE in API and not DATETIME
     this.category = category;
     this.category_type = category_type;
     this.repeat_bill = repeat_bill;
     this.payment_frequency = payment_frequency;
-    this.bill_repeat_date = bill_repeat_date ? new Date(bill_repeat_date).toISOString().split("T")[0] : null; // So it shows as DATE in API and not DATETIME
+    this.bill_repeat_date = bill_repeat_date ? new Date(bill_repeat_date).toLocaleDateString("en-CA") : null; // So it shows as DATE in API and not DATETIME
     this.paid = paid;
 }
 
@@ -47,7 +47,7 @@ constructor({ household_id, bill_id, bill_name, account_id, bill_amount, bill_du
 
     // Creates a new bill using account_id
     static async createBill(request_body) {
-        const today = new Date().toISOString().split("T")[0];
+        const today = new Date().toLocaleDateString("en-CA");
         // Destructures request body
         const { account_id, bill_name, bill_amount, bill_due_date = today, category, category_type = null, repeat_bill, payment_frequency, bill_repeat_date = null } = request_body
         // Checks if bank account exists before adding bill
@@ -66,7 +66,7 @@ constructor({ household_id, bill_id, bill_name, account_id, bill_amount, bill_du
 
     // Updates a Bill using bill_id
     static async updateBill(request_body) {
-        const today = new Date().toISOString().split("T")[0];
+        const today = new Date().toLocaleDateString("en-CA");
         // Destructures request body
         const { bill_id, bill_name, bill_amount, bill_due_date = today, bill_repeat_date = null } = request_body
         // Updates capital using SQL UPDATE
