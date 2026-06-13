@@ -19,6 +19,7 @@ export default function accounts() {
   const [activeModal, setActiveModal] = useState(null)
   const [accounts, setAccounts] = useState([]) //not in use yet
   const [balance, setBalance] = useState() //not in use yet
+  const [accountAmount, setAccountAmount] = useState()
   const [accountName, setAccountName] = useState('')
   const [accountBalance, setAccountBalance] = useState('')
   const [accountType, setAccountType] = useState('')
@@ -33,24 +34,36 @@ export default function accounts() {
   }))
 
 
-  //on page load
+  //load in id first
   useEffect(() => {
-    loadAccounts()
-    loadBalance() //need backend to create route
-    loadHouseholdId()
-  }, [])
+    loadHouseholdId();
+  }, []);
+  //run once householdid is stored
+  useEffect(() => {
+    if (householdId === null) return;
+    loadAccounts();
+    loadBalance();
+  }, [householdId]);
+
+  
 
   //get household id for asyncstorage
   async function loadHouseholdId() {
-    const id = await AsyncStorage.getItem('household_id');
-    setHouseholdId(Number(id));
+    const stored = await AsyncStorage.getItem('household');
+    if (!stored) {
+      setHouseholdId(1)
+      return
+    }
+    const { household_id } = JSON.parse(stored)
+    setHouseholdId(Number(household_id));
   }
 
   // function to get accounts for household
   async function loadAccounts() {
     try {
-      const data = await getAccounts(1) //replace with householdId when it works
+      const data = await getAccounts(householdId) 
       setAccounts(data)
+      setAccountAmount(data.length)
     } catch (error) {
       console.log("Failed to load accounts:", error)
     }
@@ -59,7 +72,7 @@ export default function accounts() {
   // function to retrieve overall balance for all accounts
   async function loadBalance() {
     try {
-      const data = await getBalance(1) //replace with householdId when it works
+      const data = await getBalance(householdId) 
       setBalance(data.balance)
     } catch (error) {
       console.log("Failed to get Balance:", error)
@@ -100,7 +113,7 @@ export default function accounts() {
       return;
     }
     await createAccount({
-      household_id: 1, //replace with householdId when it works
+      household_id: householdId, 
       account_name: accountName,
       account_balance: accountBalance,
       account_type: accountType,
@@ -139,33 +152,38 @@ export default function accounts() {
 
   return (
     <View style={{ flex: 1 }}>
-      <ScrollView style={styles.screen} contentContainerStyle={styles.body}>
-        {/* add account button */}
-        <View style={styles.container}>
-          <AddButton title="+" onPress={() => setActiveModal("account")} />
-        </View>
-          
-        
+      <ScrollView
+        style={styles.screen}
+        contentContainerStyle={styles.body}
+        showsVerticalScrollIndicator={false}
+        bounces={false}  
+      >
+        <Text style={styles.heading}>Household Banks</Text>
+        <Text style={styles.sub}>All your household finances in one place</Text>
           {/* show balance */}
-          <Card title="My Account">
+        <Card title="All Accounts">
+          <View style={styles.row}>
+            <Text style={styles.label}>Total Balance</Text>
+            <Text style={styles.value}>£{balance}</Text>
+          </View>
             <View style={styles.row}>
-              <Text style={styles.label}>Total Balance</Text>
-              <Text style={styles.value}>£{balance}</Text>
+              <Text style={styles.label}>Total Accounts</Text>
+              <Text style={styles.value}>{accountAmount}</Text>
             </View>
-          </Card>
+        </Card>
 
           {/* all accounts */}
-          <View style={styles.metabaseBox}>
-            <MetabaseScreen />
-          </View>
+        <View style={styles.metabaseBox}>
+          <MetabaseScreen />
+        </View>
 
           {/* add income and delete button */}
-          <View style={styles.bottomBar}>
-            <Pressable
-              onPress={() => setActiveModal("income")}
-              style={styles.bottomButton}
-            >
-              <Text style={styles.textStyle}>Add Income</Text>
+        <View style={styles.bottomBar}>
+          <Pressable
+            onPress={() => setActiveModal("income")}
+            style={styles.bottomButton}
+          >
+            <Text style={styles.textStyle}>Add Income</Text>
             </Pressable>
 
             <Pressable
@@ -176,6 +194,9 @@ export default function accounts() {
             </Pressable>
           </View>
       </ScrollView>
+
+      {/* add account button */}
+      <AddButton onPress={() => setActiveModal("account")} />
 
       <AddModal
         title={
@@ -288,6 +309,8 @@ export default function accounts() {
         )}
       </AddModal>
     </View>
+
+    
   )
 }
 
@@ -300,9 +323,9 @@ const styles = StyleSheet.create({
     marginBottom:60
   },
   screen: { flex: 1, backgroundColor: colours.background },
-  container: {left: 305,bottom: 30},
-  body: { padding: 16, paddingTop: 60 },
-  heading: { fontSize: 24, fontWeight: '800', color: colours.pageHeader, marginBottom: 16 },
+  body: { padding: 16, paddingTop: 30 },
+  heading: { fontSize: 24, fontWeight: '800', color: colours.pageHeader },
+  sub: { fontSize: 13, color: '#7a8794', marginBottom: 16, marginTop: 4 },
   row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8 },
   label: { color: '#55626d' },
   value: { fontWeight: '700' },
