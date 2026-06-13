@@ -160,15 +160,22 @@ export default function accounts() {
             <MetabaseScreen />
           </View>
 
-          {/* add income button */}
-          <Pressable onPress={() => setActiveModal("income")} style={styles.button}>
-            <Text style={styles.add}>Add Income</Text>
-          </Pressable>
+          {/* add income and delete button */}
+          <View style={styles.bottomBar}>
+            <Pressable
+              onPress={() => setActiveModal("income")}
+              style={styles.bottomButton}
+            >
+              <Text style={styles.textStyle}>Add Income</Text>
+            </Pressable>
 
-          {/* delete an account button */}
-          <Pressable onPress={() => setActiveModal("delete")} style={styles.button}>
-            <Text style={styles.add}>Delete An Account</Text>
-          </Pressable>
+            <Pressable
+              onPress={() => setActiveModal("delete")}
+              style={styles.bottomButton}
+            >
+              <Text style={styles.textStyle}>Delete Account</Text>
+            </Pressable>
+          </View>
       </ScrollView>
 
       <AddModal
@@ -290,7 +297,8 @@ const styles = StyleSheet.create({
     height: 400,  
     marginVertical: 16,
     borderRadius: 12,
-    overflow: "hidden"
+    overflow: "hidden",
+    marginBottom:60
   },
   screen: { flex: 1, backgroundColor: colours.background },
   container: {left: 305,bottom: 30},
@@ -299,8 +307,6 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8 },
   label: { color: '#55626d' },
   value: { fontWeight: '700' },
-  net: { color: '#16a34a', fontWeight: '700', marginTop: 8 },
-  track: { height: 12, borderRadius: 8, backgroundColor: '#e3e9f0', overflow: 'hidden', marginTop: 8 },
   fill: { height: '100%', backgroundColor: '#4a7ec2', borderRadius: 8 },
   button: {
     borderRadius: 20,
@@ -314,5 +320,23 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  bottomBar: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingVertical: 12,
+    paddingHorizontal: 16
+  },
+  bottomButton: {
+    flex: 1,
+    marginHorizontal: 6,
+    backgroundColor: '#4a7ec2',
+    padding: 12,
+    borderRadius: 16,
+    alignItems: 'center',
   }
 })
