@@ -2,25 +2,23 @@ const db = require('../database/connect');
 
 class Bill {
 
-    constructor({ household_id, bill_id, bill_name, account_id, bill_amount, bill_due_date, category, category_type, repeat_bill, payment_frequency, bill_repeat_date, paid, }) {
-        this.household_id = household_id;
-        this.bill_id = bill_id;
-        this.bill_name = bill_name;
-        this.account_id = account_id;
-        this.bill_amount = bill_amount;
-        this.bill_due_date = bill_due_date;
-        this.category = category;
-        this.category_type = category_type;
-        this.repeat_bill = repeat_bill;
-        this.payment_frequency = payment_frequency;
-        this.bill_repeat_date = bill_repeat_date;
-        this.paid = paid;
-    }
+constructor({ household_id, bill_id, bill_name, account_id, bill_amount, bill_due_date, category, category_type, repeat_bill, payment_frequency, bill_repeat_date, paid }) {
+    this.household_id = household_id;
+    this.bill_id = bill_id;
+    this.bill_name = bill_name;
+    this.account_id = account_id;
+    this.bill_amount = bill_amount;
+    this.bill_due_date = bill_due_date ? new Date(bill_due_date).toISOString().split("T")[0] : null; // So it shows as DATE in API and not DATETIME
+    this.category = category;
+    this.category_type = category_type;
+    this.repeat_bill = repeat_bill;
+    this.payment_frequency = payment_frequency;
+    this.bill_repeat_date = bill_repeat_date ? new Date(bill_repeat_date).toISOString().split("T")[0] : null; // So it shows as DATE in API and not DATETIME
+    this.paid = paid;
+}
 
     // Gets all bills for a household
-    static async getAllHouseholdBills(request_body) {
-        // Defining request body to take household_id
-        const { household_id } = request_body
+    static async getAllHouseholdBills(household_id) {
 
         // Runs SQL query: Gets all bills for a household by household_id
         const response = await db.query(`
@@ -50,10 +48,7 @@ class Bill {
     }
 
     // Gets all bills for a bank account
-    static async getAllBankAccountBills(request_body) {
-
-        // Defining request body to take account_id
-        const { account_id } = request_body
+    static async getAllBankAccountBills(account_id) {
 
         // Runs SQL query: Gets all bills for a bank account by account_id
         const response = await db.query(`

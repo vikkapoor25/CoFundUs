@@ -2,14 +2,10 @@
 const Bill = require("../models/Bill");
 
 // GET /Bills 
-// Request Body Example:
-//              { 
-//                  "household_id": 1 
-//              }
 async function getAllHouseholdBillsController(req, res) {
     try {
         // Gets all Bills from a household with getAllHouseholdBills() from models
-        const bills = await Bill.getAllHouseholdBills(req.body);
+        const bills = await Bill.getAllHouseholdBills(req.params.household_id);
         // Sends success response
         res.status(200).json(bills);
     } catch (err) {
@@ -19,14 +15,10 @@ async function getAllHouseholdBillsController(req, res) {
 }
 
 // GET /Bills 
-// Request Body Example:
-//              { 
-//                  "account_id":  1 
-//              }
 async function getAllBankAccountBillsController(req, res) {
     try {
         // Gets all Bills from an account with getAllBankAccountBills() from models
-        const bills = await Bill.getAllBankAccountBills(req.body);
+        const bills = await Bill.getAllBankAccountBills(req.params.account_id);
         // Sends success response
         res.status(200).json(bills);
     } catch (err) {
