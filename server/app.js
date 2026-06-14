@@ -3,6 +3,7 @@ const cors = require('cors');
 const householdRouter = require("./routes/household");
 const accountsRouter = require("./routes/accounts");
 const billsRouter = require("./routes/bills");
+const incomeRouter = require("./routes/income");
 
 const app = express();
 
