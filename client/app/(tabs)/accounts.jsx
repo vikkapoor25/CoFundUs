@@ -174,7 +174,9 @@ export default function accounts() {
 
           {/* all accounts */}
         <View style={styles.metabaseBox}>
-          <MetabaseScreen />
+          <MetabaseScreen 
+            url ="https://vivid-abaft.metabaseapp.com/public/dashboard/0182bc8c-096c-4b7c-beb3-8382e65315c1"
+          />
         </View>
 
           {/* add income and delete button */}
