@@ -30,3 +30,12 @@ export async function mockGetBills(householdId) {
   ]
 }
 
+export async function mockGetGoal(householdId){
+  return {
+    goal_name: "iPhone",
+    goal_amount: 1000,
+    current_amount: 800,
+    target_date: "28-08-2026"
+  }
+}
+

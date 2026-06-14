@@ -5,7 +5,7 @@ import colours from '../../constants/colours'
 import Card from '../../components/Card'
 import TableCard from '../../components/Table';
 import MetabaseScreen from '../../components/Data'
-import { getHome, mockGetHome, mockGetBills } from '../../api/home';
+import { getHome, mockGetHome, mockGetBills, mockGetGoal } from '../../api/home';
 
 
 
@@ -17,6 +17,7 @@ export default function home() {
   const [balance, setBalance] = useState()
   const [net, setNet] = useState()
   const [bills, setBills] = useState([])
+  const [goal, setGoal] = useState(null)
 
 
   //load in id first
@@ -49,9 +50,11 @@ export default function home() {
     try {
       const data = await mockGetHome(householdId)
       const billsData = await mockGetBills(householdId) 
+      const goalData = await mockGetGoal(householdId)
       setNet(data.netGainLoss)
       setBalance(data.totalBalance)
       setBills(billsData)
+      setGoal(goalData)
     } catch (error) {
       console.log("Failed to get data:", error)
     }
@@ -68,6 +71,7 @@ export default function home() {
       <Text style={styles.heading}>Hi {nameOne} and {nameTwo}!</Text>
       <Text style={styles.sub}>Your complete household financial overview</Text>
 
+      {/* display all accounts in pie chart */}
       <Card title="Account Balance Overview">
         <View style={styles.row}>
           <Text style={styles.label}>Total Balance</Text>
@@ -80,6 +84,7 @@ export default function home() {
         </View>
       </Card>
 
+      {/* display income and spending for month with net gain or loss */}
       <Card title="Monthly Income and Spending">
         <Text>Add bar charts</Text>
         <View style={styles.row}>
@@ -95,6 +100,7 @@ export default function home() {
         </View>
       </Card>
 
+      {/* display bills due within 7 days */}
       <TableCard
         title="Upcoming Bills"
         headers={['Bill', 'Amount', 'Account', 'Due']}
@@ -110,8 +116,26 @@ export default function home() {
         )}
       />
 
+      {/* display goal and progress bar */}
       <Card title="Next Goal">
-        <Text style={styles.label}>data visual of progress bar and figures </Text>
+        {!goal?.goal_name ? (
+          <Text style={styles.label}>
+            You haven’t set a savings goal yet
+          </Text>
+        ) : (
+          <>
+            <View style={styles.row}>
+              <Text style={styles.label}>{goal.goal_name}</Text>
+              <Text style={styles.label}>
+                £{goal.current_amount}/£{goal.goal_amount}
+              </Text>
+            </View>
+
+            <Text style={styles.label}>
+              Add data visual of progress bar
+            </Text>
+          </>
+        )}
       </Card>
     </ScrollView>
   )
