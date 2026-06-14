@@ -52,7 +52,7 @@ describe('Household API Endpoints', () => {
 
         // ASSERT
         expect(response.status).toBe(400);
-        expect(response.body).toEqual({ error: 'Unable to create household. Username already exists or fields are missing.' })
+        expect(response.body).toEqual({ error: 'Unable to create household.' })
     });
 });
 

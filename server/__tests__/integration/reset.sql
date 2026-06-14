@@ -28,6 +28,12 @@ INSERT INTO accounts (
     20000,
     'shared',
     200
+), (
+    1,
+    'savings',
+    5000,
+    'personal',
+    0
 );
 
 INSERT INTO goals (
@@ -47,14 +53,16 @@ INSERT INTO goals (
 INSERT INTO income (
     account_id,
     income_amount,
+    income_name,
     payment_date,
     category,
     repeat_income,
-    payment_frequency,
+    income_frequency,
     income_repeat_date
 ) VALUES (
     1,
     3000,
+    'Salary',
     '2026-07-09',
     'Salary',
     TRUE,
@@ -65,6 +73,7 @@ INSERT INTO income (
 INSERT INTO bills (
     account_id,
     bill_amount,
+    bill_name,
     bill_due_date,
     category,
     category_type,
@@ -75,9 +84,10 @@ INSERT INTO bills (
 ) VALUES (
     1,
     200,
+    'Purchased iPhone',
     '2026-07-09',
-    'purchase iphone',
-    'retail',
+    'Commercial',
+    'Retail',
     TRUE,
     'Immediate',
     '2026-06-09',
