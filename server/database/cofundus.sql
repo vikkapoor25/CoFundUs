@@ -31,7 +31,7 @@ CREATE TABLE goals (
     household_id INT NOT NULL,
     goal_name VARCHAR(50) NOT NULL,
     goal_amount INT NOT NULL,
-    current_value INT NOT NULL,
+    current_value INT DEFAULT 0,
     target_date DATE,
     PRIMARY KEY (goal_id),
     FOREIGN KEY (household_id) REFERENCES household(household_id)
