@@ -9,8 +9,8 @@ export async function getHome(householdId) {
 //mock functions until backed in ready
 export async function mockGetHome(householdId) {
   return {
-    totalBalance: 49605,
-    netGainLoss: -850,
+    totalBalance: 28500,
+    netGainLoss: 1150,
   };
 }
 export async function mockGetBills(householdId) {

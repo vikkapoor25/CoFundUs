@@ -71,16 +71,14 @@ export default function home() {
       <Text style={styles.heading}>Hi {nameOne} and {nameTwo}!</Text>
       <Text style={styles.sub}>Your complete household financial overview</Text>
 
-      {/* display all accounts in pie chart */}
+      {/* display all account in pie chart */}
       <Card title="Account Balance Overview">
         <View style={styles.row}>
           <Text style={styles.label}>Total Balance</Text>
           <Text style={styles.value}>£{balance}</Text>
         </View>
         <View style={styles.metabaseBox}>
-          <MetabaseScreen 
-            url ="https://vivid-abaft.metabaseapp.com/public/dashboard/c32c2fba-aeb7-4f1d-bccd-2b403319ca79"
-          />
+          <MetabaseScreen url="https://vivid-abaft.metabaseapp.com/public/dashboard/c32c2fba-aeb7-4f1d-bccd-2b403319ca79" />
         </View>
       </Card>
 

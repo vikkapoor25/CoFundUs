@@ -9,5 +9,8 @@ export default {
   buttonBackground: "#4a7ec2",
   buttonText: "#fff",
   red: "#dc2626",
-  green: "#16a34a"
+  green: "#16a34a",
+  softRed: "#fecaca",
+  softGreen: "#bbf7d0",
+  accountCards: "#7AB3ED"
 };
