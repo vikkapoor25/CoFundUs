@@ -1,10 +1,10 @@
 import { ScrollView, View, Text, StyleSheet, Modal, Pressable, TextInput} from 'react-native'
 import {useState} from 'react';
 import colours from '../../constants/colours'
-import Card from '../../components/Card'
+import Card from '../../components/card'
 import AddButton from '../../components/AddButton'
 import AddModal from '../../components/AddModal'
-import Field from '../../components/Field';
+import Field from '../../components/field';
 import { createAccount, getAccounts, deleteAccount } from '../../api/bank-accounts';
 
 

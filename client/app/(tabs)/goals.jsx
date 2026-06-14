@@ -1,6 +1,6 @@
 import { ScrollView, View, Text, StyleSheet } from 'react-native'
 import colours from '../../constants/colours'
-import Card from '../../components/Card'
+import Card from '../../components/card'
 
 
 

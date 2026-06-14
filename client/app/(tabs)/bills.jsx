@@ -1,10 +1,13 @@
 import { ScrollView, View, Text, StyleSheet, Pressable } from 'react-native'
 import { useState } from 'react'
+import { WebView } from 'react-native-webview'
 import colours from '../../constants/colours'
-import Card from '../../components/Card'
+import Card from '../../components/card'
 import AddButton from '../../components/AddButton'
 import AddModal from '../../components/AddModal'
-import Field from '../../components/Field'
+import Field from '../../components/field'
+
+const CHART_URL = 'https://vivid-abaft.metabaseapp.com/public/question/58ad854f-7cd1-4ab6-9c8b-e0a1522e7092'
 
 const SECTIONS = [
   { key: 'recurring', title: 'Recurring Bills' },
@@ -73,6 +76,12 @@ export default function bills() {
           <Text style={styles.heading}>Bills</Text>
           <AddButton onPress={() => setModalVisible(true)} />
         </View>
+
+        <Card title="Bills vs Account Value">
+          <View style={styles.chartBox}>
+            <WebView source={{ uri: CHART_URL }} style={{ flex: 1 }} />
+          </View>
+        </Card>
 
         {SECTIONS.map((section) => {
           const sectionBills = bills.filter((b) => b.category_type === section.key)
@@ -171,6 +180,8 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
   heading: { fontSize: 24, fontWeight: '800', color: colours.pageHeader },
   empty: { fontSize: 13, color: '#9aa3b0', paddingVertical: 6 },
+
+  chartBox: { height: 280, borderRadius: 12, overflow: 'hidden' },
 
   bill: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#eef1f5' },
   billLeft: { flex: 1, paddingRight: 12 },
