@@ -1,4 +1,8 @@
-const { createBankAccount, deleteBankAccount } = require("../../../controllers/accounts");
+const {
+  createBankAccount,
+  deleteBankAccount,
+  getAccountsByHousehold,
+} = require("../../../controllers/accounts");
 const BankAccount = require("../../../models/accounts");
 
 jest.mock("../../../models/accounts");
@@ -12,6 +16,7 @@ describe("accounts controller", () => {
 
     req = {
       body: {},
+      params: {},
     };
 
     res = {
@@ -130,6 +135,60 @@ describe("accounts controller", () => {
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({ error: "Unexpected error" });
+    });
+  });
+
+  describe("getAccountsByHousehold", () => {
+    it("should return 200 and all accounts for a household", async () => {
+      const mockAccounts = [
+        {
+          account_id: 1,
+          household_id: 1,
+          account_name: "Shared Account",
+          account_balance: 1000,
+          account_type: "shared",
+          allocated_to_goal: 200,
+          income_total: 3000,
+          bills_total: 200,
+          net_gain_loss: 2800,
+        },
+        {
+          account_id: 2,
+          household_id: 1,
+          account_name: "Savings",
+          account_balance: 5000,
+          account_type: "personal",
+          allocated_to_goal: 0,
+          income_total: 0,
+          bills_total: 0,
+          net_gain_loss: 0,
+        },
+      ];
+
+      req.params = {
+        household_id: 1,
+      };
+
+      BankAccount.getByHouseholdId.mockResolvedValue(mockAccounts);
+
+      await getAccountsByHousehold(req, res);
+
+      expect(BankAccount.getByHouseholdId).toHaveBeenCalledWith(1);
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith(mockAccounts);
+    });
+
+    it("should return 500 if fetching accounts fails", async () => {
+      req.params = {
+        household_id: 1,
+      };
+
+      BankAccount.getByHouseholdId.mockRejectedValue(new Error("Database error"));
+
+      await getAccountsByHousehold(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith({ error: "Database error" });
     });
   });
 });
