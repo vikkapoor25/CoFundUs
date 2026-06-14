@@ -2,6 +2,8 @@ const express = require("express");
 const cors = require('cors');
 const householdRouter = require("./routes/household");
 const accountsRouter = require("./routes/accounts");
+const billsRouter = require("./routes/bills");
+const incomeRouter = require("./routes/income");
 
 const app = express();
 
@@ -17,5 +19,7 @@ app.get("/", (req, res) => {
 
 app.use("/user", householdRouter);
 app.use("/bank-accounts", accountsRouter);
+app.use("/bills", billsRouter);
+app.use("/income", incomeRouter);
 
 module.exports = app;
