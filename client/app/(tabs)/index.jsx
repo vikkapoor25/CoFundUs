@@ -3,8 +3,9 @@ import { ScrollView, View, Text, StyleSheet } from 'react-native'
 import {useState, useEffect} from 'react'
 import colours from '../../constants/colours'
 import Card from '../../components/Card'
+import TableCard from '../../components/Table';
 import MetabaseScreen from '../../components/Data'
-import { getHome, mockGetHome } from '../../api/home';
+import { getHome, mockGetHome, mockGetBills } from '../../api/home';
 
 
 
@@ -15,6 +16,7 @@ export default function home() {
   const [nameTwo, setNameTwo] = useState(null)
   const [balance, setBalance] = useState()
   const [net, setNet] = useState()
+  const [bills, setBills] = useState([])
 
 
   //load in id first
@@ -45,10 +47,11 @@ export default function home() {
 
   async function loadData() {
     try {
-      const data = await mockGetHome(householdId) 
+      const data = await mockGetHome(householdId)
+      const billsData = await mockGetBills(householdId) 
       setNet(data.netGainLoss)
       setBalance(data.totalBalance)
-      console.log(data)
+      setBills(billsData)
     } catch (error) {
       console.log("Failed to get data:", error)
     }
@@ -92,9 +95,20 @@ export default function home() {
         </View>
       </Card>
 
-      <Card title="Upcoming Bills" rightIcon={<Text style={{ color: colours.red, fontWeight: '800' }}>!</Text>}>
-        <Text style={styles.label}>Bills due within the week</Text>
-      </Card>
+      <TableCard
+        title="Upcoming Bills"
+        headers={['Bill', 'Amount', 'Account', 'Due']}
+        data={bills}
+        emptyText="No bills due within the next 7 days!"
+         renderRow={(bill) => (
+          <View key={bill.bill_name} style={styles.tableRow}>
+            <Text style={styles.col}>{bill.bill_name}</Text>
+            <Text style={styles.col}>£{bill.bill_amount}</Text>
+            <Text style={styles.col}>{bill.account_name}</Text>
+            <Text style={styles.col}>{bill.bill_due_date}</Text>
+          </View>
+        )}
+      />
 
       <Card title="Next Goal">
         <Text style={styles.label}>data visual of progress bar and figures </Text>
@@ -118,4 +132,12 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8 },
   label: { color: '#55626d' },
   value: { fontWeight: '700' },
+  tableHeader: {
+  flexDirection: 'row',
+  paddingVertical: 6,
+  borderBottomWidth: 1,
+  borderBottomColor: '#e5e7eb',
+  },
+  tableRow: { flexDirection: 'row', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#f1f5f9', },
+  col: { flex: 1, fontSize: 12, color: '#111827', },
 })

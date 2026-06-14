@@ -6,17 +6,27 @@ export async function getHome(householdId) {
   return res.json() // { totalBalance, income, bills, netGainLoss, upcomingBills, goals }
 }
 
+//mock functions until backed in ready
 export async function mockGetHome(householdId) {
   return {
     totalBalance: 49605,
     netGainLoss: -850,
   };
 }
-
 export async function mockGetBills(householdId) {
-  return {
-    totalBalance: 49605,
-    netGainLoss: -850,
-  };
+  return [
+      {
+        bill_name: "EE Phone Bill",
+        account_name: "tooba",
+        bill_amount: 20,
+        bill_due_date: "2026-06-16"
+      },
+      {
+        bill_name: "Gym",
+        account_name: "tooba",
+        bill_amount: 30,
+        bill_due_date: "2026-06-17"
+      }
+  ]
 }
 
