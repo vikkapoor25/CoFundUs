@@ -9,7 +9,7 @@ billsRouter.get("/household/:household_id", billsController.getAllHouseholdBills
 // GET /Bills/bank-account/:account_id
 billsRouter.get("/bank-account/:account_id", billsController.getAllBankAccountBillsController);
 
-// POST /Bills
+// POST /Bills/new
 // Request Body Example:
 //              {
 //                  "account_id": 1,
@@ -30,7 +30,7 @@ billsRouter.get("/bank-account/:account_id", billsController.getAllBankAccountBi
 // NOTE: paid is automatically assigned FALSE by the database
 billsRouter.post("/new", billsController.createBillController);
 
-// PATCH /Bills
+// PATCH /Bills/update
 // Request Body Example:
 //              {
 //                  "bill_id": 1,
@@ -57,7 +57,7 @@ billsRouter.patch("/update", billsController.updateBillController);
 //              }
 billsRouter.patch("/paid", billsController.billPaidController);
 
-// DELETE /Bills
+// DELETE /Bills/delete
 // Request Body Example:
 //              {
 //                  "bill_id": 1
