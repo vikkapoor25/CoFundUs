@@ -7,7 +7,7 @@ import AddButton from '../../components/AddButton'
 import AddModal from '../../components/AddModal'
 import Field from '../../components/Field';
 import AccountCards from '../../components/AccountCards';
-import { createAccount, getAccounts, deleteAccount } from '../../api/bank-accounts';
+import { createAccount, getAccounts, deleteAccount, getBalance } from '../../api/bank-accounts';
 
 
 export default function accounts() {
@@ -52,19 +52,29 @@ export default function accounts() {
       setHouseholdId(1)
       return
     }
-    const { household_id } = JSON.parse(stored)
-    setHouseholdId(Number(household_id));
+    const storage = JSON.parse(stored)
+    if (!storage?.household_id) {
+      setHouseholdId(null);
+      return;
+    }
+    setHouseholdId(Number(storage.household_id));
   }
 
   // function to get accounts for household
   async function loadAccounts() {
     try {
-      const data = await getAccounts(householdId) 
-      setAccounts(data)
-      setAccountAmount(data.length)
-      console.log(data)
+      const data = await getAccounts(householdId);
+
+      const safeData = Array.isArray(data) ? data : [];
+
+      setAccounts(safeData);
+      setAccountAmount(safeData.length);
+
+      console.log("accounts:", safeData);
+
     } catch (error) {
-      console.log("Failed to load accounts:", error)
+      console.log("Failed:", error);
+      setAccounts([]);
     }
   }
 
@@ -262,6 +272,7 @@ export default function accounts() {
                 { label: "None", value: null },
                 { label: "Salary", value: "Salary" },
                 { label: "Refund", value: "Refund" },
+                { label: "Payment", value: "Payment" },
                 { label: "Other", value: "Other" }
               ]}
             />
