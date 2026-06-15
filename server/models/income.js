@@ -86,7 +86,7 @@ class Income {
       date = today,
       category,
       repeat = false,
-      income_frequency = null,
+      payment_frequency = null,
       income_repeat_date = null,
     } = request_body;
 

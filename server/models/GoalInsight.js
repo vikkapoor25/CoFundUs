@@ -1,15 +1,15 @@
-// Imports Google Gen AI SDK for Node.js
-// Allows devs to build apps powered by Gemini
-const { GoogleGenAI } = require("@google/genai")
+// Imports Groq SDK for Node.js
+// Allows devs to build apps powered by Groq AI
+const Groq = require("groq-sdk")
 
-// Import models to use getAllHousholdxxx() functions
+// Import models to use getAllHouseholdxxx() functions
 const Goal = require("./Goal")
 const Income = require("./Income")
 const Bill = require("./Bill")
 
-// Gemini API key allows you to authenticate your requests
-// Without an API key, request to Gemini wouldn't go through
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY })
+// Groq API key allows you to authenticate your requests
+// Without an API key, request to Groq wouldn't go through
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
 
 class GoalInsight {
 
@@ -21,12 +21,14 @@ class GoalInsight {
         const income = await Income.getAllHouseholdIncome(household_id)
         const bills = await Bill.getAllHouseholdBills(household_id)
 
-        // Prompt that will be inputting into Gemini
+        // Prompt that will be inputting into Groq
         // JSON.stringify converts JSON object into string
         const prompt = `
-        A couple is using a couple's personal finance app to track shared financial goals.
+        You are a financial planning assistant for a couple's personal finance app.
 
-        The breakdown of their goals, their household income, and their household bills is below:
+        A couple is using the app to track shared financial goals.
+
+        The breakdown of their goals, household income, and household bills is below:
 
         Household Goals:
         ${JSON.stringify(goals, null, 2)}
@@ -37,40 +39,76 @@ class GoalInsight {
         Household Bills:
         ${JSON.stringify(bills, null, 2)}
 
-        Analyse the feasibility of each household goal, considering:
-        - Total household income
-        - Total household bills
-        - Estimated disposable income remaining each month (total household income - total household bills)
-        - Amount already saved toward each goal 
-        - Goal target amount
-        - Goal target date
-        - Potential financial risks or concerns
+        Analyse the feasibility of each goal using only the information provided.
 
-        In the response, before diving into each goal, provide:
-        1. Estimated household disposable income
-        
-        And for each goal provide:
-        1. Goal Name 
-        2. Estimated monthly savings required (Amount Remaining to Save / Months Until Target Date)
-        3. Feasibility Rating: (Base the rating on how realistic the required monthly savings are compared with the household's estimated disposable income)
-            - Realistic
-            - Challenging
-            - Unrealistic
-        4. Rating Explanation
+        Before assigning ratings:
+        1. Calculate total household income.
+        2. Calculate total household bills.
+        3. Calculate estimated monthly disposable income:
+        Disposable Income = Total Income - Total Bills
+        4. For each goal:
+        - Calculate amount remaining to save.
+        - Calculate months until the target date.
+        - Calculate estimated monthly savings required.
+        - Compare the required monthly savings against the estimated disposable income.
 
-        Use a compact format. Do not add blank lines within each goal section. Add one blank line between different goals.
+        Feasibility Rating Rules:
+        - Realistic: Monthly savings required is less than 20% of disposable income.
+        - Challenging: Monthly savings required is between 20% and 50% of disposable income.
+        - Unrealistic: Monthly savings required exceeds 50% of disposable income, disposable income is zero or negative, or the target date cannot realistically be achieved.
 
-        Please keep advice concise, practical and written in plain English for non technical users.
+        Important Rules:
+        - Currency is GBP (£)
+        - Use only the information provided.
+        - Do not make assumptions beyond the supplied data.
+        - Do not speculate about inflation, future economic conditions, job loss, emergencies, or unexpected expenses.
+        - Do not contradict your calculations.
+        - Verify calculations before assigning ratings.
+        - Keep explanations concise and practical.
+        - Write in plain English for non-technical users. 
+        - Keep the response compact.
+        - DO NOT show any of the calculations
+
+        ----------------------------------------------
+
+        Response Format:
+
+        Estimated Household Disposable Income: $X
+
+        Goal: [Goal Name]
+        Estimated Monthly Savings Required: £X
+        Feasibility Rating: Realistic | Challenging | Unrealistic
+        Explanation: [One concise sentence explaining the rating.]
+
+        Goal: [Goal Name]
+        Estimated Monthly Savings Required: £X
+        Feasibility Rating: Realistic | Challenging | Unrealistic
+        Explanation: [One concise sentence explaining the rating.]
+
+        <NOTHING MORE>
+
+        ------------------------------------------------
+
+        Add a single blank line between goals.
+        Do not include any information in addition to what is specificed and permitted in the response format.
         `
 
-        // Sends prompt to Gemini and awaits response stored in variable called response
-        const response = await ai.models.generateContent({
-            model: "gemini-2.0-flash",
-            contents: prompt
+        // Sends the prompt to Groq's AI model and waits for a response
+        const response = await groq.chat.completions.create({
+            // AI model used to generate the response
+            model: "llama-3.1-8b-instant",
+            // Conversation sent to the AI model
+            messages: [
+                {
+                    // Indicates this message is from the user
+                    role: "user",
+                    // The prompt containing household goals, income and bills
+                    content: prompt
+                }
+            ]
         })
-
-        // Returns response variable in text format
-        return response.text
+        // Returns the AI generated response text
+        return response.choices[0].message.content
     }
 
 
@@ -82,12 +120,14 @@ class GoalInsight {
         const income = await Income.getAllHouseholdIncome(household_id)
         const bills = await Bill.getAllHouseholdBills(household_id)
 
-        // Prompt that will be inputting into Gemini
+        // Prompt that will be inputting into Groq
         // JSON.stringify converts JSON object into string
         const prompt = `
-        A couple is using a couple's personal finance app to track shared financial goals.
+        You are a financial planning assistant for a couple's personal finance app.
 
-        The breakdown of their goals, their household income, and their household bills is below:
+        A couple is using the app to track shared financial goals.
+
+        The breakdown of their goals, household income, and household bills is below:
 
         Household Goals:
         ${JSON.stringify(goals, null, 2)}
@@ -98,37 +138,74 @@ class GoalInsight {
         Household Bills:
         ${JSON.stringify(bills, null, 2)}
 
-        Analyse the priority of each household goal, considering:
-        - Total household income
-        - Total household bills
-        - Estimated disposable income remaining each month (total household income - total household bills)
-        - Amount already saved toward each goal 
-        - Goal target amount
-        - Goal target date
-        - Potential financial risks or concerns
-        
-        In the response, for each goal, do them in order of highest priority to lowest priority and provide:
-        1. Priority Ranking (e.g. 1 if first, 2 if second etc.)
-        2. Goal Name 
-        3. Priority Rating: (Base the priority rating on the urgency of the goal, financial importance, target date, progress already made, and competition with other goals for available funds.)
-            - High Priority
-            - Medium Priority
-            - Low Priority
-        4. Rating Explanation
+        Analyse the priority of each goal using only the information provided.
 
-        Use a compact format. Do not add blank lines within each goal section. Add one blank line between different goals.
+        Before assigning priority ratings:
+        1. Calculate total household income.
+        2. Calculate total household bills.
+        3. Calculate estimated monthly disposable income:
+        Disposable Income = Total Income - Total Bills
+        4. For each goal:
+        - Calculate amount remaining to save.
+        - Calculate months until the target date.
+        - Consider how urgent the target date is.
+        - Consider how much money is still needed.
+        - Consider whether the goal competes heavily with other goals for available disposable income.
 
-        Please keep advice concise, practical and written in plain English for non technical users.
+        Priority Rating Rules:
+        - High Priority: The target date is soon, the goal needs regular attention now, and or delaying would make the goal difficult to achieve.
+        - Medium Priority: The goal is important but has more time available, and or the required savings are manageable alongside other goals.
+        - Low Priority: The goal has a distant target date, requires little immediate action, and or should wait until higher-priority goals are funded.
+
+        Important Rules:
+        - Currency is GBP (£).
+        - Use only the information provided.
+        - Do not make assumptions beyond the supplied data.
+        - Do not speculate about personal importance, emotional value, future economic conditions, job loss, emergencies, or unexpected expenses.
+        - Do not invent reasons such as "high potential for use" unless this is directly stated in the data.
+        - Do not contradict your calculations.
+        - Verify calculations before assigning priority ratings.
+        - Keep explanations concise and practical.
+        - Write in plain English for non-technical users.
+        - Keep the response compact.
+        - DO NOT show any calculations.
+        - DO NOT include notes, summaries, disclaimers, or extra comments.
+
+        Response Format:
+
+        Priority Ranking: X
+        Goal: [Goal Name]
+        Priority Rating: High Priority | Medium Priority | Low Priority
+        Explanation: [One concise sentence explaining the rating.]
+
+        Priority Ranking: X
+        Goal: [Goal Name]
+        Priority Rating: High Priority | Medium Priority | Low Priority
+        Explanation: [One concise sentence explaining the rating.]
+
+        <NOTHING MORE>
+
+        List goals from highest priority to lowest priority.
+        Add a single blank line between goals.
+        Do not include any information in addition to what is specified and permitted in the response format.
         `
 
-        // Sends prompt to Gemini and awaits response stored in variable called response
-        const response = await ai.models.generateContent({
-            model: "gemini-2.0-flash",
-            contents: prompt
+        // Sends the prompt to Groq's AI model and waits for a response
+        const response = await groq.chat.completions.create({
+            // AI model used to generate the response
+            model: "llama-3.1-8b-instant",
+            // Conversation sent to the AI model
+            messages: [
+                {
+                    // Indicates this message is from the user
+                    role: "user",
+                    // The prompt containing household goals, income and bills
+                    content: prompt
+                }
+            ]
         })
-
-        // Returns response variable in text format
-        return response.text
+        // Returns the AI generated response text
+        return response.choices[0].message.content
     }
 
 
@@ -140,7 +217,7 @@ class GoalInsight {
         const income = await Income.getAllHouseholdIncome(household_id)
         const bills = await Bill.getAllHouseholdBills(household_id)
 
-        // Prompt that will be inputting into Gemini
+        // Prompt that will be inputting into Groq
         // JSON.stringify converts JSON object into string
         const prompt = `
         A couple is using a couple's personal finance app to track shared financial goals.
@@ -182,14 +259,22 @@ class GoalInsight {
         Please keep advice concise, practical, and written in plain English for non-technical users.
         `
 
-        // Sends prompt to Gemini and awaits response stored in variable called response
-        const response = await ai.models.generateContent({
-            model: "gemini-2.0-flash",
-            contents: prompt
+        // Sends the prompt to Groq's AI model and waits for a response
+        const response = await groq.chat.completions.create({
+            // AI model used to generate the response
+            model: "llama-3.1-8b-instant",
+            // Conversation sent to the AI model
+            messages: [
+                {
+                    // Indicates this message is from the user
+                    role: "user",
+                    // The prompt containing household goals, income and bills
+                    content: prompt
+                }
+            ]
         })
-
-        // Returns response variable in text format
-        return response.text
+        // Returns the AI generated response text
+        return response.choices[0].message.content
     }
 
 }

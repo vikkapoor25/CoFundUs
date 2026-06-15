@@ -45,7 +45,7 @@ CREATE TABLE income (
     payment_date DATE NOT NULL,
     category VARCHAR(50) NOT NULL,
     repeat_income BOOLEAN NOT NULL,
-    income_frequency VARCHAR(50),
+    payment_frequency VARCHAR(50),
     income_repeat_date DATE,
     PRIMARY KEY (income_id),
     FOREIGN KEY (account_id) REFERENCES accounts(account_id)
@@ -84,7 +84,7 @@ VALUES
 (1, 'Family Ski Trip', 2000, 500, '2027-1-25'),
 (1, 'Christmas Goal', 800, 100, '2026-12-25');
 
-INSERT INTO income (account_id, income_amount, income_name, payment_date, category, repeat_income, income_frequency, income_repeat_date)
+INSERT INTO income (account_id, income_amount, income_name, payment_date, category, repeat_income, payment_frequency, income_repeat_date)
  VALUES
  (1, 3000, 'Homer Wages', '2026-07-21', 'Salary', TRUE, 'Monthly', '2026-08-21'),
  (3, 200, 'Bart Paperound', '2026-08-01', 'Salary', TRUE, 'Monthly', '2026-09-01');
