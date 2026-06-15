@@ -77,8 +77,13 @@ export default function bills() {
         showsVerticalScrollIndicator={false}
         bounces={false}
       >
-        <Text style={styles.heading}>Upcoming Bills</Text>
-        <Text style={styles.sub}>Stay ahead of upcoming bills and subscriptions</Text>
+        <View style={styles.header}>
+          <View style={styles.headerText}>
+            <Text style={styles.heading}>Upcoming Bills</Text>
+            <Text style={styles.sub}>Stay ahead of upcoming bills and subscriptions</Text>
+          </View>
+          <AddButton onPress={() => setModalVisible(true)} />
+        </View>
 
         <Card title="Bills vs Account Value">
           <View style={styles.chartBox}>
@@ -124,10 +129,6 @@ export default function bills() {
           )
         })}
       </ScrollView>
-
-      <View style={styles.addBtnWrap}>
-        <AddButton onPress={() => setModalVisible(true)} />
-      </View>
 
       <AddModal title="Add A Bill" visible={modalVisible} setVisible={setModalVisible}>
         <View style={styles.form}>
@@ -201,7 +202,8 @@ const styles = StyleSheet.create({
   actionPaid: { fontSize: 12, fontWeight: '600', color: colours.cardTitle },
   actionDelete: { fontSize: 12, fontWeight: '600', color: '#d1495b' },
 
-  addBtnWrap: { position: 'absolute', right: 20, bottom: 28 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  headerText: { flex: 1, paddingRight: 12 },
 
   form: { width: 260 },
   typeLabel: { fontSize: 12, color: '#55626d', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 },
