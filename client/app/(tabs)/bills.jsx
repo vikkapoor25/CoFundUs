@@ -75,9 +75,8 @@ export default function bills() {
         style={styles.screen}
         contentContainerStyle={styles.body}
         showsVerticalScrollIndicator={false}
-        bounces={false}  
+        bounces={false}
       >
-
         <Text style={styles.heading}>Upcoming Bills</Text>
         <Text style={styles.sub}>Stay ahead of upcoming bills and subscriptions</Text>
 
@@ -126,13 +125,52 @@ export default function bills() {
         })}
       </ScrollView>
 
-      <AddButton onPress={() => setModalVisible(true)} />
+      <View style={styles.addBtnWrap}>
+        <AddButton onPress={() => setModalVisible(true)} />
+      </View>
 
-      <AddModal
-        title="Add A Bill"
-        visible={modalVisible}
-        setVisible={setModalVisible}
-      />
+      <AddModal title="Add A Bill" visible={modalVisible} setVisible={setModalVisible}>
+        <View style={styles.form}>
+          <Field
+            label="Bill Name"
+            placeholder="e.g. Netflix"
+            value={billName}
+            onChangeText={setBillName}
+          />
+          <Field
+            label="Amount"
+            placeholder="e.g. 12"
+            keyboardType="numeric"
+            value={amount}
+            onChangeText={setAmount}
+          />
+          <Field
+            label="Account"
+            placeholder="e.g. Alex, Sam, Shared"
+            value={account}
+            onChangeText={setAccount}
+          />
+          <Field
+            label="Due Date"
+            placeholder="DD/MM"
+            value={dueDate}
+            onChangeText={setDueDate}
+          />
+
+          <Text style={styles.typeLabel}>Type</Text>
+          <View style={styles.typeRow}>
+            {SECTIONS.map((s) => (
+              <Pressable
+                key={s.key}
+                onPress={() => setType(s.key)}
+                style={[styles.chip, type === s.key && styles.chipActive]}
+              >
+                <Text style={[styles.chipText, type === s.key && styles.chipTextActive]}>
+                  {s.title}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
 
           <Pressable style={styles.submit} onPress={handleAddBill}>
             <Text style={styles.submitText}>Add Bill</Text>
@@ -145,11 +183,34 @@ export default function bills() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colours.background },
+  body: { padding: 16, paddingTop: 30 },
   heading: { fontSize: 24, fontWeight: '800', color: colours.pageHeader },
   sub: { fontSize: 13, color: '#7a8794', marginBottom: 16, marginTop: 4 },
-  body: { padding: 16, paddingTop: 30 },
-  row: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#eef1f5' },
-  cell: { flex: 1, fontSize: 12, color: '#3f4856' },
-  head: { fontWeight: '700', color: '#7a8794', fontSize: 11 },
-  rightCell: { textAlign: 'right' },
+  empty: { fontSize: 13, color: '#9aa3b0', paddingVertical: 6 },
+
+  chartBox: { height: 280, borderRadius: 12, overflow: 'hidden' },
+
+  bill: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#eef1f5' },
+  billLeft: { flex: 1, paddingRight: 12 },
+  billName: { fontSize: 14, fontWeight: '700', color: '#2f3a48' },
+  billMeta: { fontSize: 12, color: '#7a8794', marginTop: 2 },
+  amount: { fontSize: 14, fontWeight: '700', color: '#2f3a48' },
+  paidText: { color: '#9aa3b0', textDecorationLine: 'line-through' },
+
+  actions: { flexDirection: 'row', gap: 16, marginTop: 6 },
+  actionPaid: { fontSize: 12, fontWeight: '600', color: colours.cardTitle },
+  actionDelete: { fontSize: 12, fontWeight: '600', color: '#d1495b' },
+
+  addBtnWrap: { position: 'absolute', right: 20, bottom: 28 },
+
+  form: { width: 260 },
+  typeLabel: { fontSize: 12, color: '#55626d', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 },
+  typeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 18 },
+  chip: { borderWidth: 1, borderColor: '#d7dee6', borderRadius: 16, paddingVertical: 6, paddingHorizontal: 12 },
+  chipActive: { backgroundColor: colours.cardTitle, borderColor: colours.cardTitle },
+  chipText: { fontSize: 12, color: '#55626d' },
+  chipTextActive: { color: '#fff', fontWeight: '700' },
+
+  submit: { backgroundColor: colours.cardTitle, borderRadius: 10, height: 46, alignItems: 'center', justifyContent: 'center' },
+  submitText: { color: '#fff', fontWeight: '700', fontSize: 15 },
 })
