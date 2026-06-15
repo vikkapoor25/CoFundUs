@@ -10,16 +10,19 @@ export default function SelectField({
 }) {
   const [open, setOpen] = useState(false)
 
+  const selected = options.find(opt => opt.value === value)
+
   return (
     <View style={styles.wrap}>
       {label ? <Text style={styles.label}>{label}</Text> : null}
 
-        {/* placeholder */}
+      {/* display */}
       <Pressable style={styles.input} onPress={() => setOpen(true)}>
-        <Text style={{ color: value ? '#000' : '#999' }}>
-            {value ? value : placeholder}
+        <Text style={{ color: selected ? '#000' : '#999' }}>
+          {selected ? selected.label : placeholder}
         </Text>
-    </Pressable>
+      </Pressable>
+
       {/* dropdown */}
       <Modal visible={open} transparent animationType="fade">
         <Pressable style={styles.overlay} onPress={() => setOpen(false)}>
@@ -31,11 +34,11 @@ export default function SelectField({
                 <Pressable
                   style={styles.option}
                   onPress={() => {
-                    onChange(item)
+                    onChange(item.value)
                     setOpen(false)
                   }}
                 >
-                  <Text>{item}</Text>
+                  <Text>{item.label}</Text>
                 </Pressable>
               )}
             />
@@ -56,6 +59,7 @@ const styles = StyleSheet.create({
     color: '#55626d',
     marginBottom: 6,
     textTransform: 'uppercase',
+    letterSpacing: 0.5
   },
 
   input: {

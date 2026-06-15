@@ -1,7 +1,7 @@
 const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
 
 // Calls the backend /bank-accounts router.
-export async function addIncome(bank_account_id) {
+export async function addIncome(body) {
   const res = await fetch(`${BASE_URL}/bank-accounts/?`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -29,15 +29,12 @@ export async function deleteAccount(bank_account_id) {
   const res = await fetch(`${BASE_URL}/bank-accounts/delete`, {
     method: 'DELETE',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ bank_account_id }),
+    body: JSON.stringify({ account_id: bank_account_id })
   })
   return res.json()
 }
 
 export async function getBalance(household_id) {
-  const res = await fetch(`${BASE_URL}/bank-accounts/?`, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' }
-  })
+  const res = await fetch(`${BASE_URL}/bank-accounts/balance/${household_id}`)
   return res.json()
 }

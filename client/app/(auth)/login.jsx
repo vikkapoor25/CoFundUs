@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useState } from 'react'
 import { View, Text, TextInput, Pressable, Image, StyleSheet } from 'react-native'
 import { useRouter } from 'expo-router'
@@ -18,6 +19,17 @@ export default function login() {
     try {
       const data = await apiLogin(username, password)
       if (data && data.jwt_token) {
+
+        //save data in storage
+        await AsyncStorage.setItem(
+          "household",
+          JSON.stringify({
+            household_id: data.household_id,
+            name_1: data.name_1,
+            name_2: data.name_2,
+          })
+        )
+      
         router.replace('/')
       } else {
         setError(data?.error || 'Invalid login details')
@@ -93,7 +105,7 @@ const styles = StyleSheet.create({
   label: { fontSize: 13, color: '#55626d', marginBottom: 6, fontWeight: '600' },
   input: { borderBottomWidth: 1, borderBottomColor: '#d7dee6', height: 44, marginBottom: 18, fontSize: 14 },
   error: { color: '#e5484d', fontSize: 13, marginBottom: 10 },
-  btn: { backgroundColor: '#7e9fd6', borderRadius: 10, height: 48, alignItems: 'center', justifyContent: 'center', marginTop: 8 },
+  btn: { backgroundColor: '#4a7ec2', borderRadius: 10, height: 48, alignItems: 'center', justifyContent: 'center', marginTop: 8 },
   btnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
   links: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 18 },
   link: { color: '#4a7ec2', fontWeight: '600', fontSize: 13 },
