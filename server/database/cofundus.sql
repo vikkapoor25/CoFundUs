@@ -39,13 +39,12 @@ CREATE TABLE goals (
 
 CREATE TABLE income (
     income_id INT GENERATED ALWAYS AS IDENTITY,
-    income_name VARCHAR(50) NOT NULL,
     account_id INT NOT NULL,
     income_amount INT NOT NULL,
     payment_date DATE NOT NULL,
     category VARCHAR(50) NOT NULL,
     repeat_income BOOLEAN NOT NULL,
-    income_frequency VARCHAR(50) NOT NULL,
+    payment_frequency VARCHAR(50) NOT NULL,
     income_repeat_date DATE NOT NULL,
     PRIMARY KEY (income_id),
     FOREIGN KEY (account_id) REFERENCES accounts(account_id)
@@ -120,16 +119,14 @@ INSERT INTO goals (
 INSERT INTO income (
     account_id,
     income_amount,
-    income_name,
     payment_date,
     category,
     repeat_income,
-    income_frequency,
+    payment_frequency,
     income_repeat_date
 ) VALUES (
     1,
     3000,
-    'Salary',
     '2026-07-09',
     'Salary',
     TRUE,
