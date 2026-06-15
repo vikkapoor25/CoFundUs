@@ -3,12 +3,12 @@ import { ScrollView, View, Text, StyleSheet, Modal, Pressable, Keyboard, TextInp
 import {useState, useEffect} from 'react'
 import colours from '../../constants/colours'
 import Card from '../../components/Card'
+import AccountCards from '../../components/AccountCards';
 import AddButton from '../../components/AddButton'
 import AddModal from '../../components/AddModal'
 import Field from '../../components/Field'
 import DateField from '../../components/DateField'
 import SelectField from '../../components/SelectField'
-import MetabaseScreen from '../../components/Data'
 import { createAccount, getAccounts, deleteAccount,addIncome, getBalance } from '../../api/bank-accounts';
 
 
@@ -64,6 +64,7 @@ export default function accounts() {
       const data = await getAccounts(householdId) 
       setAccounts(data)
       setAccountAmount(data.length)
+      console.log(data)
     } catch (error) {
       console.log("Failed to load accounts:", error)
     }
@@ -94,7 +95,6 @@ export default function accounts() {
       date: date,
     };
 
-    console.log("PAYLOAD:", payload);
     await addIncome({
       account_id: accountId,
       income_frequency: incomeFrequency,
@@ -130,7 +130,6 @@ export default function accounts() {
       alert("Please select an account");
       return;
     }
-    console.log("PAYLOAD:", accountId);
     await deleteAccount(accountId);
     //reload accounts for updated list
     await loadAccounts();
@@ -160,39 +159,41 @@ export default function accounts() {
       >
         <Text style={styles.heading}>Household Banks</Text>
         <Text style={styles.sub}>All your household finances in one place</Text>
-          {/* show balance */}
-        <Card title="All Accounts">
-          <View style={styles.row}>
-            <Text style={styles.label}>Total Balance</Text>
-            <Text style={styles.value}>£{balance}</Text>
-          </View>
+        {/* show balance */}
+        
+        <View style={styles.list}>
+          <Card title="All Accounts">
             <View style={styles.row}>
-              <Text style={styles.label}>Total Accounts</Text>
-              <Text style={styles.value}>{accountAmount}</Text>
+              <Text style={styles.label}>Total Balance</Text>
+              <Text style={styles.value}>£{balance}</Text>
             </View>
-        </Card>
+              <View style={styles.row}>
+                <Text style={styles.label}>Total Accounts</Text>
+                <Text style={styles.value}>{accountAmount}</Text>
+              </View>
+          </Card>
 
-          {/* all accounts */}
-        <View style={styles.metabaseBox}>
-          <MetabaseScreen />
-        </View>
+          {/* view account information */}
+          <AccountCards accounts={accounts} />
 
           {/* add income and delete button */}
-        <View style={styles.bottomBar}>
-          <Pressable
-            onPress={() => setActiveModal("income")}
-            style={styles.bottomButton}
-          >
-            <Text style={styles.textStyle}>Add Income</Text>
-            </Pressable>
-
+          <View style={styles.bottomBar}>
             <Pressable
-              onPress={() => setActiveModal("delete")}
+              onPress={() => setActiveModal("income")}
               style={styles.bottomButton}
             >
+              <Text style={styles.textStyle}>Add Income</Text>
+              </Pressable>
+
+              <Pressable
+                onPress={() => setActiveModal("delete")}
+                style={styles.bottomButton}
+              >
               <Text style={styles.textStyle}>Delete Account</Text>
             </Pressable>
           </View>
+
+        </View>
       </ScrollView>
 
       {/* add account button */}
@@ -313,23 +314,48 @@ export default function accounts() {
     
   )
 }
-
 const styles = StyleSheet.create({
-  metabaseBox: {
-    height: 400,  
-    marginVertical: 16,
-    borderRadius: 12,
-    overflow: "hidden",
-    marginBottom:60
+  screen: {
+    flex: 1,
+    backgroundColor: colours.background,
   },
-  screen: { flex: 1, backgroundColor: colours.background },
-  body: { padding: 16, paddingTop: 30 },
-  heading: { fontSize: 24, fontWeight: '800', color: colours.pageHeader },
-  sub: { fontSize: 13, color: '#7a8794', marginBottom: 16, marginTop: 4 },
-  row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8 },
-  label: { color: '#55626d' },
-  value: { fontWeight: '700' },
-  fill: { height: '100%', backgroundColor: colours.buttonBackground, borderRadius: 8 },
+  body: {
+    padding: 16,
+    paddingTop: 30,
+    paddingBottom: 24,
+  },
+  heading: {
+    fontSize: 24,
+    fontWeight: "800",
+    color: colours.pageHeader,
+  },
+  sub: {
+    fontSize: 13,
+    color: "#7a8794",
+    marginTop: 4,
+    marginBottom: 16,
+  },
+  list: {
+    marginTop: 10,
+    gap: 16, 
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 8,
+  },
+  label: {
+    color: "#55626d",
+  },
+  value: {
+    fontWeight: "700",
+  },
+  bottomBar: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 12,
+    marginTop: 4,
+  },
   button: {
     borderRadius: 20,
     padding: 10,
@@ -338,27 +364,16 @@ const styles = StyleSheet.create({
     backgroundColor: colours.buttonBackground,
     alignSelf: 'center'
   },
-  textStyle: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  bottomBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: 12,
-    paddingHorizontal: 16
-  },
   bottomButton: {
     flex: 1,
-    marginHorizontal: 6,
     backgroundColor: colours.buttonBackground,
     padding: 12,
     borderRadius: 16,
-    alignItems: 'center',
-  }
-})
+    alignItems: "center",
+  },
+  textStyle: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+});
