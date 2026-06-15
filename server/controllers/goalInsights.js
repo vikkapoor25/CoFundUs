@@ -1,6 +1,6 @@
 const GoalInsight = require("../models/GoalInsight")
 
-// GET goal-insights/feasibility/:household_id
+// GET goal-insights/feasibility/household/:household_id
 async function feasibility(req, res) {
     try {
         // Gets feasibility for each of a household's goals using getFeasibility() from models
@@ -14,7 +14,7 @@ async function feasibility(req, res) {
 }
 
 
-// GET goal-insights/priority/:household_id
+// GET goal-insights/priority/household/:household_id
 async function priority(req, res) {
     try {
         // Gets priority for each of a household's goals using getPriority() from models
@@ -28,11 +28,11 @@ async function priority(req, res) {
 }
 
 
-// GET goal-insights/optimisation/:household_id
+// GET goal-insights/optimisation/household/:household_id
 async function optimisation(req, res) {
     try {
         // Gets household's spending and identify actions to save money using getOptimisation() from models
-        const optimisation = await GoalInsight.getFeasibility(req.params.household_id);
+        const optimisation = await GoalInsight.getOptimisation(req.params.household_id);
         // Sends success response
         res.status(200).json(optimisation);
     } catch (err) {
