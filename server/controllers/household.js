@@ -34,6 +34,7 @@ async function login(req, res) {
             res.status(200).json({
                 success: true,
                 jwt_token: token,
+                household_id: household.household_id,
                 name_1: household.name_1,
                 name_2: household.name_2
             });

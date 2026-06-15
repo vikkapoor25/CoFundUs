@@ -17,9 +17,30 @@ describe("Bank Accounts API Endpoints", () => {
   });
 
   afterAll(async () => {
-  await new Promise((resolve) => api.close(resolve));
-  await db.end();
-});
+    await new Promise((resolve) => api.close(resolve));
+    await db.end();
+  });
+
+  describe("GET /bank-accounts/:household_id", () => {
+    it("should return all bank accounts for a household with income, bills, and net gain/loss", async () => {
+      const response = await request(api).get("/bank-accounts/1");
+
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body)).toBe(true);
+      expect(response.body.length).toBeGreaterThan(0);
+      expect(response.body[0]).toHaveProperty("household_id", 1);
+      expect(response.body[0]).toHaveProperty("income_total");
+      expect(response.body[0]).toHaveProperty("bills_total");
+      expect(response.body[0]).toHaveProperty("net_gain_loss");
+    });
+
+    it("should return an empty array if the household has no bank accounts", async () => {
+      const response = await request(api).get("/bank-accounts/999");
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual([]);
+    });
+  });
 
   describe("POST /bank-accounts/new", () => {
     it("should create a new bank account and return it", async () => {

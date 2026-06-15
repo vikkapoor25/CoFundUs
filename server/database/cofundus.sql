@@ -31,7 +31,7 @@ CREATE TABLE goals (
     household_id INT NOT NULL,
     goal_name VARCHAR(50) NOT NULL,
     goal_amount INT NOT NULL,
-    current_value INT NOT NULL,
+    current_value INT DEFAULT 0,
     target_date DATE,
     PRIMARY KEY (goal_id),
     FOREIGN KEY (household_id) REFERENCES household(household_id)
@@ -52,15 +52,16 @@ CREATE TABLE income (
 
 CREATE TABLE bills (
     bill_id INT GENERATED ALWAYS AS IDENTITY,
+    bill_name VARCHAR(50) NOT NULL,
     account_id INT NOT NULL,
     bill_amount INT NOT NULL,
-    bill_due_date DATE NOT NULL,
+    bill_due_date DATE DEFAULT CURRENT_DATE,
     category VARCHAR(50) NOT NULL,
-    category_type VARCHAR(50) NOT NULL,
+    category_type VARCHAR(50),
     repeat_bill BOOLEAN NOT NULL,
     payment_frequency VARCHAR(50),
     bill_repeat_date DATE,
-    paid BOOLEAN NOT NULL,
+    paid BOOLEAN DEFAULT false,
     PRIMARY KEY (bill_id),
     FOREIGN KEY (account_id) REFERENCES accounts(account_id)
 );
@@ -136,6 +137,7 @@ INSERT INTO income (
 INSERT INTO bills (
     account_id,
     bill_amount,
+    bill_name,
     bill_due_date,
     category,
     category_type,
@@ -146,9 +148,10 @@ INSERT INTO bills (
 ) VALUES (
     1,
     200,
+    'Purchased iPhone',
     '2026-07-09',
-    'purchase iphone',
-    'retail',
+    'Commercial',
+    'Retail',
     TRUE,
     'Immediate',
     '2026-06-09',
