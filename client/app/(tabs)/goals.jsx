@@ -5,8 +5,15 @@ import Card from '../../components/card'
 
 
 export default function goals() {
+
+
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.body}>
+    <ScrollView
+        style={styles.screen}
+        contentContainerStyle={styles.body}
+        showsVerticalScrollIndicator={false}
+        bounces={false}  
+      >
       <Text style={styles.heading}>AI Insights</Text>
       <Text style={styles.sub}>Your AI Financial Coach</Text>
 
@@ -32,7 +39,7 @@ export default function goals() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colours.background },
-  body: { padding: 16, paddingTop: 60 },
+  body: { padding: 16, paddingTop: 30 },
   heading: { fontSize: 24, fontWeight: '800', color: colours.pageHeader },
   sub: { fontSize: 13, color: '#7a8794', marginBottom: 16, marginTop: 4 },
   line: { fontSize: 13, color: '#3f4856', paddingVertical: 6, lineHeight: 18 },
