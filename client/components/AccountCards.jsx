@@ -1,13 +1,15 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import Card from "./Card";
 import colours from "../constants/colours";
 
 export default function AccountCards({
   title = "Household Accounts",
   accounts = [],
-  emptyText = "No accounts available",
+  emptyText = "You don’t have any accounts set up yet. Add an account to start tracking your balance.",
   renderAccount,
+  addIncome,
+  deleteAccount
 }) {
   return (
     <Card title={title}>
@@ -20,6 +22,7 @@ export default function AccountCards({
               renderAccount(account, index)
             ) : (
               <View key={account.account_id} style={styles.card}>
+                
                 
                 {/* left (name and type) */}
                 <View style={styles.left}>
@@ -60,6 +63,22 @@ export default function AccountCards({
                       Goal: £{Number(account.allocated_to_goal)}
                     </Text>
                   )}
+                </View>
+
+                <View style={styles.actionsRow}>
+                  <Pressable
+                    onPress={() => addIncome?.(account.account_id)}
+                    style={[styles.smallButton, styles.incomeButton]}
+                  >
+                    <Text style={styles.smallButtonText}>Add Income</Text>
+                  </Pressable>
+
+                  <Pressable
+                    onPress={() => deleteAccount?.(account.account_id)}
+                    style={[styles.smallButton, styles.deleteButton]}
+                  >
+                    <Text style={styles.smallButtonText}>Delete</Text>
+                  </Pressable>
                 </View>
 
               </View>
@@ -120,7 +139,7 @@ const styles = StyleSheet.create({
   statsRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 14,
+    marginTop: 5,
     paddingTop: 14,
     borderTopWidth: 1,
     borderTopColor: "#f3f3f3",
@@ -132,8 +151,33 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     paddingVertical: 12,
-    color: "white",
+    color: colours.label,
     fontSize: 13,
     fontStyle: "italic",
   },
+  actionsRow: {
+    marginTop: 10,
+    flexDirection: "row",
+  },
+  smallButton: {
+  flex: 1,
+  paddingVertical: 8,
+  borderRadius: 8,
+  borderWidth: 1,
+  borderColor: "rgba(255,255,255,0.3)",
+  alignItems: "center",
+},
+
+deleteButton: {
+  marginLeft: 8,
+  borderColor: colours.softRed,
+},
+incomeButton:  {
+  borderColor: "white",
+},
+smallButtonText: {
+  color: "white",
+  fontSize: 12,
+  fontWeight: "600",
+},
 });

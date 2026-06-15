@@ -78,7 +78,7 @@ export default function home() {
           <Text style={styles.value}>£{balance}</Text>
         </View>
         <View style={styles.metabaseBox}>
-          <MetabaseScreen url="https://vivid-abaft.metabaseapp.com/public/dashboard/c32c2fba-aeb7-4f1d-bccd-2b403319ca79" />
+          <MetabaseScreen url="https://vivid-abaft.metabaseapp.com/public/question/42e0e5ac-8274-4c8c-9e66-c816874c51ae#titled=false"/>
         </View>
       </Card>
 
@@ -141,11 +141,11 @@ export default function home() {
 
 const styles = StyleSheet.create({
   metabaseBox: {
-    height: 400,  
+    height: 300,  
     marginVertical: 16,
     borderRadius: 12,
     overflow: "hidden",
-    marginBottom:60
+    marginBottom:0
   },
   screen: { flex: 1, backgroundColor: colours.background },
   body: { padding: 16, paddingTop: 30 },
