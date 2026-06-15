@@ -56,6 +56,28 @@ class BankAccount {
 
     return result.rows;
   }
+
+  static async getBalanceByHouseholdId(household_id) {
+  const result = await db.query(
+    `SELECT
+        household_id,
+        COALESCE(SUM(account_balance), 0)::INT AS total_balance
+     FROM accounts
+     WHERE household_id = $1
+     GROUP BY household_id;`,
+    [household_id]
+  );
+
+  if (result.rows.length === 0) {
+    return {
+      household_id: Number(household_id),
+      total_balance: 0,
+    };
+  }
+
+  return result.rows[0];
+}
+
 }
 
 module.exports = BankAccount;

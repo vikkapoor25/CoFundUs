@@ -6,6 +6,30 @@ describe("BankAccount model", () => {
     jest.clearAllMocks();
   });
 
+  describe("getBalanceByHouseholdId", () => {
+  it("should return total balance for a household", async () => {
+    const mockResponse = {
+      rows: [{ household_id: 1, total_balance: 25000 }],
+    };
+
+    jest.spyOn(db, "query").mockResolvedValue(mockResponse);
+
+    const result = await BankAccount.getBalanceByHouseholdId(1);
+
+    expect(db.query).toHaveBeenCalledTimes(1);
+    expect(result).toEqual({ household_id: 1, total_balance: 25000 });
+  });
+
+  it("should return 0 balance if household has no accounts", async () => {
+    jest.spyOn(db, "query").mockResolvedValue({ rows: [] });
+
+    const result = await BankAccount.getBalanceByHouseholdId(999);
+
+    expect(db.query).toHaveBeenCalledTimes(1);
+    expect(result).toEqual({ household_id: 999, total_balance: 0 });
+  });
+});
+
   describe("create", () => {
     it("should create a new bank account and return it", async () => {
       const mockAccount = {
