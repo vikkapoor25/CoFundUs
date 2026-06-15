@@ -6,7 +6,7 @@ import colours from '../constants/colours'
 export default function Card({ title, children  }) {
   return (
     <View style={styles.card}>
-      <Text style={styles.cardTitle}>{title}</Text>
+        <Text style={styles.cardTitle}>{title}</Text>
       <View>{children }</View>
     </View>
   );
@@ -14,5 +14,12 @@ export default function Card({ title, children  }) {
 
 const styles = StyleSheet.create({
   card: { backgroundColor: colours.cardBackground, borderRadius: 16, padding: 16, marginBottom: 14 },
-  cardTitle: { fontSize: 15, fontWeight: '700', color: colours.cardTitle, marginBottom: 12 }
+  cardTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: colours.cardTitle
+  },
+  rightIcon: {
+    marginLeft: 8
+  }
 });

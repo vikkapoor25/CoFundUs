@@ -13,12 +13,15 @@ export default function bills() {
 
   return (
     <View style={{ flex: 1 }}>
-      <ScrollView style={styles.screen} contentContainerStyle={styles.body}>
-        <Text style={styles.heading}>Bills</Text>
+      <ScrollView
+        style={styles.screen}
+        contentContainerStyle={styles.body}
+        showsVerticalScrollIndicator={false}
+        bounces={false}  
+      >
 
-        <View style={styles.container}>
-          <AddButton onPress={() => setModalVisible(true)} />
-        </View>
+        <Text style={styles.heading}>Upcoming Bills</Text>
+        <Text style={styles.sub}>Stay ahead of upcoming bills and subscriptions</Text>
 
         <Card title="Upcoming Bills">
           <View style={styles.row}>
@@ -90,6 +93,8 @@ export default function bills() {
         </Card>
       </ScrollView>
 
+      <AddButton onPress={() => setModalVisible(true)} />
+
       <AddModal
         title="Add A Bill"
         visible={modalVisible}
@@ -102,9 +107,9 @@ export default function bills() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colours.background },
-  container: {left: 305,bottom: 30},
-  body: { padding: 16, paddingTop: 60 },
-  heading: { fontSize: 24, fontWeight: '800', color: colours.pageHeader, marginBottom: 16 },
+  heading: { fontSize: 24, fontWeight: '800', color: colours.pageHeader },
+  sub: { fontSize: 13, color: '#7a8794', marginBottom: 16, marginTop: 4 },
+  body: { padding: 16, paddingTop: 30 },
   row: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#eef1f5' },
   cell: { flex: 1, fontSize: 12, color: '#3f4856' },
   head: { fontWeight: '700', color: '#7a8794', fontSize: 11 },
