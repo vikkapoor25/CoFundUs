@@ -2,14 +2,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ScrollView, View, Text, StyleSheet, Modal, Pressable, Keyboard, TextInput} from 'react-native'
 import {useState, useEffect} from 'react'
 import colours from '../../constants/colours'
-import Card from '../../components/Card'
-import AccountCards from '../../components/AccountCards';
+import Card from '../../components/card'
 import AddButton from '../../components/AddButton'
 import AddModal from '../../components/AddModal'
-import Field from '../../components/Field'
-import DateField from '../../components/DateField'
-import SelectField from '../../components/SelectField'
-import { createAccount, getAccounts, deleteAccount,addIncome, getBalance } from '../../api/bank-accounts';
+import Field from '../../components/field';
+import { createAccount, getAccounts, deleteAccount } from '../../api/bank-accounts';
 
 
 export default function accounts() {

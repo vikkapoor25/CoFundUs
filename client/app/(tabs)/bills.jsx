@@ -1,15 +1,73 @@
-import { ScrollView, View, Text, StyleSheet, Modal} from 'react-native'
-import {useState} from 'react';
+import { ScrollView, View, Text, StyleSheet, Pressable } from 'react-native'
+import { useState } from 'react'
+import { WebView } from 'react-native-webview'
 import colours from '../../constants/colours'
-import Card from '../../components/Card'
+import Card from '../../components/card'
 import AddButton from '../../components/AddButton'
 import AddModal from '../../components/AddModal'
+import Field from '../../components/field'
 
+const CHART_URL = 'https://vivid-abaft.metabaseapp.com/public/question/58ad854f-7cd1-4ab6-9c8b-e0a1522e7092'
 
+const SECTIONS = [
+  { key: 'recurring', title: 'Recurring Bills' },
+  { key: 'subscription', title: 'Subscriptions' },
+  { key: 'one-time', title: 'One-Time Bills' },
+]
+
+const SEED_BILLS = [
+  { bill_id: 1, account: 'Sam', bill_name: 'EE Phone Bill', bill_amount: 16, bill_due_date: '14/06', category_type: 'recurring', paid: false },
+  { bill_id: 2, account: 'Shared', bill_name: 'Rent', bill_amount: 1500, bill_due_date: '01/07', category_type: 'recurring', paid: false },
+  { bill_id: 3, account: 'Shared', bill_name: 'Electricity & Gas', bill_amount: 120, bill_due_date: '02/07', category_type: 'recurring', paid: false },
+  { bill_id: 4, account: 'Alex', bill_name: 'Netflix', bill_amount: 10, bill_due_date: '11/06', category_type: 'subscription', paid: false },
+  { bill_id: 5, account: 'Alex', bill_name: 'Spotify', bill_amount: 12, bill_due_date: '03/06', category_type: 'subscription', paid: true },
+  { bill_id: 6, account: 'Shared', bill_name: 'Concert Tickets', bill_amount: 120, bill_due_date: '14/07', category_type: 'one-time', paid: false },
+  { bill_id: 7, account: 'Alex', bill_name: 'Car Repair', bill_amount: 180, bill_due_date: '20/06', category_type: 'one-time', paid: false },
+]
 
 export default function bills() {
+  const [bills, setBills] = useState(SEED_BILLS)
+  const [modalVisible, setModalVisible] = useState(false)
 
-  const [modalVisible, setModalVisible] = useState(false);
+  const [billName, setBillName] = useState('')
+  const [amount, setAmount] = useState('')
+  const [account, setAccount] = useState('')
+  const [dueDate, setDueDate] = useState('')
+  const [type, setType] = useState('recurring')
+
+  function resetForm() {
+    setBillName('')
+    setAmount('')
+    setAccount('')
+    setDueDate('')
+    setType('recurring')
+  }
+
+  function handleAddBill() {
+    if (!billName || !amount) return
+    const newBill = {
+      bill_id: Date.now(),
+      account: account || 'Shared',
+      bill_name: billName,
+      bill_amount: Number(amount) || 0,
+      bill_due_date: dueDate || '--/--',
+      category_type: type,
+      paid: false,
+    }
+    setBills((current) => [...current, newBill])
+    resetForm()
+    setModalVisible(false)
+  }
+
+  function togglePaid(bill_id) {
+    setBills((current) =>
+      current.map((b) => (b.bill_id === bill_id ? { ...b, paid: !b.paid } : b))
+    )
+  }
+
+  function removeBill(bill_id) {
+    setBills((current) => current.filter((b) => b.bill_id !== bill_id))
+  }
 
   return (
     <View style={{ flex: 1 }}>
@@ -23,74 +81,49 @@ export default function bills() {
         <Text style={styles.heading}>Upcoming Bills</Text>
         <Text style={styles.sub}>Stay ahead of upcoming bills and subscriptions</Text>
 
-        <Card title="Upcoming Bills">
-          <View style={styles.row}>
-            <Text style={[styles.cell, styles.head]}>Days Left</Text>
-            <Text style={[styles.cell, styles.head]}>Payment</Text>
-            <Text style={[styles.cell, styles.head]}>Account</Text>
-            <Text style={[styles.cell, styles.head, styles.rightCell]}>Amount</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.cell}>2 days</Text>
-            <Text style={styles.cell}>EE Phone Bill</Text>
-            <Text style={styles.cell}>Sam</Text>
-            <Text style={[styles.cell, styles.rightCell]}>£16</Text>
+        <Card title="Bills vs Account Value">
+          <View style={styles.chartBox}>
+            <WebView source={{ uri: CHART_URL }} style={{ flex: 1 }} />
           </View>
         </Card>
 
-        <Card title="Subscriptions">
-          <View style={styles.row}>
-            <Text style={[styles.cell, styles.head]}>Payment</Text>
-            <Text style={[styles.cell, styles.head]}>Amount</Text>
-            <Text style={[styles.cell, styles.head]}>Account</Text>
-            <Text style={[styles.cell, styles.head, styles.rightCell]}>Due</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.cell}>Rent</Text>
-            <Text style={styles.cell}>£1,500</Text>
-            <Text style={styles.cell}>Shared</Text>
-            <Text style={[styles.cell, styles.rightCell]}>01/07</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.cell}>Electricity & Gas</Text>
-            <Text style={styles.cell}>£120</Text>
-            <Text style={styles.cell}>Shared</Text>
-            <Text style={[styles.cell, styles.rightCell]}>02/07</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.cell}>Netflix</Text>
-            <Text style={styles.cell}>£10</Text>
-            <Text style={styles.cell}>Alex</Text>
-            <Text style={[styles.cell, styles.rightCell]}>11/06</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.cell}>Spotify</Text>
-            <Text style={styles.cell}>£12</Text>
-            <Text style={styles.cell}>Alex</Text>
-            <Text style={[styles.cell, styles.rightCell]}>03/06</Text>
-          </View>
-        </Card>
-
-        <Card title="One-Time Bills">
-          <View style={styles.row}>
-            <Text style={[styles.cell, styles.head]}>Payment</Text>
-            <Text style={[styles.cell, styles.head]}>Amount</Text>
-            <Text style={[styles.cell, styles.head]}>Account</Text>
-            <Text style={[styles.cell, styles.head, styles.rightCell]}>Date</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.cell}>Concert Tickets</Text>
-            <Text style={styles.cell}>£120</Text>
-            <Text style={styles.cell}>Shared</Text>
-            <Text style={[styles.cell, styles.rightCell]}>14/07</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.cell}>Car Repair</Text>
-            <Text style={styles.cell}>£180</Text>
-            <Text style={styles.cell}>Alex</Text>
-            <Text style={[styles.cell, styles.rightCell]}>20/06</Text>
-          </View>
-        </Card>
+        {SECTIONS.map((section) => {
+          const sectionBills = bills.filter((b) => b.category_type === section.key)
+          return (
+            <Card key={section.key} title={section.title}>
+              {sectionBills.length === 0 ? (
+                <Text style={styles.empty}>No bills yet</Text>
+              ) : (
+                sectionBills.map((bill) => (
+                  <View key={bill.bill_id} style={styles.bill}>
+                    <View style={styles.billLeft}>
+                      <Text style={[styles.billName, bill.paid && styles.paidText]}>
+                        {bill.bill_name}
+                      </Text>
+                      <Text style={styles.billMeta}>
+                        {bill.account} · due {bill.bill_due_date}
+                        {bill.paid ? ' · Paid' : ''}
+                      </Text>
+                      <View style={styles.actions}>
+                        <Pressable onPress={() => togglePaid(bill.bill_id)}>
+                          <Text style={styles.actionPaid}>
+                            {bill.paid ? 'Mark unpaid' : 'Mark paid'}
+                          </Text>
+                        </Pressable>
+                        <Pressable onPress={() => removeBill(bill.bill_id)}>
+                          <Text style={styles.actionDelete}>Delete</Text>
+                        </Pressable>
+                      </View>
+                    </View>
+                    <Text style={[styles.amount, bill.paid && styles.paidText]}>
+                      £{Number(bill.bill_amount).toLocaleString()}
+                    </Text>
+                  </View>
+                ))
+              )}
+            </Card>
+          )
+        })}
       </ScrollView>
 
       <AddButton onPress={() => setModalVisible(true)} />
@@ -101,6 +134,11 @@ export default function bills() {
         setVisible={setModalVisible}
       />
 
+          <Pressable style={styles.submit} onPress={handleAddBill}>
+            <Text style={styles.submitText}>Add Bill</Text>
+          </Pressable>
+        </View>
+      </AddModal>
     </View>
   )
 }

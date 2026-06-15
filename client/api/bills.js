@@ -8,7 +8,7 @@ export async function getBills(householdId) {
 }
 
 export async function createBill(body) {
-  // body: { bill_amount, account_id, date, category, repeat, payment_frequency, bill_repeat_date }
+  // body: { account_id, bill_name, bill_amount, bill_due_date, category, category_type, repeat_bill, payment_frequency, bill_repeat_date, paid }
   const res = await fetch(`${BASE_URL}/bills/new`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
