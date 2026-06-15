@@ -1,11 +1,12 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { ScrollView, View, Text, StyleSheet } from 'react-native'
 import {useState, useEffect} from 'react'
 import colours from '../../constants/colours'
 import Card from '../../components/Card'
-import TableCard from '../../components/Table';
+import TableCard from '../../components/Table'
 import MetabaseScreen from '../../components/Data'
-import { getHome, mockGetHome, mockGetBills, mockGetGoal } from '../../api/home';
+import { getHome, mockGetHome, mockGetBills, mockGetGoal, getNet } from '../../api/home'
+import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry'
 
 
 
@@ -22,13 +23,13 @@ export default function home() {
 
   //load in id first
   useEffect(() => {
-    loadStorage();
-  }, []);
+    loadStorage()
+  }, [])
 
   useEffect(() => {
-    if (householdId === null) return;
+    if (householdId === null) return
     loadData()
-  }, [householdId]);
+  }, [householdId])
 
   //get names from asyncstorage
   async function loadStorage() {
@@ -43,15 +44,16 @@ export default function home() {
     const { household_id } = JSON.parse(stored)
     setNameOne(name_1 ?? "")
     setNameTwo(name_2 ?? "")
-    setHouseholdId(Number(household_id));
+    setHouseholdId(Number(household_id))
   }
 
   async function loadData() {
     try {
+      const netData = await getNet(householdId)
       const data = await mockGetHome(householdId)
       const billsData = await mockGetBills(householdId) 
       const goalData = await mockGetGoal(householdId)
-      setNet(data.netGainLoss)
+      setNet(Number(netData.net_gain_loss))
       setBalance(data.totalBalance)
       setBills(billsData)
       setGoal(goalData)
@@ -60,7 +62,7 @@ export default function home() {
     }
   }
 
-
+  console.log(net)
   return (
     <ScrollView
       style={styles.screen}
@@ -73,10 +75,6 @@ export default function home() {
 
       {/* display all account in pie chart */}
       <Card title="Account Balance Overview">
-        <View style={styles.row}>
-          <Text style={styles.label}>Total Balance</Text>
-          <Text style={styles.value}>£{balance}</Text>
-        </View>
         <View style={styles.metabaseBox}>
           <MetabaseScreen url="https://vivid-abaft.metabaseapp.com/public/question/42e0e5ac-8274-4c8c-9e66-c816874c51ae#titled=false"/>
         </View>
@@ -85,15 +83,17 @@ export default function home() {
       {/* display income and spending for month with net gain or loss */}
       <Card title="Monthly Income and Spending">
         <Text>Add bar charts</Text>
+
         <View style={styles.row}>
-          <Text style={styles.label}>Net Gain/Loss (£):</Text>
+          <Text style={styles.label}>Net Gain/Loss:</Text>
+
           <Text
             style={[
               styles.value,
-              { color: net >= 0 ? colours.green : colours.red }
+              { color: net >= 0 ? colours.green : colours.red },
             ]}
           >
-            {net}
+            {net >= 0 ? "+" : ""}£{Number(net)}
           </Text>
         </View>
       </Card>
