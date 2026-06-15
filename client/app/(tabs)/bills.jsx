@@ -82,7 +82,6 @@ export default function bills() {
             <Text style={styles.heading}>Upcoming Bills</Text>
             <Text style={styles.sub}>Stay ahead of upcoming bills and subscriptions</Text>
           </View>
-          <AddButton onPress={() => setModalVisible(true)} />
         </View>
 
         <Card title="Bills vs Account Value">
@@ -129,6 +128,8 @@ export default function bills() {
           )
         })}
       </ScrollView>
+
+      <AddButton onPress={() => setModalVisible(true)} />
 
       <AddModal title="Add A Bill" visible={modalVisible} setVisible={setModalVisible}>
         <View style={styles.form}>
