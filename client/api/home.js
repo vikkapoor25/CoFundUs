@@ -6,6 +6,13 @@ export async function getHome(householdId) {
   return res.json() // { totalBalance, income, bills, netGainLoss, upcomingBills, goals }
 }
 
+//fetch households bills
+export async function getBills(householdId) {
+  const res = await fetch(`${BASE_URL}/home/bills/${householdId}`)
+  return res.json() 
+}
+
+//fetch households netgain/loss
 export async function getNet(householdId){
   const res = await fetch(`${BASE_URL}/home/net/${householdId}`)
   return res.json()
@@ -17,22 +24,6 @@ export async function mockGetHome(householdId) {
     totalBalance: 28500,
     netGainLoss: 1150,
   };
-}
-export async function mockGetBills(householdId) {
-  return [
-      {
-        bill_name: "EE Phone Bill",
-        account_name: "tooba",
-        bill_amount: 20,
-        bill_due_date: "2026-06-16"
-      },
-      {
-        bill_name: "Gym",
-        account_name: "tooba",
-        bill_amount: 30,
-        bill_due_date: "2026-06-17"
-      }
-  ]
 }
 
 export async function mockGetGoal(householdId){

@@ -5,7 +5,7 @@ import colours from '../../constants/colours'
 import Card from '../../components/Card'
 import TableCard from '../../components/Table'
 import MetabaseScreen from '../../components/Data'
-import { getHome, mockGetHome, mockGetBills, mockGetGoal, getNet } from '../../api/home'
+import { getHome, mockGetHome, mockGetGoal, getNet, getBills } from '../../api/home'
 import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry'
 
 
@@ -50,19 +50,17 @@ export default function home() {
   async function loadData() {
     try {
       const netData = await getNet(householdId)
+      const billData = await getBills(householdId)
       const data = await mockGetHome(householdId)
-      const billsData = await mockGetBills(householdId) 
       const goalData = await mockGetGoal(householdId)
       setNet(Number(netData.net_gain_loss))
-      setBalance(data.totalBalance)
       setBills(billsData)
+      setBalance(data.totalBalance)
       setGoal(goalData)
     } catch (error) {
       console.log("Failed to get data:", error)
     }
   }
-
-  console.log(net)
   return (
     <ScrollView
       style={styles.screen}
