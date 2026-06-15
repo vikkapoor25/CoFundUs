@@ -41,8 +41,18 @@ async function getAccountsByHousehold(req, res) {
   }
 }
 
+async function getBalanceByHousehold(req, res) {
+  try {
+    const balance = await BankAccount.getBalanceByHouseholdId(req.params.household_id);
+    res.status(200).json(balance);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
 module.exports = {
   createBankAccount,
   deleteBankAccount,
   getAccountsByHousehold,
+  getBalanceByHousehold,
 };
