@@ -18,20 +18,8 @@ export async function getNet(householdId){
   return res.json()
 }
 
-//mock functions until backed in ready
-export async function mockGetHome(householdId) {
-  return {
-    totalBalance: 28500,
-    netGainLoss: 1150,
-  };
-}
-
-export async function mockGetGoal(householdId){
-  return {
-    goal_name: "iPhone",
-    goal_amount: 1000,
-    current_amount: 800,
-    target_date: "28-08-2026"
-  }
+export async function getGoal(householdId){
+  const res= await fetch(`${BASE_URL}/home/goal/${householdId}`)
+  return res.json()
 }
 

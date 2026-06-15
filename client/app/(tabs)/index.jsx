@@ -5,7 +5,7 @@ import colours from '../../constants/colours'
 import Card from '../../components/Card'
 import TableCard from '../../components/Table'
 import MetabaseScreen from '../../components/Data'
-import { getHome, mockGetHome, mockGetGoal, getNet, getBills } from '../../api/home'
+import { getHome, getNet, getBills, getGoal } from '../../api/home'
 import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry'
 
 
@@ -15,7 +15,6 @@ export default function home() {
   const [householdId, setHouseholdId] = useState(null)
   const [nameOne, setNameOne] = useState(null)
   const [nameTwo, setNameTwo] = useState(null)
-  const [balance, setBalance] = useState()
   const [net, setNet] = useState()
   const [bills, setBills] = useState([])
   const [goal, setGoal] = useState(null)
@@ -51,11 +50,9 @@ export default function home() {
     try {
       const netData = await getNet(householdId)
       const billData = await getBills(householdId)
-      const data = await mockGetHome(householdId)
-      const goalData = await mockGetGoal(householdId)
+      const goalData = await getGoal(householdId)
       setNet(Number(netData.net_gain_loss))
       setBills(billsData)
-      setBalance(data.totalBalance)
       setGoal(goalData)
     } catch (error) {
       console.log("Failed to get data:", error)
@@ -80,7 +77,7 @@ export default function home() {
 
       {/* display income and spending for month with net gain or loss */}
       <Card title="Monthly Income and Spending">
-        <Text>Add bar charts</Text>
+        {/* add bar chart visual */}
 
         <View style={styles.row}>
           <Text style={styles.label}>Net Gain/Loss:</Text>
@@ -115,7 +112,7 @@ export default function home() {
       {/* display goal and progress bar */}
       <Card title="Next Goal">
         {!goal?.goal_name ? (
-          <Text style={styles.label}>
+          <Text style={styles.emptyText}>
             You haven’t set a savings goal yet
           </Text>
         ) : (
@@ -123,12 +120,14 @@ export default function home() {
             <View style={styles.row}>
               <Text style={styles.label}>{goal.goal_name}</Text>
               <Text style={styles.label}>
-                £{goal.current_amount}/£{goal.goal_amount}
+                £{goal.current_value}/£{goal.goal_amount}
               </Text>
             </View>
 
+            {/* add progress bar data */}
+
             <Text style={styles.label}>
-              Add data visual of progress bar
+              Target date: {goal.target_date}
             </Text>
           </>
         )}
@@ -160,4 +159,10 @@ const styles = StyleSheet.create({
   },
   tableRow: { flexDirection: 'row', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#f1f5f9', },
   col: { flex: 1, fontSize: 12, color: '#111827', },
+  emptyText:{
+    paddingVertical: 12,
+    color: '#7a8794',
+    fontSize: 13,
+    fontStyle: 'italic',
+  }
 })
