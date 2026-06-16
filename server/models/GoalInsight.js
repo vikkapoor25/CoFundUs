@@ -84,7 +84,8 @@ class GoalInsight {
             }
             return {
                 goal_name: goal.goal_name,
-                feasibility_rating:  feasibilityRating
+                feasibility_rating: feasibilityRating,
+                feasibility_percentage: feasibilityPercentage
             }
         })
 
@@ -101,41 +102,54 @@ class GoalInsight {
         // Prompt that will be inputting into Groq
         // JSON.stringify converts JSON object into string
         const prompt = `
-        You are a financial planning assistant for a couple's personal finance app.
+        You are a financial planning assistant for a household finance application.
 
-        Analyse the feasibility of each household goal using only the data provided.
+        Your role is to explain how achievable each household savings goal appears based on the financial calculations provided.
 
-        Calculated household data for feasibility:
-        ${JSON.stringify(FeasibilityCalculations, null, 2)}
+        You must produce one financial assessment for each household goal.
 
-        Strict Rules:
-        - Do not perform any calculations.
-        - Do not change any values.
-        - Do not change any feasibility ratings.
-        - Use the monthly_savings value as the Estimated Monthly Savings Required.
-        - Explain each feasibility rating in one concise sentence.
-        - Use GBP (£).
-        - Write in plain English.
-        - Do not include notes, summaries, disclaimers, headings, or extra comments.
+        Household Disposable Income:
+        £${FeasibilityCalculations.disposableIncome}
+
+        Monthly Savings Data:
+        ${JSON.stringify(FeasibilityCalculations.monthlySavings, null, 2)}
+
+        Feasibility Rating Data:
+        ${JSON.stringify(FeasibilityCalculations.feasibilityRating, null, 2)}
+
+        Output Rules:
+
+        - Output exactly one block per goal in Monthly Savings Data.
+        - Use each goal_name exactly as provided.
+        - Use each monthly_savings value as the Estimated Monthly Savings Required.
+        - Use each feasibility_rating exactly as provided.
+        - Do not create new goals.
+        - Do not repeat goals.
+        - Do not mention missing goals.
+        - Do not perform calculations.
+        - Do not add any introduction, summary, recommendation, note, disclaimer, heading, or conclusion.
+        - Stop immediately after the final Explanation line.
 
         Response Format:
 
-        Estimated Household Disposable Income: £X
+        Estimated Household Disposable Income: £${FeasibilityCalculations.disposableIncome}
 
-        Goal: [Goal Name]
-        Estimated Monthly Savings Required: £X
-        Feasibility Rating: Realistic | Challenging | Unrealistic
-        Explanation: [One concise sentence explaining the rating.]
+        Goal: [goal_name]
+        Estimated Monthly Savings Required: £[monthly_savings]
+        Feasibility Rating: [feasibility_rating]
+        Explanation: [One concise sentence explaining why this feasibility rating was assigned using the financial calculations provided.]
 
-        Goal: [Goal Name]
-        Estimated Monthly Savings Required: £X
-        Feasibility Rating: Realistic | Challenging | Unrealistic
-        Explanation: [One concise sentence explaining the rating.]
-
-        <NOTHING MORE>
+        Explanation Rules:
+        - Base the explanation on the financial calculations provided.
+        - Interpret the financial impact rather than repeating calculation values.
+        - Explain what the rating means for the household in practical terms.
+        - Avoid quoting percentages, formulas, or raw calculation values unless necessary.
+        - Keep explanations concise, professional, and easy to understand.
+        - Do not make assumptions about personal motivations, emotions, or lifestyle choices.
 
         Formatting Rules:
-        - Add one blank line between goals.
+
+        - Add exactly one blank line between goal blocks.
         - Do not include anything outside the response format.
         `
 
@@ -143,6 +157,8 @@ class GoalInsight {
         const response = await groq.chat.completions.create({
             // AI model used to generate the response
             model: "llama-3.1-8b-instant",
+            // Makes AI as predictable/deterministic as possible
+            temperature: 0,
             // Conversation sent to the AI model
             messages: [
                 {
@@ -232,7 +248,10 @@ class GoalInsight {
             }
             return {
                 goal_name: goal.goal_name,
-                priority_rating:  priorityRating
+                priority_rating: priorityRating,
+                months_until_target: months,
+                monthly_savings_required: monthlySavings,
+                savings_pressure: savingsPressure
             }
         })
 
@@ -249,72 +268,67 @@ class GoalInsight {
         // Prompt that will be inputting into Groq
         // JSON.stringify converts JSON object into string
         const prompt = `
-        You are a financial planning assistant for a couple's personal finance app.
+        You are a financial adviser inside a household finance app.
 
-        The financial calculations and priority ratings have already been completed by the application.
+        Your role is to help the household understand which savings goals should be prioritised first.
 
-        Use only the calculated data provided.
+        The priority ratings have already been calculated using the financial data provided. Do not recalculate or change the ratings.
 
-        Calculated Household Data:
-        ${JSON.stringify(priorityCalculations, null, 2)}
+        Priority Data:
+        ${JSON.stringify(priorityCalculations.priorityRating, null, 2)}
 
-        Task:
-        - Present all High Priority goals first.
-        - Present all Medium Priority goals second.
-        - Present all Low Priority goals last.
-        - Use the supplied priority_rating exactly as provided.
-        - Identify the single most important reason for each goal's priority.
-        - Explain the priority rating in one concise sentence.
+        Output Rules:
 
-        Priority Based On must be one of:
-        - Target Date
-        - Monthly Savings Requirement
-        - Amount Remaining
-        - Disposable Income Pressure
-
-        Strict Rules:
-        - Do not perform calculations.
-        - Do not modify any values.
-        - Do not change any priority ratings.
-        - Do not create numerical rankings.
-        - Do not include a Priority Ranking field.
-        - Each goal must appear exactly once.
+        - Output exactly one block per item in Priority Data.
+        - Sort the goals by priority before outputting them.
+        - Show High Priority goals first, then Medium Priority goals, then Low Priority goals.
+        - Within the same priority rating, place goals with fewer months_until_target first.
+        - Assign Priority Rank after sorting.
+        - Priority Rank must start at 1 for the first goal shown and increase by 1 for each following goal.
+        - Use each goal_name exactly as provided.
+        - Use each priority_rating exactly as provided.
+        - Do not create new goals.
         - Do not repeat goals.
-        - Do not merge goals.
-        - Do not omit goals.
-        - Use the supplied priority_rating exactly as provided.
-        - Priority Based On must contain exactly one reason.
-        - Use GBP (£).
-        - Write in plain English.
-        - Do not provide recommendations.
-        - Do not provide summaries.
-        - Do not provide conclusions.
-        - Do not provide an overall assessment.
-        - Do not provide any content before the first Goal line.
-        - Do not provide any content after the final Explanation line.
-        - End the response immediately after the final Explanation line.
+        - Do not perform calculations.
+        - Do not add an introduction, summary, recommendation section, note, disclaimer, heading, or conclusion.
+        - Stop immediately after the final Explanation line.
 
         Response Format:
 
-        Goal: [Goal Name]
-        Priority Rating: High Priority | Medium Priority | Low Priority
-        Priority Based On: Target Date | Monthly Savings Requirement | Amount Remaining | Disposable Income Pressure
-        Explanation: [One concise sentence explaining the priority rating.]
+        Priority Rank: [priority_rank]
+        Goal: [goal_name]
+        Priority Rating: [priority_rating]
+        Explanation: [One concise sentence explaining the financial planning reason this goal has this priority position.]
 
-        <NOTHING MORE>
+        Explanation Rules:
+
+        - Sound like a calm, professional financial adviser.
+        - Explain the practical planning reason for the goal's priority position.
+        - Focus on prioritisation, not affordability.
+        - Use the priority rating, time remaining, savings pressure, and required saving commitment as context.
+        - Interpret the data in plain English rather than listing calculations.
+        - Use exact figures only if they make the advice clearer.
+        - Do not simply define High Priority, Medium Priority, or Low Priority.
+        - Do not repeat the same explanation for multiple goals.
+        - Do not describe the goal itself.
+        - Do not explain the personal purpose or emotional value of the goal.
+        - Do not comment on whether the goal is important, worthwhile, enjoyable, expensive, significant, or beneficial.
+        - Do not invent personal motivations, lifestyle details, family intentions, or future outcomes.
+        - Do not speak from the household's perspective.
+        - Do not use "we", "our", "us", "I", or "you".
+        - Keep the explanation practical, natural, and easy to understand.
 
         Formatting Rules:
 
-        - List all High Priority goals first.
-        - Then list all Medium Priority goals.
-        - Then list all Low Priority goals.
-        - Add exactly one blank line between goals.
+        - Add exactly one blank line between goal blocks.
         - Do not include anything outside the response format.
         `
         // Sends the prompt to Groq's AI model and waits for a response
         const response = await groq.chat.completions.create({
             // AI model used to generate the response
             model: "llama-3.1-8b-instant",
+            // Makes AI as predictable/deterministic as possible
+            temperature: 0,
             // Conversation sent to the AI model
             messages: [
                 {
@@ -380,7 +394,10 @@ class GoalInsight {
             }
             return {
                 bill_name: bill.bill_name,
-                optimisation_priority: priority
+                optimisation_priority: priority,
+                monthly_bill_amount: bill.bill_amount,
+                percentage_of_bills: percentageOfBills,
+                estimated_annual_savings: bill.bill_amount * 12 * 0.25
             }
         })
 
@@ -396,64 +413,66 @@ class GoalInsight {
 
         // Prompt that will be inputting into Groq
         // JSON.stringify converts JSON object into string
-                const prompt = `
-        You are a financial planning assistant for a couple's personal finance app.
+const prompt = `
+You are a financial adviser inside a household finance application.
 
-        The spending calculations have already been completed by the application.
+Your role is to identify the spending categories that may offer the greatest opportunities for savings.
 
-        Use only the calculated bill data provided to explain spending reduction opportunities.
+Optimisation priorities and estimated annual savings have already been calculated using household financial data. Do not recalculate them.
 
-        Calculated Household Spending Data:
-        ${JSON.stringify(optimisationCalculations, null, 2)}
+Optimisation Data:
+${JSON.stringify(optimisationCalculations.optimisationPriority, null, 2)}
 
-        Important Context:
-        - estimated_annual_savings is based on a simple 25% reduction estimate.
-        - optimisation_priority has already been calculated by the application.
-        - Do not change any calculated values.
-        - Do not change any optimisation priorities.
-        - Do not perform calculations.
+Output Rules:
 
-        Task:
-        For each bill, write one concise spending reduction opportunity.
+* Output exactly one block per item in Optimisation Data.
+* Use each bill_name exactly as provided.
+* Use each optimisation_priority exactly as provided.
+* Use each estimated_annual_savings exactly as provided.
+* Assign Priority Rank based on the order of output.
+* Priority Rank must start at 1 and increase by 1 for each following bill.
+* Do not create new bills.
+* Do not repeat bills.
+* Do not perform calculations.
+* Do not invent specific products, brands, providers, tariffs, or prices.
+* Do not add an introduction, summary, disclaimer, heading, or conclusion.
 
-        Strict Rules:
-        - Use GBP (£).
-        - Use the supplied estimated_annual_savings exactly as provided.
-        - Use the supplied optimisation_priority exactly as provided.
-        - Do not invent exact product prices.
-        - Do not invent unsupported savings figures.
-        - Only suggest alternatives that are generic and reasonable from the bill name.
-        - If no clear alternative can be identified, write "No specific alternative identified".
-        - Do not include introductions, conclusions, notes, summaries, recommendations, or extra commentary.
-        - End the response immediately after the final Estimated Annual Savings line.
+Response Format:
 
-        Response Format:
+Priority Rank: [priority_rank]
+Bill: [bill_name]
+Priority Rating: [optimisation_priority]
+Recommendation: [One concise sentence explaining the savings opportunity and a practical next step.]
+Estimated Annual Savings: £[estimated_annual_savings]
 
-        Disclaimer: Suggested alternatives and savings estimates are suggestions only. They may not be practical for your situation. Please check pricing and product details before taking action.
+Advice Style:
 
-        Priority Rating: High Priority | Medium Priority | Low Priority
-        Spending Reduction Opportunity: [One concise sentence describing the opportunity.]
-        Alternative Products & Services: [One concise sentence describing a suitable alternative or "No specific alternative identified".]
-        Estimated Annual Savings: £X
+* Sound like a professional financial adviser.
+* Focus on identifying practical savings opportunities.
+* Explain why the bill may be worth reviewing.
+* Suggest a realistic next step.
+* Interpret the financial impact in plain English rather than repeating calculations.
+* Do not judge spending choices.
+* Do not use words such as "unnecessary", "wasteful", "bad", or "excessive".
+* Do not comment on personal lifestyle choices.
+* Do not speak from the household's perspective.
+* Do not use "we", "our", "us", "I", or "you".
+* Keep recommendations concise, practical, and easy to understand.
 
-        Priority Rating: High Priority | Medium Priority | Low Priority
-        Spending Reduction Opportunity: [One concise sentence describing the opportunity.]
-        Alternative Products & Services: [One concise sentence describing a suitable alternative or "No specific alternative identified".]
-        Estimated Annual Savings: £X
+Formatting Rules:
 
-        <NOTHING MORE>
-
-        Formatting Rules:
-        - List opportunities from highest priority to lowest priority.
-        - Do not add blank lines within an opportunity.
-        - Add exactly one blank line between opportunities.
-        - Do not include any content outside the response format.        
-        `
-
+* Show High Priority bills first.
+* Then show Medium Priority bills.
+* Then show Low Priority bills.
+* Within each priority group, show larger estimated annual savings first.
+* Add exactly one blank line between bill blocks.
+* Do not include anything outside the response format.
+  `
         // Sends the prompt to Groq's AI model and waits for a response
         const response = await groq.chat.completions.create({
             // AI model used to generate the response
             model: "llama-3.1-8b-instant",
+            temperature: 0,
             // Conversation sent to the AI model
             messages: [
                 {

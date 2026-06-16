@@ -7,7 +7,7 @@ async function feasibility(req, res) {
         const feasibility = await GoalInsight.getFeasibility(req.params.household_id);
 
         // Sends success response (JSON Format With no Key)
-        // res.status(200).json(feasibility);
+        res.status(200).json(feasibility);
 
         // Sends success response (JSON Format with Key Insight)
         // res.status(200).json({
@@ -15,7 +15,7 @@ async function feasibility(req, res) {
         // })
 
         // Sends success response (In Text Format for Viewing Backend)
-        res.type("text/plain").send(feasibility)
+        // res.type("text/plain").send(feasibility)
 
     } catch (err) {
         // Sends server error response
@@ -32,7 +32,7 @@ async function priority(req, res) {
         const priority = await GoalInsight.getPriority(req.params.household_id);
 
         // Sends success response (JSON Format With no Key)
-        // res.status(200).json(priority);
+        res.status(200).json(priority);
 
         // Sends success response (JSON Format with Key Insight)
         // res.status(200).json({
@@ -40,7 +40,7 @@ async function priority(req, res) {
         // })
 
         // Sends success response (In Text Format for Viewing Backend)
-        res.type("text/plain").send(priority)
+        // res.type("text/plain").send(priority)
 
     } catch (err) {
         // Sends server error response
@@ -56,7 +56,7 @@ async function optimisation(req, res) {
         const optimisation = await GoalInsight.getOptimisation(req.params.household_id);
 
         // Sends success response (JSON Format With no Key)
-        // res.status(200).json(optimisation);
+        res.status(200).json(optimisation);
 
                 // Sends success response (JSON Format with Key Insight)
         // res.status(200).json({
@@ -64,7 +64,7 @@ async function optimisation(req, res) {
         // })
 
         // Sends success response (In Text Format for Viewing Backend)
-        res.type("text/plain").send(optimisation)
+        // res.type("text/plain").send(optimisation)
 
     } catch (err) {
         // Sends server error response
