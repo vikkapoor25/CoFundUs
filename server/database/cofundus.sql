@@ -39,13 +39,12 @@ CREATE TABLE goals (
 
 CREATE TABLE income (
     income_id INT GENERATED ALWAYS AS IDENTITY,
-    income_name VARCHAR(50) NOT NULL,
     account_id INT NOT NULL,
     income_amount INT NOT NULL,
     payment_date DATE NOT NULL,
     category VARCHAR(50) NOT NULL,
     repeat_income BOOLEAN NOT NULL,
-    income_frequency VARCHAR(50),
+    payment_frequency VARCHAR(50),
     income_repeat_date DATE,
     PRIMARY KEY (income_id),
     FOREIGN KEY (account_id) REFERENCES accounts(account_id)
@@ -84,8 +83,8 @@ VALUES
 (1, 'Family Ski Trip', 2000, 500, '2027-1-25'),
 (1, 'Christmas Goal', 800, 100, '2026-12-25');
 
-INSERT INTO income (account_id, income_amount, income_name, payment_date, category, repeat_income, income_frequency, income_repeat_date)
- VALUES 
+INSERT INTO income (account_id, income_amount, income_name, payment_date, category, repeat_income, payment_frequency, income_repeat_date)
+ VALUES
  (1, 3000, 'Homer Wages', '2026-07-21', 'Salary', TRUE, 'Monthly', '2026-08-21'),
  (3, 200, 'Bart Paperound', '2026-08-01', 'Salary', TRUE, 'Monthly', '2026-09-01');
  
@@ -95,14 +94,14 @@ INSERT INTO income (account_id, income_amount, income_name, payment_date, catego
  (4, 500, 'Lisa Scholarship', '2016-07-23', 'Other', FALSE);
 
  INSERT INTO bills (account_id, bill_amount, bill_name,     bill_due_date, category,    category_type,         repeat_bill, payment_frequency, bill_repeat_date, paid)
-  VALUES 
+  VALUES
                     ( 1,         200,    'Cable TV',        '2026-07-15', 'Luxury',     'Entertainment',        TRUE,       'Monthly',          '2026-08-15', FALSE),
                     ( 1,         50,    'Phone Bill',       '2026-07-20', 'Essential',  'Subscription',         TRUE,       'Monthly',          '2026-08-20', FALSE),
                     ( 1,         30,    'Duff Beer',        '2026-07-21', 'Luxury',     'Leisure',              TRUE,       'Monthly',          '2026-08-21', FALSE),
                     ( 1,         300,    'Insurance',       '2026-07-31', 'Essential',  'Subsription',          TRUE,       'Annually',         '2027-07-31', FALSE);
 
 INSERT INTO bills (account_id, bill_amount, bill_name,     bill_due_date, category,    category_type,         repeat_bill, paid)
-  VALUES 
+  VALUES
                     ( 1,         50,'Bart Grafitti fine',   '2026-07-31', 'Other',      'Negative',             FALSE, FALSE),
                     ( 1,         25,    'Electricity',      '2026-07-18', 'Utilities',  'Home Utility',         FALSE, FALSE),
                     ( 1,         60,    'Shopping',         '2026-07-02', 'Essential',  'Consumable',           FALSE, FALSE),

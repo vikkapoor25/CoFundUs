@@ -53,16 +53,14 @@ INSERT INTO goals (
 INSERT INTO income (
     account_id,
     income_amount,
-    income_name,
     payment_date,
     category,
     repeat_income,
-    income_frequency,
+    payment_frequency,
     income_repeat_date
 ) VALUES (
     1,
     3000,
-    'Salary',
     '2026-07-09',
     'Salary',
     TRUE,
