@@ -40,6 +40,7 @@ CREATE TABLE goals (
 CREATE TABLE income (
     income_id INT GENERATED ALWAYS AS IDENTITY,
     account_id INT NOT NULL,
+    income_name VARCHAR(50) NOT NULL, 
     income_amount INT NOT NULL,
     payment_date DATE NOT NULL,
     category VARCHAR(50) NOT NULL,
