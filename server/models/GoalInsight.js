@@ -220,7 +220,9 @@ class GoalInsight {
         // Prompt that will be inputting into Groq
         // JSON.stringify converts JSON object into string
         const prompt = `
-        A couple is using a couple's personal finance app to track shared financial goals.
+        You are a financial planning assistant for a couple's personal finance app.
+
+        A couple is using the app to track shared financial goals.
 
         The breakdown of their goals, their household income, and their household bills is below:
 
@@ -240,9 +242,26 @@ class GoalInsight {
         - Recurring subscriptions or bills
         - Areas where spending may be reduced
         - High-confidence cheaper alternatives where appropriate
-        - Which actions are likely to have the biggest financial impact
+        - Which actions are likely to have the biggest financial 
 
-        In the response, list actions in order of priority.
+        Priority Rating Rules:
+        - High Priority: An action that can be taken immediately and save a large amount of money
+        - Medium Priority: An action that can be taken immediately or save a large amount of money
+        - Low Priority: An action that is not immediate and savings are long-term
+        
+        Important Rules:
+        - Currency is GBP (£).
+        - Use only the information provided.
+        - Do not make assumptions beyond the supplied data.
+        - Do not speculate about personal importance, emotional value, future economic conditions, job loss, emergencies, or unexpected expenses.
+        - Do not invent reasons such as "high potential for use" unless this is directly stated in the data.
+        - Do not contradict your calculations.
+        - Verify calculations before assigning priority ratings.
+        - Keep explanations concise and practical.
+        - Write in plain English for non-technical users.
+        - Keep the response compact.
+        - DO NOT show any calculations.
+        - DO NOT include notes, summaries, disclaimers, or extra comments.
 
         For each action, provide:
         1. Priority
@@ -250,9 +269,27 @@ class GoalInsight {
         3. Alternative Products and Services
         4. Estimated Annual Savings
 
-        Add the following disclaimer at the bottom:
+        Response Format:
 
-        Disclaimer: Suggested alternatives and savings estimates are indicative only. Please check current prices and product details before taking action.
+        NOTE: 
+
+        Priority Ranking: High Priority | Medium Priority | Low Priority
+        Spending Reduction Opporutnity: [One concise sentence explaining the opportunity.]
+        Alternative Products & Services: [One concise sentence explaining alternative products and service e.g. Libre Office instead of Microsoft.]
+        Estimated Annual Savings: £X
+
+        Priority Ranking: High Priority | Medium Priority | Low Priority
+        Spending Reduction Opporutnity: [One concise sentence explaining the opportunity.]
+        Alternative Products & Services: [One concise sentence explaining alternative products and service e.g. Libre Office instead of Microsoft.]
+        Estimated Annual Savings: £X
+
+        <NOTHING MORE>
+
+        List opportunities from highest priority to lowest priority.
+
+        Add the following disclaimer before providing the response:
+
+        Disclaimer: Suggested alternatives and savings estimates are suggestions only. They may not be practical for your situation. Please check the prices provided and the product details before taking action.
 
         Use a compact format. Do not add blank lines within each action section. Add one blank line between different actions.
 
