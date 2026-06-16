@@ -1,4 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useState } from 'react'
 import { View, Text, TextInput, Pressable, Image, StyleSheet } from 'react-native'
 import { useRouter } from 'expo-router'
@@ -21,6 +21,7 @@ export default function login() {
       if (data && data.jwt_token) {
 
         //save data in storage
+        await AsyncStorage.setItem("token", data.jwt_token);
         await AsyncStorage.setItem(
           "household",
           JSON.stringify({
