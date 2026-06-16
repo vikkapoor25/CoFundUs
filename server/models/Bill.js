@@ -138,11 +138,35 @@ constructor({ household_id, bill_id, bill_name, account_id, bill_amount, bill_du
     // Update a bill as paid
     static async billPaid(request_body) {
         const { bill_id } = request_body
-        const response = await db.query(`UPDATE bills SET paid = true WHERE bill_id = $1 RETURNING paid;`, 
-            [bill_id ]);
-        if (response.rows.length !== 1) {
-            throw new Error("Unable to mark bill as paid.");
+
+        // Get get account id
+        const bill = await db.query(
+            `SELECT account_id, bill_amount, paid
+            FROM bills
+            WHERE bill_id = $1;`,
+            [bill_id]
+        )
+        if (bill.rows.length !== 1) {
+            throw new Error("Bill not found.");
         }
+
+        const { account_id, bill_amount, paid } = bill.rows[0];
+        //mark as paid
+        const response = await db.query(
+            `UPDATE bills 
+            SET paid = true 
+            WHERE bill_id = $1 
+            RETURNING paid;`, 
+            [bill_id ]
+        )
+        // reduce from account balance
+        await db.query(
+            `UPDATE accounts
+            SET account_balance = account_balance - $1
+            WHERE account_id = $2;`,
+            [bill_amount, account_id]
+        );
+
         return response.rows[0];
     }
 

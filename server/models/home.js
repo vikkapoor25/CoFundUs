@@ -27,7 +27,7 @@ class Home {
        FROM bills b
        JOIN accounts a ON b.account_id = a.account_id
        WHERE a.household_id = $1
-       AND b.bill_due_date <= CURRENT_DATE;`,
+       AND b.paid = 'true';`,
       [household_id]
     );
 
