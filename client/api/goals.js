@@ -33,5 +33,5 @@ export async function deleteGoal(goal_id) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ goal_id }),
   })
-  return res.json()
+  return res.status === 204 ? { success: true } : res.json()
 }

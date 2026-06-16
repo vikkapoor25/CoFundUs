@@ -127,12 +127,6 @@ export default function TabsLayout() {
             <Ionicons name="log-out-outline" size={size} color={color} />
           ),
         }}
-        listeners={{
-          tabPress: (e) => {
-            e.preventDefault()
-            router.replace("/login")
-          },
-        }}
       />
     </Tabs>
   )
