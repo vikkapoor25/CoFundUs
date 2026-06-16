@@ -10,7 +10,7 @@ import Field from '../../components/Field'
 import { getBills, createBill, deleteBill, markBillPaid } from '../../api/bills'
 import { getAccounts } from '../../api/bank-accounts'
 
-const CHART_URL = 'https://vivid-abaft.metabaseapp.com/public/question/58ad854f-7cd1-4ab6-9c8b-e0a1522e7092'
+const CHART_URL = 'https://vivid-abaft.metabaseapp.com/public/question/58ad854f-7cd1-4ab6-9c8b-e0a1522e7092#titled=false'
 
 const SECTIONS = [
   { key: true, title: 'Recurring Bills' },
@@ -128,10 +128,9 @@ export default function bills() {
             <Text style={styles.heading}>Upcoming Bills</Text>
             <Text style={styles.sub}>Stay ahead of upcoming bills and subscriptions</Text>
           </View>
-          <AddButton onPress={() => setModalVisible(true)} />
         </View>
 
-        <Card title="Bills vs Account Value">
+        <Card title="Bills vs Account Totals">
           <View style={styles.chartBox}>
             <WebView source={{ uri: CHART_URL }} style={{ flex: 1 }} />
           </View>
@@ -175,6 +174,8 @@ export default function bills() {
           )
         })}
       </ScrollView>
+
+      <AddButton onPress={() => setModalVisible(true)} />
 
       <AddModal title="Add A Bill" visible={modalVisible} setVisible={setModalVisible}>
         <ScrollView style={styles.formScroll} contentContainerStyle={styles.form}>

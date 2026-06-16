@@ -9,7 +9,7 @@ import AddModal from '../../components/AddModal'
 import Field from '../../components/Field'
 import { getGoals, createGoal, updateGoal, deleteGoal } from '../../api/goals'
 
-const GOALS_CHART_URL = 'https://vivid-abaft.metabaseapp.com/public/question/01fb9a29-2898-4050-8054-83830670f761'
+const GOALS_CHART_URL = 'https://vivid-abaft.metabaseapp.com/public/question/b2d671f5-1801-4fa0-b123-26a28f0a3b6d#titled=false'
 
 export default function goals() {
   const [householdId, setHouseholdId] = useState(null)
@@ -123,7 +123,6 @@ export default function goals() {
             <Text style={styles.heading}>Goals</Text>
             <Text style={styles.sub}>Save together and track your progress</Text>
           </View>
-          <AddButton onPress={() => setActiveModal('add')} />
         </View>
 
         <Card title="AI Insights">
@@ -172,6 +171,8 @@ export default function goals() {
           })
         )}
       </ScrollView>
+
+      <AddButton onPress={() => setActiveModal('add')} />
 
       <AddModal
         title={activeModal === 'commit' ? 'Add Money To Goal' : 'Add A Goal'}

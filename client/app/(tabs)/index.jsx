@@ -1,11 +1,12 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { ScrollView, View, Text, StyleSheet } from 'react-native'
 import {useState, useEffect} from 'react'
 import colours from '../../constants/colours'
 import Card from '../../components/Card'
-import TableCard from '../../components/Table';
+import TableCard from '../../components/Table'
 import MetabaseScreen from '../../components/Data'
-import { getHome, mockGetHome, mockGetBills, mockGetGoal } from '../../api/home';
+import { getHome, getNet, getBills, getGoal } from '../../api/home'
+import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry'
 
 
 
@@ -14,7 +15,6 @@ export default function home() {
   const [householdId, setHouseholdId] = useState(null)
   const [nameOne, setNameOne] = useState(null)
   const [nameTwo, setNameTwo] = useState(null)
-  const [balance, setBalance] = useState()
   const [net, setNet] = useState()
   const [bills, setBills] = useState([])
   const [goal, setGoal] = useState(null)
@@ -22,13 +22,13 @@ export default function home() {
 
   //load in id first
   useEffect(() => {
-    loadStorage();
-  }, []);
+    loadStorage()
+  }, [])
 
   useEffect(() => {
-    if (householdId === null) return;
+    if (householdId === null) return
     loadData()
-  }, [householdId]);
+  }, [householdId])
 
   //get names from asyncstorage
   async function loadStorage() {
@@ -43,24 +43,21 @@ export default function home() {
     const { household_id } = JSON.parse(stored)
     setNameOne(name_1 ?? "")
     setNameTwo(name_2 ?? "")
-    setHouseholdId(Number(household_id));
+    setHouseholdId(Number(household_id))
   }
 
   async function loadData() {
     try {
-      const data = await mockGetHome(householdId)
-      const billsData = await mockGetBills(householdId) 
-      const goalData = await mockGetGoal(householdId)
-      setNet(data.netGainLoss)
-      setBalance(data.totalBalance)
-      setBills(billsData)
+      const netData = await getNet(householdId)
+      const billData = await getBills(householdId)
+      const goalData = await getGoal(householdId)
+      setNet(Number(netData.net_gain_loss))
+      setBills(billData)
       setGoal(goalData)
     } catch (error) {
       console.log("Failed to get data:", error)
     }
   }
-
-
   return (
     <ScrollView
       style={styles.screen}
@@ -73,10 +70,6 @@ export default function home() {
 
       {/* display all account in pie chart */}
       <Card title="Account Balance Overview">
-        <View style={styles.row}>
-          <Text style={styles.label}>Total Balance</Text>
-          <Text style={styles.value}>£{balance}</Text>
-        </View>
         <View style={styles.metabaseBox}>
           <MetabaseScreen url="https://vivid-abaft.metabaseapp.com/public/question/42e0e5ac-8274-4c8c-9e66-c816874c51ae#titled=false"/>
         </View>
@@ -84,16 +77,20 @@ export default function home() {
 
       {/* display income and spending for month with net gain or loss */}
       <Card title="Monthly Income and Spending">
-        <Text>Add bar charts</Text>
+
+        <View style={styles.metabaseBox}>
+          <MetabaseScreen url="https://vivid-abaft.metabaseapp.com/public/question/08a8be30-88dd-42db-a593-0af035c3fae6#titled=false"/>
+        </View>
+
         <View style={styles.row}>
-          <Text style={styles.label}>Net Gain/Loss (£):</Text>
+          <Text style={styles.label}>Net Gain/Loss:</Text>
           <Text
             style={[
               styles.value,
-              { color: net >= 0 ? colours.green : colours.red }
+              { color: net >= 0 ? colours.green : colours.red },
             ]}
           >
-            {net}
+            {net >= 0 ? "+" : ""}£{Number(net)}
           </Text>
         </View>
       </Card>
@@ -117,7 +114,7 @@ export default function home() {
       {/* display goal and progress bar */}
       <Card title="Next Goal">
         {!goal?.goal_name ? (
-          <Text style={styles.label}>
+          <Text style={styles.emptyText}>
             You haven’t set a savings goal yet
           </Text>
         ) : (
@@ -125,12 +122,14 @@ export default function home() {
             <View style={styles.row}>
               <Text style={styles.label}>{goal.goal_name}</Text>
               <Text style={styles.label}>
-                £{goal.current_amount}/£{goal.goal_amount}
+                £{goal.current_value}/£{goal.goal_amount}
               </Text>
             </View>
 
+            {/* add progress bar data */}
+
             <Text style={styles.label}>
-              Add data visual of progress bar
+              Target date: {goal.target_date}
             </Text>
           </>
         )}
@@ -162,4 +161,10 @@ const styles = StyleSheet.create({
   },
   tableRow: { flexDirection: 'row', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#f1f5f9', },
   col: { flex: 1, fontSize: 12, color: '#111827', },
+  emptyText:{
+    paddingVertical: 12,
+    color: '#7a8794',
+    fontSize: 13,
+    fontStyle: 'italic',
+  }
 })
