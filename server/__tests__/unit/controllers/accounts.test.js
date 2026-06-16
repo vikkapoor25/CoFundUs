@@ -2,6 +2,7 @@ const {
   createBankAccount,
   deleteBankAccount,
   getAccountsByHousehold,
+  getBalanceByHousehold,
 } = require("../../../controllers/accounts");
 const BankAccount = require("../../../models/accounts");
 
@@ -24,6 +25,36 @@ describe("accounts controller", () => {
       json: jest.fn(),
     };
   });
+
+  describe("getBalanceByHousehold", () => {
+  it("should return 200 and total balance for a household", async () => {
+    req.params = { household_id: 1 };
+
+    const mockBalance = {
+      household_id: 1,
+      total_balance: 25000,
+    };
+
+    BankAccount.getBalanceByHouseholdId.mockResolvedValue(mockBalance);
+
+    await getBalanceByHousehold(req, res);
+
+    expect(BankAccount.getBalanceByHouseholdId).toHaveBeenCalledWith(1);
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith(mockBalance);
+  });
+
+  it("should return 500 if fetching balance fails", async () => {
+    req.params = { household_id: 1 };
+
+    BankAccount.getBalanceByHouseholdId.mockRejectedValue(new Error("Database error"));
+
+    await getBalanceByHousehold(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ error: "Database error" });
+  });
+});
 
   describe("createBankAccount", () => {
     it("should return 201 and the new account when creation is successful", async () => {

@@ -3,6 +3,7 @@ const app = require("../../app");
 const db = require("../../database/connect");
 const { resetTestDB } = require("./config");
 
+
 describe("Bank Accounts API Endpoints", () => {
   let api;
 
@@ -41,6 +42,26 @@ describe("Bank Accounts API Endpoints", () => {
       expect(response.body).toEqual([]);
     });
   });
+
+  describe("GET /bank-accounts/balance/:household_id", () => {
+  it("should return total balance for a household", async () => {
+    const response = await request(api).get("/bank-accounts/balance/1");
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty("household_id", 1);
+    expect(response.body).toHaveProperty("total_balance");
+  });
+
+  it("should return 0 if household has no accounts", async () => {
+    const response = await request(api).get("/bank-accounts/balance/999");
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({
+      household_id: 999,
+      total_balance: 0,
+    });
+  });
+});
 
   describe("POST /bank-accounts/new", () => {
     it("should create a new bank account and return it", async () => {
