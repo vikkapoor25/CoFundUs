@@ -82,6 +82,7 @@ class Income {
 
     const {
       account_id,
+      income_name,
       income_amount,
       payment_date = today,
       category,
@@ -119,22 +120,24 @@ class Income {
     if (existingBankAccount.rows.length !== 1) {
       throw new Error("Unable to create income for account.");
     }
-
+    
     const response = await db.query(
       `INSERT INTO income
-      (account_id, income_amount, payment_date, category, repeat_income, payment_frequency, income_repeat_date)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
-      RETURNING *;`,
+      (account_id, income_name, income_amount, payment_date, category,
+      repeat_income, payment_frequency, income_repeat_date)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+      RETURNING *`,
       [
         account_id,
+        income_name,
         income_amount,
         payment_date,
         category,
         repeat_income,
         payment_frequency,
         income_repeat_date,
-      ]
-    );
+     ]
+   );
 
     const householdResponse = await db.query(
       "SELECT household_id FROM accounts WHERE account_id = $1",

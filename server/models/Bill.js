@@ -47,22 +47,80 @@ constructor({ household_id, bill_id, bill_name, account_id, bill_amount, bill_du
 
     // Creates a new bill using account_id
     static async createBill(request_body) {
-        const today = new Date().toLocaleDateString("en-CA");
-        // Destructures request body
-        const { account_id, bill_name, bill_amount, bill_due_date = today, category, category_type = null, repeat_bill, payment_frequency, bill_repeat_date = null } = request_body
-        // Checks if bank account exists before adding bill
-        const existingBankAccount = await db.query("SELECT * FROM accounts WHERE account_id = $1", 
-            [account_id]);
-        if (existingBankAccount.rows.length === 1) {
-            // Creates bill for the bank account using account_id
-            const response = await db.query("INSERT INTO bills (account_id, bill_name, bill_amount, bill_due_date, category, category_type, repeat_bill, payment_frequency, bill_repeat_date) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *;", 
-                [account_id, bill_name, bill_amount, bill_due_date, category, category_type, repeat_bill, payment_frequency, bill_repeat_date]);
-            // Returns created bill
+        try {
+            const today = new Date().toLocaleDateString("en-CA");
+
+            const {
+            account_id,
+            bill_name,
+            bill_amount,
+            bill_due_date = today,
+            category,
+            category_type = null,
+            repeat_bill,
+            payment_frequency
+            } = request_body;
+
+            let bill_repeat_date = null;
+
+            if (payment_frequency) {
+            const normalisedFrequency = payment_frequency.trim().toLowerCase();
+            const nextDate = new Date(bill_due_date);
+
+            if (!Number.isNaN(nextDate.getTime())) {
+                if (normalisedFrequency === "monthly") {
+                nextDate.setMonth(nextDate.getMonth() + 1);
+                bill_repeat_date = nextDate.toLocaleDateString("en-CA");
+                } else if (normalisedFrequency === "annually") {
+                nextDate.setFullYear(nextDate.getFullYear() + 1);
+                bill_repeat_date = nextDate.toLocaleDateString("en-CA");
+                }
+            }
+            }
+
+            const existingBankAccount = await db.query(
+            "SELECT * FROM accounts WHERE account_id = $1",
+            [account_id]
+            );
+
+            if (existingBankAccount.rows.length !== 1) {
+            throw new Error("Account not found");
+            }
+
+            const response = await db.query(
+            `INSERT INTO bills (
+                account_id,
+                bill_name,
+                bill_amount,
+                bill_due_date,
+                category,
+                category_type,
+                repeat_bill,
+                payment_frequency,
+                bill_repeat_date
+            )
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+            RETURNING *;`,
+            [
+                account_id,
+                bill_name,
+                bill_amount,
+                bill_due_date,
+                category,
+                category_type,
+                repeat_bill,
+                payment_frequency,
+                bill_repeat_date
+            ]
+            );
+
             return new Bill(response.rows[0]);
-        } else {
-            throw new Error("Unable to create bill for account.");
+
+        } catch (error) {
+            console.error("createBill error:", error);
+            throw error; // IMPORTANT so frontend sees real error
         }
-    }
+        }
 
     // Updates a Bill using bill_id
     static async updateBill(request_body) {
