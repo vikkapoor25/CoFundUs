@@ -1,72 +1,118 @@
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { ScrollView, View, Text, StyleSheet, Pressable } from 'react-native'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { WebView } from 'react-native-webview'
 import colours from '../../constants/colours'
 import Card from '../../components/Card'
 import AddButton from '../../components/AddButton'
 import AddModal from '../../components/AddModal'
 import Field from '../../components/Field'
+import { getBills, createBill, deleteBill, markBillPaid } from '../../api/bills'
+import { getAccounts } from '../../api/bank-accounts'
 
 const CHART_URL = 'https://vivid-abaft.metabaseapp.com/public/question/58ad854f-7cd1-4ab6-9c8b-e0a1522e7092'
 
 const SECTIONS = [
-  { key: 'recurring', title: 'Recurring Bills' },
-  { key: 'subscription', title: 'Subscriptions' },
-  { key: 'one-time', title: 'One-Time Bills' },
+  { key: true, title: 'Recurring Bills' },
+  { key: false, title: 'One-Time Bills' },
 ]
 
-const SEED_BILLS = [
-  { bill_id: 1, account: 'Sam', bill_name: 'EE Phone Bill', bill_amount: 16, bill_due_date: '14/06', category_type: 'recurring', paid: false },
-  { bill_id: 2, account: 'Shared', bill_name: 'Rent', bill_amount: 1500, bill_due_date: '01/07', category_type: 'recurring', paid: false },
-  { bill_id: 3, account: 'Shared', bill_name: 'Electricity & Gas', bill_amount: 120, bill_due_date: '02/07', category_type: 'recurring', paid: false },
-  { bill_id: 4, account: 'Alex', bill_name: 'Netflix', bill_amount: 10, bill_due_date: '11/06', category_type: 'subscription', paid: false },
-  { bill_id: 5, account: 'Alex', bill_name: 'Spotify', bill_amount: 12, bill_due_date: '03/06', category_type: 'subscription', paid: true },
-  { bill_id: 6, account: 'Shared', bill_name: 'Concert Tickets', bill_amount: 120, bill_due_date: '14/07', category_type: 'one-time', paid: false },
-  { bill_id: 7, account: 'Alex', bill_name: 'Car Repair', bill_amount: 180, bill_due_date: '20/06', category_type: 'one-time', paid: false },
-]
+const CATEGORIES = ['Subscription', 'Entertainment', 'Beauty', 'Consumable', 'Negative', 'Leisure', 'Home Utility']
 
 export default function bills() {
-  const [bills, setBills] = useState(SEED_BILLS)
+  const [householdId, setHouseholdId] = useState(null)
+  const [bills, setBills] = useState([])
+  const [accounts, setAccounts] = useState([])
   const [modalVisible, setModalVisible] = useState(false)
+
+  const accountOptions = accounts.map((a) => ({ label: a.account_name, value: a.account_id }))
 
   const [billName, setBillName] = useState('')
   const [amount, setAmount] = useState('')
-  const [account, setAccount] = useState('')
+  const [accountId, setAccountId] = useState('')
   const [dueDate, setDueDate] = useState('')
-  const [type, setType] = useState('recurring')
+  const [category, setCategory] = useState('')
+  const [categoryType, setCategoryType] = useState('')
+  const [paymentFrequency, setPaymentFrequency] = useState('')
+  const [billRepeatDate, setBillRepeatDate] = useState('')
+  const [recurring, setRecurring] = useState(true)
+
+  useEffect(() => {
+    loadHouseholdId()
+  }, [])
+
+  useEffect(() => {
+    if (householdId === null) return
+    loadBills()
+    loadAccounts()
+  }, [householdId])
+
+  async function loadAccounts() {
+    try {
+      const data = await getAccounts(householdId)
+      setAccounts(Array.isArray(data) ? data : [])
+    } catch (error) {
+      setAccounts([])
+    }
+  }
+
+  async function loadHouseholdId() {
+    const stored = await AsyncStorage.getItem('household')
+    if (!stored) {
+      setHouseholdId(1)
+      return
+    }
+    const { household_id } = JSON.parse(stored)
+    setHouseholdId(Number(household_id) || 1)
+  }
+
+  async function loadBills() {
+    try {
+      const data = await getBills(householdId)
+      setBills(Array.isArray(data) ? data : [])
+    } catch (error) {
+      setBills([])
+    }
+  }
 
   function resetForm() {
     setBillName('')
     setAmount('')
-    setAccount('')
+    setAccountId('')
     setDueDate('')
-    setType('recurring')
+    setCategory('')
+    setCategoryType('')
+    setPaymentFrequency('')
+    setBillRepeatDate('')
+    setRecurring(true)
   }
 
-  function handleAddBill() {
+  async function handleAddBill() {
     if (!billName || !amount) return
-    const newBill = {
-      bill_id: Date.now(),
-      account: account || 'Shared',
+    await createBill({
+      account_id: Number(accountId) || householdId,
       bill_name: billName,
       bill_amount: Number(amount) || 0,
-      bill_due_date: dueDate || '--/--',
-      category_type: type,
-      paid: false,
-    }
-    setBills((current) => [...current, newBill])
+      bill_due_date: dueDate,
+      category: category,
+      category_type: categoryType,
+      repeat_bill: recurring,
+      payment_frequency: recurring ? paymentFrequency : null,
+      bill_repeat_date: recurring ? billRepeatDate : null,
+    })
     resetForm()
     setModalVisible(false)
+    loadBills()
   }
 
-  function togglePaid(bill_id) {
-    setBills((current) =>
-      current.map((b) => (b.bill_id === bill_id ? { ...b, paid: !b.paid } : b))
-    )
+  async function handleMarkPaid(bill_id) {
+    await markBillPaid(bill_id)
+    loadBills()
   }
 
-  function removeBill(bill_id) {
-    setBills((current) => current.filter((b) => b.bill_id !== bill_id))
+  async function handleDelete(bill_id) {
+    await deleteBill(bill_id)
+    loadBills()
   }
 
   return (
@@ -92,9 +138,9 @@ export default function bills() {
         </Card>
 
         {SECTIONS.map((section) => {
-          const sectionBills = bills.filter((b) => b.category_type === section.key)
+          const sectionBills = bills.filter((b) => b.repeat_bill === section.key)
           return (
-            <Card key={section.key} title={section.title}>
+            <Card key={section.title} title={section.title}>
               {sectionBills.length === 0 ? (
                 <Text style={styles.empty}>No bills yet</Text>
               ) : (
@@ -105,16 +151,16 @@ export default function bills() {
                         {bill.bill_name}
                       </Text>
                       <Text style={styles.billMeta}>
-                        {bill.account} · due {bill.bill_due_date}
+                        {bill.category} · due {bill.bill_due_date}
                         {bill.paid ? ' · Paid' : ''}
                       </Text>
                       <View style={styles.actions}>
-                        <Pressable onPress={() => togglePaid(bill.bill_id)}>
-                          <Text style={styles.actionPaid}>
-                            {bill.paid ? 'Mark unpaid' : 'Mark paid'}
-                          </Text>
-                        </Pressable>
-                        <Pressable onPress={() => removeBill(bill.bill_id)}>
+                        {!bill.paid && (
+                          <Pressable onPress={() => handleMarkPaid(bill.bill_id)}>
+                            <Text style={styles.actionPaid}>Mark paid</Text>
+                          </Pressable>
+                        )}
+                        <Pressable onPress={() => handleDelete(bill.bill_id)}>
                           <Text style={styles.actionDelete}>Delete</Text>
                         </Pressable>
                       </View>
@@ -131,52 +177,63 @@ export default function bills() {
       </ScrollView>
 
       <AddModal title="Add A Bill" visible={modalVisible} setVisible={setModalVisible}>
-        <View style={styles.form}>
-          <Field
-            label="Bill Name"
-            placeholder="e.g. Netflix"
-            value={billName}
-            onChangeText={setBillName}
-          />
-          <Field
-            label="Amount"
-            placeholder="e.g. 12"
-            keyboardType="numeric"
-            value={amount}
-            onChangeText={setAmount}
-          />
-          <Field
-            label="Account"
-            placeholder="e.g. Alex, Sam, Shared"
-            value={account}
-            onChangeText={setAccount}
-          />
-          <Field
-            label="Due Date"
-            placeholder="DD/MM"
-            value={dueDate}
-            onChangeText={setDueDate}
-          />
-
-          <Text style={styles.typeLabel}>Type</Text>
+        <ScrollView style={styles.formScroll} contentContainerStyle={styles.form}>
+          <Field label="Bill Name" placeholder="e.g. Netflix" value={billName} onChangeText={setBillName} />
+          <Field label="Amount" placeholder="e.g. 15" keyboardType="numeric" value={amount} onChangeText={setAmount} />
+          <Text style={styles.typeLabel}>Account</Text>
+          {accountOptions.length === 0 ? (
+            <Text style={styles.hint}>No accounts found. Add one on the Accounts page first.</Text>
+          ) : (
+            <View style={styles.typeRow}>
+              {accountOptions.map((opt) => (
+                <Pressable
+                  key={opt.value}
+                  onPress={() => setAccountId(opt.value)}
+                  style={[styles.chip, accountId === opt.value && styles.chipActive]}
+                >
+                  <Text style={[styles.chipText, accountId === opt.value && styles.chipTextActive]}>
+                    {opt.label}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+          )}
+          <Text style={styles.typeLabel}>Category</Text>
           <View style={styles.typeRow}>
-            {SECTIONS.map((s) => (
+            {CATEGORIES.map((c) => (
               <Pressable
-                key={s.key}
-                onPress={() => setType(s.key)}
-                style={[styles.chip, type === s.key && styles.chipActive]}
+                key={c}
+                onPress={() => setCategory(c)}
+                style={[styles.chip, category === c && styles.chipActive]}
               >
-                <Text style={[styles.chipText, type === s.key && styles.chipTextActive]}>
-                  {s.title}
-                </Text>
+                <Text style={[styles.chipText, category === c && styles.chipTextActive]}>{c}</Text>
               </Pressable>
             ))}
           </View>
+          <Field label="Category Type" placeholder="e.g. Subscription" value={categoryType} onChangeText={setCategoryType} />
+          <Field label="Due Date" placeholder="YYYY-MM-DD" value={dueDate} onChangeText={setDueDate} />
+
+          <Text style={styles.typeLabel}>Repeat</Text>
+          <View style={styles.typeRow}>
+            <Pressable onPress={() => setRecurring(true)} style={[styles.chip, recurring && styles.chipActive]}>
+              <Text style={[styles.chipText, recurring && styles.chipTextActive]}>Recurring</Text>
+            </Pressable>
+            <Pressable onPress={() => setRecurring(false)} style={[styles.chip, !recurring && styles.chipActive]}>
+              <Text style={[styles.chipText, !recurring && styles.chipTextActive]}>One-Time</Text>
+            </Pressable>
+          </View>
+
+          {recurring && (
+            <>
+              <Field label="Payment Frequency" placeholder="e.g. Monthly" value={paymentFrequency} onChangeText={setPaymentFrequency} />
+              <Field label="Bill Repeat Date" placeholder="YYYY-MM-DD" value={billRepeatDate} onChangeText={setBillRepeatDate} />
+            </>
+          )}
 
           <Pressable style={styles.submit} onPress={handleAddBill}>
             <Text style={styles.submitText}>Add Bill</Text>
           </Pressable>
-        </View>
+        </ScrollView>
       </AddModal>
     </View>
   )
@@ -185,9 +242,12 @@ export default function bills() {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colours.background },
   body: { padding: 16, paddingTop: 30 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  headerText: { flex: 1, paddingRight: 12 },
   heading: { fontSize: 24, fontWeight: '800', color: colours.pageHeader },
   sub: { fontSize: 13, color: '#7a8794', marginBottom: 16, marginTop: 4 },
   empty: { fontSize: 13, color: '#9aa3b0', paddingVertical: 6 },
+  hint: { fontSize: 12, color: '#9aa3b0', marginBottom: 14 },
 
   chartBox: { height: 280, borderRadius: 12, overflow: 'hidden' },
 
@@ -202,10 +262,8 @@ const styles = StyleSheet.create({
   actionPaid: { fontSize: 12, fontWeight: '600', color: colours.cardTitle },
   actionDelete: { fontSize: 12, fontWeight: '600', color: '#d1495b' },
 
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  headerText: { flex: 1, paddingRight: 12 },
-
-  form: { width: 260 },
+  formScroll: { maxHeight: 420 },
+  form: { width: 270, paddingBottom: 4 },
   typeLabel: { fontSize: 12, color: '#55626d', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 },
   typeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 18 },
   chip: { borderWidth: 1, borderColor: '#d7dee6', borderRadius: 16, paddingVertical: 6, paddingHorizontal: 12 },
@@ -213,6 +271,6 @@ const styles = StyleSheet.create({
   chipText: { fontSize: 12, color: '#55626d' },
   chipTextActive: { color: '#fff', fontWeight: '700' },
 
-  submit: { backgroundColor: colours.cardTitle, borderRadius: 10, height: 46, alignItems: 'center', justifyContent: 'center' },
+  submit: { backgroundColor: colours.cardTitle, borderRadius: 10, height: 46, alignItems: 'center', justifyContent: 'center', marginTop: 4 },
   submitText: { color: '#fff', fontWeight: '700', fontSize: 15 },
 })
