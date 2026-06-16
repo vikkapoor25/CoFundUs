@@ -42,8 +42,8 @@ class GoalInsight {
         Analyse the feasibility of each goal using only the information provided.
 
         Before assigning ratings:
-        1. Calculate total household income.
-        2. Calculate total household bills.
+        1. Calculate total household income (monthly).
+        2. Calculate total household bills (monthly).
         3. Calculate estimated monthly disposable income:
         Disposable Income = Total Income - Total Bills
         4. For each goal:
@@ -141,8 +141,8 @@ class GoalInsight {
         Analyse the priority of each goal using only the information provided.
 
         Before assigning priority ratings:
-        1. Calculate total household income.
-        2. Calculate total household bills.
+        1. Calculate total household income (monthly).
+        2. Calculate total household bills (monthly).
         3. Calculate estimated monthly disposable income:
         Disposable Income = Total Income - Total Bills
         4. For each goal:
@@ -236,8 +236,8 @@ class GoalInsight {
         ${JSON.stringify(bills, null, 2)}
 
         Analyse the household's spending and identify actions that could help free up money to reach their financial goals faster. Consider:
-        - Total household income
-        - Total household bills
+        - Total household income (monthly)
+        - Total household bills (monthly)
         - Estimated disposable income remaining each month
         - Recurring subscriptions or bills
         - Areas where spending may be reduced

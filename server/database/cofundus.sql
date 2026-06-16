@@ -39,14 +39,18 @@ CREATE TABLE goals (
 
 CREATE TABLE income (
     income_id INT GENERATED ALWAYS AS IDENTITY,
-    income_name VARCHAR(50) NOT NULL,
     account_id INT NOT NULL,
     income_amount INT NOT NULL,
     payment_date DATE NOT NULL,
     category VARCHAR(50) NOT NULL,
     repeat_income BOOLEAN NOT NULL,
+<<<<<<< HEAD
     payment_frequency VARCHAR(50),
     income_repeat_date DATE,
+=======
+    payment_frequency VARCHAR(50) NOT NULL,
+    income_repeat_date DATE NOT NULL,
+>>>>>>> 196f8b1738455700169634692f453baf29afbcec
     PRIMARY KEY (income_id),
     FOREIGN KEY (account_id) REFERENCES accounts(account_id)
 );
@@ -84,10 +88,30 @@ VALUES
 (1, 'Family Ski Trip', 2000, 500, '2027-1-25'),
 (1, 'Christmas Goal', 800, 100, '2026-12-25');
 
+<<<<<<< HEAD
 INSERT INTO income (account_id, income_amount, income_name, payment_date, category, repeat_income, payment_frequency, income_repeat_date)
  VALUES
  (1, 3000, 'Homer Wages', '2026-07-21', 'Salary', TRUE, 'Monthly', '2026-08-21'),
  (3, 200, 'Bart Paperound', '2026-08-01', 'Salary', TRUE, 'Monthly', '2026-09-01');
+=======
+INSERT INTO income (
+    account_id,
+    income_amount,
+    payment_date,
+    category,
+    repeat_income,
+    payment_frequency,
+    income_repeat_date
+) VALUES (
+    1,
+    3000,
+    '2026-07-09',
+    'Salary',
+    TRUE,
+    'Monthly',
+    '2026-08-09'
+);
+>>>>>>> 196f8b1738455700169634692f453baf29afbcec
 
 INSERT INTO income (account_id, income_amount, income_name, payment_date, category, repeat_income)
  VALUES

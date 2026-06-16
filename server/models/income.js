@@ -83,7 +83,7 @@ class Income {
     const {
       account_id,
       income_amount,
-      date = today,
+      payment_date = today,
       category,
       repeat = false,
       payment_frequency = null,
@@ -107,10 +107,10 @@ class Income {
       [
         account_id,
         income_amount,
-        date,
+        payment_date,
         category,
         repeat,
-        income_frequency,
+        payment_frequency,
         income_repeat_date,
       ]
     );
@@ -132,7 +132,7 @@ class Income {
     const {
       income_id,
       income_amount,
-      date = today,
+      payment_date = today,
       repeat = false,
       payment_frequency = null,
       income_repeat_date = null,
@@ -149,7 +149,7 @@ class Income {
       RETURNING *;`,
       [
         income_amount,
-        date,
+        payment_date,
         repeat,
         payment_frequency,
         income_repeat_date,
