@@ -1,13 +1,15 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { ScrollView, View, Text, StyleSheet, Modal, Pressable, Keyboard, TextInput} from 'react-native'
 import {useState, useEffect} from 'react'
 import colours from '../../constants/colours'
 import Card from '../../components/Card'
 import AddButton from '../../components/AddButton'
 import AddModal from '../../components/AddModal'
-import Field from '../../components/Field';
-import AccountCards from '../../components/AccountCards';
-import { createAccount, getAccounts, deleteAccount, getBalance } from '../../api/bank-accounts';
+import Field from '../../components/Field'
+import DateField from '../../components/DateField'
+import SelectField from '../../components/SelectField'
+import AccountCards from '../../components/AccountCards'
+import { createAccount, getAccounts, deleteAccount, getBalance } from '../../api/bank-accounts'
 
 
 export default function accounts() {
@@ -15,17 +17,18 @@ export default function accounts() {
 
   const [householdId, setHouseholdId] = useState(null)
   const [activeModal, setActiveModal] = useState(null)
-  const [accounts, setAccounts] = useState([]) //not in use yet
-  const [balance, setBalance] = useState() //not in use yet
+  const [accounts, setAccounts] = useState([]) 
+  const [balance, setBalance] = useState()
   const [accountAmount, setAccountAmount] = useState()
   const [accountName, setAccountName] = useState('')
   const [accountBalance, setAccountBalance] = useState('')
   const [accountType, setAccountType] = useState('')
-  const [accountId, setAccountId] = useState('') //not in use yet
+  const [accountId, setAccountId] = useState('')
   const [incomeFrequency, setIncomeFrequency] = useState('')
   const [amount, setAmount] = useState('')
   const [category, setCategory] = useState(null)
   const [date, setDate] = useState(new Date())
+  const [deleteTarget, setDeleteTarget] = useState(null);
   const accountOptions = accounts.map(acc => ({
     label: acc.account_name,
     value: acc.account_id,
@@ -64,14 +67,8 @@ export default function accounts() {
   async function loadAccounts() {
     try {
       const data = await getAccounts(householdId);
-
-      const safeData = Array.isArray(data) ? data : [];
-
-      setAccounts(safeData);
-      setAccountAmount(safeData.length);
-
-      console.log("accounts:", safeData);
-
+      setAccounts(data);
+      setAccountAmount(data.length);
     } catch (error) {
       console.log("Failed:", error);
       setAccounts([]);
@@ -94,7 +91,6 @@ export default function accounts() {
       alert("Please fill in all fields");
       return;
     }
-
     const payload = {
       account_id: accountId,
       income_frequency: incomeFrequency,
@@ -102,7 +98,6 @@ export default function accounts() {
       category: category ?? null,
       date: date,
     };
-
     await addIncome({
       account_id: accountId,
       income_frequency: incomeFrequency,
@@ -157,6 +152,21 @@ export default function accounts() {
     setDate(new Date())
   }
 
+  function openIncomeModal(accountId) {
+    setAccountId(accountId);
+    setActiveModal("income");
+  }
+
+  function openDeleteModal(accountId) {
+    setDeleteTarget(accountId);
+    setActiveModal("delete-confirm");
+  }
+
+  const selectedAccount = accounts.find(
+    acc => acc.account_id === accountId
+  );
+
+
   return (
     <View style={{ flex: 1 }}>
       <ScrollView
@@ -182,24 +192,7 @@ export default function accounts() {
           </Card>
 
           {/* view account information */}
-          <AccountCards accounts={accounts} />
-
-          {/* add income and delete button */}
-          <View style={styles.bottomBar}>
-            <Pressable
-              onPress={() => setActiveModal("income")}
-              style={styles.bottomButton}
-            >
-              <Text style={styles.textStyle}>Add Income</Text>
-              </Pressable>
-
-              <Pressable
-                onPress={() => setActiveModal("delete")}
-                style={styles.bottomButton}
-              >
-              <Text style={styles.textStyle}>Delete Account</Text>
-            </Pressable>
-          </View>
+          <AccountCards accounts={accounts} addIncome={openIncomeModal} deleteAccount={openDeleteModal}/>
 
         </View>
       </ScrollView>
@@ -211,9 +204,7 @@ export default function accounts() {
         title={
           activeModal === "account"
             ? "Add A Bank Account"
-            : activeModal === "income"
-            ? "Add Income"
-            : "Delete A Bank Account"
+            : ""
         }
         visible={activeModal !== null}
         setVisible={() => setActiveModal(null)}
@@ -249,13 +240,9 @@ export default function accounts() {
 
         {activeModal === "income" && (
           <>
-            <SelectField
-              label="Bank Account"
-              value={accountId}
-              onChange={setAccountId}
-              placeholder="Select Bank Account"
-              options={accountOptions}
-            />
+            <Text style={styles.modalTitle}>
+              Adding income to {selectedAccount?.account_name}
+            </Text>
             <Field
               label="Amount"
               placeholder="Enter Amount" 
@@ -292,30 +279,52 @@ export default function accounts() {
               value={date}
               onChange={setDate}
             />
-            
-
             <Pressable style={styles.button} onPress={handleAddIncome}>
               <Text style={styles.textStyle}>Add Income</Text>
             </Pressable>
           </>
         )}
-        {activeModal === "delete" && (
-          <>
-            <SelectField
-              label="Bank Account"
-              value={accountId}
-              onChange={setAccountId}
-              placeholder="Select Bank Account"
-              options={accountOptions}
-            />
+        {activeModal === "delete-confirm" && (
+          <View style={styles.confirmContainer}>
+            
+            <Text style={styles.confirmTitle}>
+              Delete account?
+            </Text>
 
-            <Pressable
-              style={styles.button}
-              onPress={handleDeleteAccount}
-            >
-              <Text style={styles.textStyle}>Delete Account</Text>
-            </Pressable>
-          </>
+            <Text style={styles.confirmText}>
+              Are you sure you want to delete{" "}
+              <Text style={styles.confirmBold}>
+                {accounts.find(a => a.account_id === deleteTarget)?.account_name}
+              </Text>
+              ? This action cannot be undone.
+            </Text>
+
+            <View style={styles.confirmActions}>
+              
+              <Pressable
+                style={[styles.confirmButton, styles.cancelButton]}
+                onPress={() => {
+                  setActiveModal(null);
+                  setDeleteTarget(null);
+                }}
+              >
+                <Text style={styles.confirmCancelText}>Cancel</Text>
+              </Pressable>
+
+              <Pressable
+                style={[styles.confirmButton, styles.deleteButton]}
+                onPress={async () => {
+                  await deleteAccount(deleteTarget);
+                  await loadAccounts();
+                  setActiveModal(null);
+                  setDeleteTarget(null);
+                }}
+              >
+                <Text style={styles.confirmDeleteText}>Delete</Text>
+              </Pressable>
+
+            </View>
+          </View>
         )}
       </AddModal>
     </View>
@@ -346,7 +355,7 @@ const styles = StyleSheet.create({
   },
   list: {
     marginTop: 10,
-    gap: 16, 
+    gap: 10, 
   },
   row: {
     flexDirection: "row",
@@ -384,5 +393,62 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     textAlign: "center",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "800",
+    marginBottom: 10,
+    color: "#111",
+    textAlign: "center",
+  },
+  modalTitleBold: {
+    color: colours.label,
+    fontWeight: "800",
+  },
+  confirmContainer: {
+    alignItems: "center",
+    paddingVertical: 10,
+  },
+  confirmTitle: {
+    fontSize: 18,
+    fontWeight: "800",
+    marginBottom: 10,
+    color: "#111",
+  },
+  confirmText: {
+    fontSize: 13,
+    color: "#55626d",
+    textAlign: "center",
+    marginBottom: 20,
+    lineHeight: 18,
+  },
+  confirmBold: {
+    fontWeight: "700",
+    color: "#111",
+  },
+  confirmActions: {
+    flexDirection: "row",
+    gap: 10,
+    width: "100%",
+  },
+  confirmButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  cancelButton: {
+    backgroundColor: "#e5e7eb",
+  },
+  deleteButton: {
+    backgroundColor: "#c0392b",
+  },
+  confirmCancelText: {
+    fontWeight: "700",
+    color: "#111",
+  },
+  confirmDeleteText: {
+    fontWeight: "700",
+    color: "white",
   },
 });

@@ -74,7 +74,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   modalText: {
-    marginBottom: 15,
-    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: "800",
+    marginBottom: 10,
+    color: "#111",
+    textAlign: "center",
   },
+  
 });
