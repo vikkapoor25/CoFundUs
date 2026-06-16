@@ -63,7 +63,7 @@ export default function goals() {
       goal_name: goalName,
       goal_amount: Number(goalAmount) || 0,
       current_value: 0,
-      target_date: targetDate,
+      target_date: targetDate || null,
     })
     setGoalName('')
     setGoalAmount('')
