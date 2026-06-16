@@ -52,7 +52,7 @@ export default function home() {
       const billData = await getBills(householdId)
       const goalData = await getGoal(householdId)
       setNet(Number(netData.net_gain_loss))
-      setBills(billsData)
+      setBills(billData)
       setGoal(goalData)
     } catch (error) {
       console.log("Failed to get data:", error)
