@@ -7,7 +7,7 @@ import AddButton from '../../components/AddButton'
 import AddModal from '../../components/AddModal'
 import Field from '../../components/Field'
 
-const CHART_URL = 'https://vivid-abaft.metabaseapp.com/public/question/58ad854f-7cd1-4ab6-9c8b-e0a1522e7092'
+const CHART_URL = 'https://vivid-abaft.metabaseapp.com/public/question/58ad854f-7cd1-4ab6-9c8b-e0a1522e7092#titled=false'
 
 const SECTIONS = [
   { key: 'recurring', title: 'Recurring Bills' },
@@ -84,7 +84,7 @@ export default function bills() {
           </View>
         </View>
 
-        <Card title="Bills vs Account Value">
+        <Card title="Bills vs Account Totals">
           <View style={styles.chartBox}>
             <WebView source={{ uri: CHART_URL }} style={{ flex: 1 }} />
           </View>

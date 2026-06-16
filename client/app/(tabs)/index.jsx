@@ -77,11 +77,13 @@ export default function home() {
 
       {/* display income and spending for month with net gain or loss */}
       <Card title="Monthly Income and Spending">
-        {/* add bar chart visual */}
+
+        <View style={styles.metabaseBox}>
+          <MetabaseScreen url="https://vivid-abaft.metabaseapp.com/public/question/08a8be30-88dd-42db-a593-0af035c3fae6#titled=false"/>
+        </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Net Gain/Loss:</Text>
-
           <Text
             style={[
               styles.value,

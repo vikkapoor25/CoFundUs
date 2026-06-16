@@ -28,50 +28,45 @@ export default function accounts() {
   const [amount, setAmount] = useState('')
   const [category, setCategory] = useState(null)
   const [date, setDate] = useState(new Date())
-  const [deleteTarget, setDeleteTarget] = useState(null);
-  const accountOptions = accounts.map(acc => ({
-    label: acc.account_name,
-    value: acc.account_id,
-  }))
-
+  const [deleteTarget, setDeleteTarget] = useState(null)
 
   //load in id first
   useEffect(() => {
-    loadHouseholdId();
-  }, []);
+    loadHouseholdId()
+  }, [])
   //run once householdid is stored
   useEffect(() => {
-    if (householdId === null) return;
-    loadAccounts();
-    loadBalance();
-  }, [householdId]);
+    if (householdId === null) return
+    loadAccounts()
+    loadBalance()
+  }, [householdId])
 
   
 
   //get household id for asyncstorage
   async function loadHouseholdId() {
-    const stored = await AsyncStorage.getItem('household');
+    const stored = await AsyncStorage.getItem('household')
     if (!stored) {
       setHouseholdId(1)
       return
     }
     const storage = JSON.parse(stored)
     if (!storage?.household_id) {
-      setHouseholdId(null);
-      return;
+      setHouseholdId(null)
+      return
     }
-    setHouseholdId(Number(storage.household_id));
+    setHouseholdId(Number(storage.household_id))
   }
 
   // function to get accounts for household
   async function loadAccounts() {
     try {
-      const data = await getAccounts(householdId);
-      setAccounts(data);
-      setAccountAmount(data.length);
+      const data = await getAccounts(householdId)
+      setAccounts(data)
+      setAccountAmount(data.length)
     } catch (error) {
-      console.log("Failed:", error);
-      setAccounts([]);
+      console.log("Failed:", error)
+      setAccounts([])
     }
   }
 
@@ -79,7 +74,7 @@ export default function accounts() {
   async function loadBalance() {
     try {
       const data = await getBalance(householdId) 
-      setBalance(data.balance)
+      setBalance(data.total_balance)
     } catch (error) {
       console.log("Failed to get Balance:", error)
     }
@@ -88,8 +83,8 @@ export default function accounts() {
   // function to add income to account
   async function handleAddIncome() {
     if (!accountId || !incomeFrequency || !amount || !date) {
-      alert("Please fill in all fields");
-      return;
+      alert("Please fill in all fields")
+      return
     }
     const payload = {
       account_id: accountId,
@@ -97,46 +92,45 @@ export default function accounts() {
       income_amount: amount,
       category: category ?? null,
       date: date,
-    };
+    }
     await addIncome({
       account_id: accountId,
       income_frequency: incomeFrequency,
       income_amount: amount,
       category: category ?? null,
       date: date,
-    });
+    })
     resetIncomeForm()
-    setActiveModal(null);
+    setActiveModal(null)
   }
 
   // function to add bank account
   async function handleAddAccount() {
     if (!accountName || !accountBalance || !accountType) {
-      alert("Please fill in all fields");
-      return;
+      alert("Please fill in all fields")
+      return
     }
     await createAccount({
       household_id: householdId, 
       account_name: accountName,
       account_balance: accountBalance,
       account_type: accountType,
-    });
-    //reload accounts for updated list
-    await loadAccounts();
+    })
+    //reload information
+    await loadAccounts()
+    await loadBalance()
     resetAccountForm()
-    setActiveModal(null);
+    setActiveModal(null)
   }
 
   //delet account by id
   async function handleDeleteAccount() {
     if (!accountId) {
-      alert("Please select an account");
-      return;
+      alert("Please select an account")
+      return
     }
-    await deleteAccount(accountId);
-    //reload accounts for updated list
-    await loadAccounts();
-    setActiveModal(null);
+    await deleteAccount(accountId)
+    setActiveModal(null)
   }
   //reset form
   function resetAccountForm() {
@@ -153,18 +147,18 @@ export default function accounts() {
   }
 
   function openIncomeModal(accountId) {
-    setAccountId(accountId);
-    setActiveModal("income");
+    setAccountId(accountId)
+    setActiveModal("income")
   }
 
   function openDeleteModal(accountId) {
-    setDeleteTarget(accountId);
-    setActiveModal("delete-confirm");
+    setDeleteTarget(accountId)
+    setActiveModal("delete-confirm")
   }
 
   const selectedAccount = accounts.find(
     acc => acc.account_id === accountId
-  );
+  )
 
 
   return (
@@ -304,8 +298,8 @@ export default function accounts() {
               <Pressable
                 style={[styles.confirmButton, styles.cancelButton]}
                 onPress={() => {
-                  setActiveModal(null);
-                  setDeleteTarget(null);
+                  setActiveModal(null)
+                  setDeleteTarget(null)
                 }}
               >
                 <Text style={styles.confirmCancelText}>Cancel</Text>
@@ -314,10 +308,11 @@ export default function accounts() {
               <Pressable
                 style={[styles.confirmButton, styles.deleteButton]}
                 onPress={async () => {
-                  await deleteAccount(deleteTarget);
-                  await loadAccounts();
-                  setActiveModal(null);
-                  setDeleteTarget(null);
+                  await deleteAccount(deleteTarget)
+                  await loadAccounts()
+                  await loadBalance()
+                  setActiveModal(null)
+                  setDeleteTarget(null)
                 }}
               >
                 <Text style={styles.confirmDeleteText}>Delete</Text>
@@ -451,4 +446,4 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "white",
   },
-});
+})
