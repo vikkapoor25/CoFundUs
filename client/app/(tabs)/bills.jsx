@@ -1,5 +1,5 @@
 import { ScrollView, View, Text, StyleSheet, Pressable, Dimensions, Modal } from 'react-native'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { WebView } from 'react-native-webview'
 import colours from '../../constants/colours'
 import Card from '../../components/Card'
@@ -8,11 +8,12 @@ import AddModal from '../../components/AddModal'
 import Field from '../../components/Field'
 import { getBills, createBill, deleteBill, markBillPaid } from '../../api/bills'
 import { getAccounts } from '../../api/bank-accounts'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const CHARTS = [
-  'https://vivid-abaft.metabaseapp.com/public/question/d73c0b97-8c7c-4883-b571-c2a286e8fb76',
-  'https://vivid-abaft.metabaseapp.com/public/question/044c35dc-1275-421e-98f0-98b4cf1528b5',
-  'https://vivid-abaft.metabaseapp.com/public/question/a66e81c3-fe91-4fae-bf40-381eaf2328a1',
+  'https://vivid-abaft.metabaseapp.com/public/question/d73c0b97-8c7c-4883-b571-c2a286e8fb76#titled=false',
+  'https://vivid-abaft.metabaseapp.com/public/question/044c35dc-1275-421e-98f0-98b4cf1528b5#titled=false',
+  'https://vivid-abaft.metabaseapp.com/public/question/a66e81c3-fe91-4fae-bf40-381eaf2328a1#titled=false',
 ]
 
 const SLIDE_W = Dimensions.get('window').width - 32
