@@ -15,17 +15,19 @@ class Home {
   static async getIncomeVsBills(household_id) {
     const incomeResponse = await db.query(
       `SELECT COALESCE(SUM(i.income_amount), 0) AS overall_income
-       FROM income i
-       JOIN accounts a ON i.account_id = a.account_id
-       WHERE a.household_id = $1;`,
+      FROM income i
+      JOIN accounts a ON i.account_id = a.account_id
+      WHERE a.household_id = $1
+      AND i.payment_date <= CURRENT_DATE;`,
       [household_id]
-    );
+  );
 
     const billsResponse = await db.query(
       `SELECT COALESCE(SUM(b.bill_amount), 0) AS overall_bills
        FROM bills b
        JOIN accounts a ON b.account_id = a.account_id
-       WHERE a.household_id = $1;`,
+       WHERE a.household_id = $1
+       AND b.bill_due_date <= CURRENT_DATE;`,
       [household_id]
     );
 

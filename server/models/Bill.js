@@ -49,7 +49,6 @@ constructor({ household_id, bill_id, bill_name, account_id, bill_amount, bill_du
     static async createBill(request_body) {
         try {
             const today = new Date().toLocaleDateString("en-CA");
-
             const {
             account_id,
             bill_name,
@@ -120,7 +119,7 @@ constructor({ household_id, bill_id, bill_name, account_id, bill_amount, bill_du
             console.error("createBill error:", error);
             throw error; // IMPORTANT so frontend sees real error
         }
-        }
+    }
 
     // Updates a Bill using bill_id
     static async updateBill(request_body) {
