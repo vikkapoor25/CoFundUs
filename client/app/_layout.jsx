@@ -31,11 +31,11 @@ export default function RootLayout() {
     if (loggedIn && inAuthGroup) {
       router.replace("/(tabs)/index")
     }
-  }, [loggedIn, loading, segments])
+  }, [loggedIn, loading])
 
   if (loading) {
     return null
   }
 
-  return <Stack screenOptions={{ headerShown: false }} />
+  return <Stack screenOptions={{ headerShown: false }} />;
 }
