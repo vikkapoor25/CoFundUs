@@ -26,12 +26,17 @@ export async function createAccount(body) {
 }
 
 export async function deleteAccount(bank_account_id) {
+
   const res = await fetch(`${BASE_URL}/bank-accounts/delete`, {
     method: 'DELETE',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ account_id: bank_account_id })
   })
-  return res.json()
+
+  const data = await res.json()
+  console.log(data)
+
+  return data
 }
 
 export async function getBalance(household_id) {

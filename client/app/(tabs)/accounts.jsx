@@ -130,12 +130,17 @@ export default function accounts() {
 
   //delet account by id
   async function handleDeleteAccount() {
-    if (!accountId) {
-      alert("Please select an account")
-      return
+    console.log("hit del")
+    try {
+      await deleteAccount(deleteTarget)
+      await loadAccounts()
+      await loadBalance()
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setActiveModal(null)
+      setDeleteTarget(null)
     }
-    await deleteAccount(accountId)
-    setActiveModal(null)
   }
   //reset form
   function resetAccountForm() {
@@ -317,17 +322,10 @@ export default function accounts() {
 
               <Pressable
                 style={[styles.confirmButton, styles.deleteButton]}
-                onPress={async () => {
-                  await deleteAccount(deleteTarget)
-                  await loadAccounts()
-                  await loadBalance()
-                  setActiveModal(null)
-                  setDeleteTarget(null)
-                }}
+                onPress={handleDeleteAccount}
               >
                 <Text style={styles.confirmDeleteText}>Delete</Text>
               </Pressable>
-
             </View>
           </View>
         )}
