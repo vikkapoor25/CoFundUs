@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { ScrollView, View, Text, StyleSheet, Modal, Pressable, Keyboard, TextInput} from 'react-native'
-import {useState, useEffect} from 'react'
+import { useFocusEffect } from '@react-navigation/native'
+import {useState, useEffect, useCallback } from 'react'
 import colours from '../../constants/colours'
 import Card from '../../components/Card'
 import AddButton from '../../components/AddButton'
@@ -10,6 +11,7 @@ import DateField from '../../components/DateField'
 import SelectField from '../../components/SelectField'
 import AccountCards from '../../components/AccountCards'
 import { createAccount, getAccounts, deleteAccount, getBalance } from '../../api/bank-accounts'
+import { createIncome } from '../../api/income'
 
 
 export default function accounts() {
@@ -25,6 +27,7 @@ export default function accounts() {
   const [accountType, setAccountType] = useState('')
   const [accountId, setAccountId] = useState('')
   const [incomeFrequency, setIncomeFrequency] = useState('')
+  const[incomeName, setIncomeName] = useState(null)
   const [amount, setAmount] = useState('')
   const [category, setCategory] = useState(null)
   const [date, setDate] = useState(new Date())
@@ -41,7 +44,14 @@ export default function accounts() {
     loadBalance()
   }, [householdId])
 
-  
+  useFocusEffect(
+    useCallback(() => {
+      if (householdId === null) return
+
+      loadAccounts()
+      loadBalance()
+    }, [householdId])
+  )
 
   //get household id for asyncstorage
   async function loadHouseholdId() {
@@ -86,21 +96,16 @@ export default function accounts() {
       alert("Please fill in all fields")
       return
     }
-    const payload = {
+    await createIncome({
       account_id: accountId,
-      income_frequency: incomeFrequency,
+      income_name: incomeName,
       income_amount: amount,
-      category: category ?? null,
-      date: date,
-    }
-    await addIncome({
-      account_id: accountId,
-      income_frequency: incomeFrequency,
-      income_amount: amount,
-      category: category ?? null,
-      date: date,
+      payment_date: date.toISOString().split("T")[0],
+      category: category,
+      payment_frequency: incomeFrequency,
     })
     resetIncomeForm()
+    await loadAccounts()
     setActiveModal(null)
   }
 
@@ -238,6 +243,12 @@ export default function accounts() {
               Adding income to {selectedAccount?.account_name}
             </Text>
             <Field
+              label="Name"
+              placeholder="Enter Income Name" 
+              value={incomeName}
+              onChangeText={setIncomeName}
+            />
+            <Field
               label="Amount"
               placeholder="Enter Amount" 
               keyboardType="numeric" 
@@ -250,7 +261,6 @@ export default function accounts() {
               onChange={setCategory}
               placeholder="Select Category"
               options={[
-                { label: "None", value: null },
                 { label: "Salary", value: "Salary" },
                 { label: "Refund", value: "Refund" },
                 { label: "Payment", value: "Payment" },

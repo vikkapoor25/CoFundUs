@@ -6,6 +6,8 @@ import Card from '../../components/Card'
 import AddButton from '../../components/AddButton'
 import AddModal from '../../components/AddModal'
 import Field from '../../components/Field'
+import SelectField from '../../components/SelectField'
+import DateField from '../../components/DateField'
 import { getBills, createBill, deleteBill, markBillPaid } from '../../api/bills'
 import { getAccounts } from '../../api/bank-accounts'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -28,13 +30,10 @@ const CATEGORIES = ['Subscription', 'Entertainment', 'Beauty', 'Consumable', 'Ne
 export default function bills() {
   const [householdId, setHouseholdId] = useState(null)
   const [bills, setBills] = useState([])
-  const [accounts, setAccounts] = useState([])
   const [modalVisible, setModalVisible] = useState(false)
   const [activeChart, setActiveChart] = useState(0)
   const [fullChart, setFullChart] = useState(null)
-
-  const accountOptions = accounts.map((a) => ({ label: a.account_name, value: a.account_id }))
-
+  const [accounts, setAccounts] = useState([]) 
   const [billName, setBillName] = useState('')
   const [amount, setAmount] = useState('')
   const [accountId, setAccountId] = useState('')
@@ -58,8 +57,9 @@ export default function bills() {
   async function loadAccounts() {
     try {
       const data = await getAccounts(householdId)
-      setAccounts(Array.isArray(data) ? data : [])
+      setAccounts(data)
     } catch (error) {
+      console.log("Failed:", error)
       setAccounts([])
     }
   }
@@ -97,17 +97,18 @@ export default function bills() {
 
   async function handleAddBill() {
     if (!billName || !amount) return
-    await createBill({
-      account_id: Number(accountId) || householdId,
+    const payload = ({
+      account_id: accountId ,
       bill_name: billName,
-      bill_amount: Number(amount) || 0,
-      bill_due_date: dueDate,
+      bill_amount: amount,
+      bill_due_date: dueDate.toISOString().split("T")[0],
       category: category,
       category_type: categoryType,
       repeat_bill: recurring,
       payment_frequency: recurring ? paymentFrequency : null,
-      bill_repeat_date: recurring ? billRepeatDate : null,
     })
+    console.log(payload)
+    await createBill(payload)
     resetForm()
     setModalVisible(false)
     loadBills()
@@ -115,12 +116,12 @@ export default function bills() {
 
   async function handleMarkPaid(bill_id) {
     await markBillPaid(bill_id)
-    loadBills()
+    await loadBills()
   }
 
   async function handleDelete(bill_id) {
     await deleteBill(bill_id)
-    loadBills()
+    await loadBills()
   }
 
   return (
@@ -206,28 +207,37 @@ export default function bills() {
 
       <AddButton onPress={() => setModalVisible(true)} />
 
-      <AddModal title="Add A Bill" visible={modalVisible} setVisible={setModalVisible}>
+      <AddModal 
+        title="Add A Bill" 
+        visible={modalVisible} 
+        setVisible={setModalVisible}
+      >
         <ScrollView style={styles.formScroll} contentContainerStyle={styles.form}>
-          <Field label="Bill Name" placeholder="e.g. Netflix" value={billName} onChangeText={setBillName} />
-          <Field label="Amount" placeholder="e.g. 15" keyboardType="numeric" value={amount} onChangeText={setAmount} />
-          <Text style={styles.typeLabel}>Account</Text>
-          {accountOptions.length === 0 ? (
-            <Text style={styles.hint}>No accounts found. Add one on the Accounts page first.</Text>
-          ) : (
-            <View style={styles.typeRow}>
-              {accountOptions.map((opt) => (
-                <Pressable
-                  key={opt.value}
-                  onPress={() => setAccountId(opt.value)}
-                  style={[styles.chip, accountId === opt.value && styles.chipActive]}
-                >
-                  <Text style={[styles.chipText, accountId === opt.value && styles.chipTextActive]}>
-                    {opt.label}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
-          )}
+          <Field 
+            label="Bill Name" 
+            placeholder="e.g. Netflix" 
+            value={billName} 
+            onChangeText={setBillName} 
+          />
+          <Field
+            label="Amount" 
+            placeholder="e.g. 15" 
+            keyboardType="numeric"
+            value={amount} 
+            onChangeText={setAmount} 
+          />
+          <SelectField
+            label="Account"
+            value={accountId}
+            onChange={setAccountId}
+            placeholder="Select Account"
+            options={accounts.map(acc => ({
+              label: acc.account_name,  
+              value: acc.account_id
+            }))}
+          />
+
+
           <Text style={styles.typeLabel}>Category</Text>
           <View style={styles.typeRow}>
             {CATEGORIES.map((c) => (
@@ -241,7 +251,11 @@ export default function bills() {
             ))}
           </View>
           <Field label="Category Type" placeholder="e.g. Subscription" value={categoryType} onChangeText={setCategoryType} />
-          <Field label="Due Date" placeholder="YYYY-MM-DD" value={dueDate} onChangeText={setDueDate} />
+          <DateField
+            label="Due Date"
+            value={dueDate}
+            onChange={setDueDate}
+          />
 
           <Text style={styles.typeLabel}>Repeat</Text>
           <View style={styles.typeRow}>
@@ -255,8 +269,16 @@ export default function bills() {
 
           {recurring && (
             <>
-              <Field label="Payment Frequency" placeholder="e.g. Monthly" value={paymentFrequency} onChangeText={setPaymentFrequency} />
-              <Field label="Bill Repeat Date" placeholder="YYYY-MM-DD" value={billRepeatDate} onChangeText={setBillRepeatDate} />
+              <SelectField
+                label="Category"
+                value={paymentFrequency}
+                onChange={setPaymentFrequency}
+                placeholder="Select Category"
+                options={[
+                  { label: "Monthly", value: "Monthly" },
+                  { label: "Annually", value: "Annually" }
+                ]}
+              />
             </>
           )}
 

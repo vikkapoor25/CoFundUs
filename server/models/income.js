@@ -82,13 +82,35 @@ class Income {
 
     const {
       account_id,
+      income_name,
       income_amount,
       payment_date = today,
       category,
-      repeat = false,
       payment_frequency = null,
-      income_repeat_date = null,
     } = request_body;
+
+    let repeat_income = false;
+    let income_repeat_date = null;
+
+    if (payment_frequency) {
+      const normalisedFrequency = payment_frequency.trim().toLowerCase();
+      const nextDate = new Date(payment_date);
+
+      if (!Number.isNaN(nextDate.getTime())) {
+        if (normalisedFrequency === "monthly") {
+          repeat_income = true;
+          nextDate.setMonth(nextDate.getMonth() + 1);
+          income_repeat_date = nextDate.toLocaleDateString("en-CA");
+        } else if (
+          normalisedFrequency === "annually" ||
+          normalisedFrequency === "annual"
+        ) {
+          repeat_income = true;
+          nextDate.setFullYear(nextDate.getFullYear() + 1);
+          income_repeat_date = nextDate.toLocaleDateString("en-CA");
+        }
+      }
+    }
 
     const existingBankAccount = await db.query(
       "SELECT * FROM accounts WHERE account_id = $1",
@@ -98,22 +120,24 @@ class Income {
     if (existingBankAccount.rows.length !== 1) {
       throw new Error("Unable to create income for account.");
     }
-
+    
     const response = await db.query(
       `INSERT INTO income
-      (account_id, income_amount, payment_date, category, repeat_income, payment_frequency, income_repeat_date)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
-      RETURNING *;`,
+      (account_id, income_name, income_amount, payment_date, category,
+      repeat_income, payment_frequency, income_repeat_date)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+      RETURNING *`,
       [
         account_id,
+        income_name,
         income_amount,
         payment_date,
         category,
-        repeat,
+        repeat_income,
         payment_frequency,
         income_repeat_date,
-      ]
-    );
+     ]
+   );
 
     const householdResponse = await db.query(
       "SELECT household_id FROM accounts WHERE account_id = $1",
@@ -133,24 +157,48 @@ class Income {
       income_id,
       income_amount,
       payment_date = today,
-      repeat = false,
+      category,
       payment_frequency = null,
-      income_repeat_date = null,
     } = request_body;
+
+    let repeat_income = false;
+    let income_repeat_date = null;
+
+    if (payment_frequency) {
+      const normalisedFrequency = payment_frequency.trim().toLowerCase();
+      const nextDate = new Date(payment_date);
+
+      if (!Number.isNaN(nextDate.getTime())) {
+        if (normalisedFrequency === "monthly") {
+          repeat_income = true;
+          nextDate.setMonth(nextDate.getMonth() + 1);
+          income_repeat_date = nextDate.toLocaleDateString("en-CA");
+        } else if (
+          normalisedFrequency === "annually" ||
+          normalisedFrequency === "annual"
+        ) {
+          repeat_income = true;
+          nextDate.setFullYear(nextDate.getFullYear() + 1);
+          income_repeat_date = nextDate.toLocaleDateString("en-CA");
+        }
+      }
+    }
 
     const response = await db.query(
       `UPDATE income
       SET income_amount = $1,
           payment_date = $2,
-          repeat_income = $3,
-          payment_frequency = $4,
-          income_repeat_date = $5
-      WHERE income_id = $6
+          category = $3,
+          repeat_income = $4,
+          payment_frequency = $5,
+          income_repeat_date = $6
+      WHERE income_id = $7
       RETURNING *;`,
       [
         income_amount,
         payment_date,
-        repeat,
+        category,
+        repeat_income,
         payment_frequency,
         income_repeat_date,
         income_id,
