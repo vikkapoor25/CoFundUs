@@ -12,6 +12,8 @@ CREATE TABLE household (
     name_2 VARCHAR(30) NOT NULL,
     email_1 VARCHAR(50) NOT NULL,
     email_2 VARCHAR(50) NOT NULL,
+    twofa_code VARCHAR(10),
+    twofa_expires_at TIMESTAMP,
     PRIMARY KEY (household_id)
 );
 
