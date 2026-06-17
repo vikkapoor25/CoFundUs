@@ -92,7 +92,7 @@ export default function home() {
         </View>
 
         <View style={styles.row}>
-          <Text style={styles.label}>Net Gain/Loss:</Text>
+          <Text style={styles.label}>Months Net Gain/Loss:</Text>
           <Text
             style={[
               styles.value,

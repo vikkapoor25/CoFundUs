@@ -18,7 +18,7 @@ class Home {
       FROM income i
       JOIN accounts a ON i.account_id = a.account_id
       WHERE a.household_id = $1
-      AND i.payment_date <= CURRENT_DATE;`,
+      AND EXTRACT(MONTH FROM i.payment_date) = EXTRACT(MONTH FROM CURRENT_DATE) AND EXTRACT(YEAR FROM i.payment_date) = EXTRACT(YEAR FROM CURRENT_DATE);`,
       [household_id]
   );
 
@@ -27,7 +27,7 @@ class Home {
        FROM bills b
        JOIN accounts a ON b.account_id = a.account_id
        WHERE a.household_id = $1
-       AND b.paid = 'true';`,
+       AND EXTRACT(MONTH FROM b.bill_due_date) = EXTRACT(MONTH FROM CURRENT_DATE) AND EXTRACT(YEAR FROM b.bill_due_date) = EXTRACT(YEAR FROM CURRENT_DATE)`,
       [household_id]
     );
 
