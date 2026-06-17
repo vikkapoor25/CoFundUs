@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 
 const Household = require('../models/Household');
 
@@ -49,7 +50,6 @@ async function login(req, res) {
       res.status(401).json({ error: err.message });
     }
 }
-
 
 module.exports = {
     register, login
