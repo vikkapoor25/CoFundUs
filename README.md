@@ -69,84 +69,129 @@ Breakdown:
     "setup-db": "node ./server/database/setup.js"
 }
 
-# Python Setup
+## Step-By-Step: Dockerising Backend API 
 
-1. Create .gitignore
+### 1. Create `dockerfile` File and Populate
+
+Create a `dockerfile` and populate it:
+
+```dockerfile
+# Uses official Node.js image
+FROM node:20
+
+# Sets working directory inside container
+WORKDIR /app
+
+# Copies package files first
+COPY package*.json ./
+
+# Installs dependencies
+RUN npm install
+
+# Copies the rest of the project files
+COPY . .
+
+# Exposes the port the app runs on
+EXPOSE 3000
+
+# Starts the application
+CMD ["npm", "start"]
+```
+
+**NOTE:** Must be in the same level as `package.json` and `.env` files.
+
+### 2. Create `.dockerignore` File 
+
+Create `.dockerignore` and add:
 
 ```
-__pycache__/
-*.pyc
+node_modules
 .env
-.venv/
-venv/
-.coverage
-htmlcov/
-.pytest_cache/
+.git
+```
+
+This prevents unnecessary/sensitive files being copied into the image.
+
+### 3. Check `package.json` Scripts
+
+We must have access to `npm start`
+
+```JSON
+"scripts": {
+  "dev": "nodemon -L index.js",
+  "start": "node index.js",
+  "setup-db": "node ./database/setup.js"
+}
+```
+
+### 4. Check `index.js` Uses Environment Port
+
+Ensure we are using `process.env.PORT`.
+
+```javascript
+require("dotenv").config();
+
+const api = require("./app");
+
+const port = process.env.PORT;
+
+api.listen(port, () => {
+    console.log(`API listening on ${port}`);
+})
+```
+
+### 4.5. Before Progressing (Project Specific)
+
+We must ensure our `.env` has everything in it:
+- DB_URL
+- PORT
+- GROQ_API_KEY
+- SECRET_TOKEN
+NOTE: Convene as group and decide
+We must ensure AWS RDS Database is public
+The one generating the container must have the ip address of their laptop in an AWS RDS security group
+
+### 5. Build Docker Image
+
+```Bash
+docker build -t snacks-api .
 ```
 where:
-`__pycache__` → Python compiled files
-`*.pyc` → Python bytecode
-`.env` → Environment variables
-`venv / .venv` → Virtual environment
-`.coverage` → Coverage reports
-`htmlcov` → Coverage HTML output
-`.pytest_cache` → Pytest cache
+- `docker build` creates the Image
+- `-t snacks-api` names the Image
+- ` .` uses the current folder to create image
 
-2. Create Virtual Environment and activate
-
-Create:
+### 6. Run Docker Container
 
 ```Bash
-python -m venv .venv
-```
-
-Activate (Linux/Mac)
-
-```Bash
-source .venv/bin/activate
-```
-
-3. Install Flask Dependencies
-
-```Bash
-pip install flask flask-cors python-dotenv
+docker run --env-file .env -p 3000:3000 snacks-api
 ```
 
 where:
-`flask` → Web framework (similar to Express)
-`flask-cors` → Allows requests from frontend applications
-`python-dotenv` → Loads environment variables from .env
+- `--env-file .env` passes environment variables into the container 
+- `-p 3000:3000` connects local port 3000 to container port 3000
+- `countries-api` references image name
 
-4. Install Testing Libraries
+### 7. Test API
 
-```Bash
-pip install pytest pytest-cov
+In HTTPie:
+
+```
+http://localhost:3000/snacks
 ```
 
-where:
-`pytest` → Test framework (similar to Jest)
-`pytest-cov` → Coverage reporting
+If it works, your containerised API is successfully talking to Supabase.
 
-5. Install Gemini SDK
+### 8. Stop Container
 
-```Bash
-pip install google-genai
-```
-
-Allows our python application to communication with Google's Gemini AI without having to manually make HTTP requests
-
-6. Save Dependencies
-
-Equivalent of `package.json`
+Find running containers:
 
 ```Bash
-pip freeze > requirements.txt
+docker ps
 ```
 
-Anyone can install with:
+Stop container from running:
 
 ```Bash
-pip install -r requirements.txt
+docker stop <container_id>
 ```
-
-7. Run project with `python server/app.py`
