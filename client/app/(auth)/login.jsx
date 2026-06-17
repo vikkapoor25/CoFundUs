@@ -46,7 +46,8 @@ export default function login() {
     <View style={styles.container}>
       <View style={styles.top}>
         <Image source={require('../../assets/images/logo.png')} style={styles.logo} />
-        <Text style={styles.tagline}>Track, Save, Grow Together</Text>
+        <Text style={styles.brand}>CoFund<Text style={styles.brandAccent}>Us</Text></Text>
+        <Text style={styles.tagline}>Track. Save. Grow Together.</Text>
       </View>
 
       <Svg width="100%" height={70} viewBox="0 0 1440 120" preserveAspectRatio="none" style={styles.wave}>
@@ -99,6 +100,8 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colours.navBackground },
   top: { height: 250, alignItems: 'center', justifyContent: 'center', gap: 12 },
   logo: { width: 90, height: 90, resizeMode: 'contain' },
+  brand: { color: '#fff', fontSize: 30, fontWeight: '800', letterSpacing: 0.5 },
+  brandAccent: { color: '#bcd3f0' },
   tagline: { color: '#fff', fontSize: 15, fontWeight: '600' },
   wave: { marginBottom: -1 },
   bottom: { flex: 1, backgroundColor: '#fff', paddingHorizontal: 28, paddingTop: 8 },
