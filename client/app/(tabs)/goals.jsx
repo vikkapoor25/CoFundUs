@@ -8,13 +8,15 @@ import AddButton from '../../components/AddButton'
 import AddModal from '../../components/AddModal'
 import Field from '../../components/Field'
 import { getGoals, createGoal, updateGoal, deleteGoal } from '../../api/goals'
+import { getFeasibility, getPriority, getOptimisation } from '../../api/goalInsights'
 
 const GOALS_CHART_URL = 'https://vivid-abaft.metabaseapp.com/public/question/b2d671f5-1801-4fa0-b123-26a28f0a3b6d#titled=false'
 
 export default function goals() {
   const [householdId, setHouseholdId] = useState(null)
   const [goals, setGoals] = useState([])
-  const [insights, setInsights] = useState(null)
+  const [insights, setInsights] = useState({ feasibility: null, priority: null, optimisation: null })
+  const [insightsLoading, setInsightsLoading] = useState(false)
 
   const [activeModal, setActiveModal] = useState(null)
   const [selectedGoal, setSelectedGoal] = useState(null)
@@ -32,6 +34,7 @@ export default function goals() {
   useEffect(() => {
     if (householdId === null) return
     loadGoals()
+    loadInsights()
   }, [householdId])
 
   async function loadHouseholdId() {
@@ -49,10 +52,28 @@ export default function goals() {
       const data = await getGoals(householdId)
       const goalList = Array.isArray(data) ? data : data.goals
       setGoals(Array.isArray(goalList) ? goalList : [])
-      setInsights(data.insights ?? data.ai_insights ?? data.ai ?? null)
     } catch (error) {
       setGoals([])
-      setInsights(null)
+    }
+  }
+
+  async function loadInsights() {
+    setInsightsLoading(true)
+    try {
+      const [feasibility, priority, optimisation] = await Promise.all([
+        getFeasibility(householdId),
+        getPriority(householdId),
+        getOptimisation(householdId),
+      ])
+      setInsights({
+        feasibility: typeof feasibility === 'string' ? feasibility : null,
+        priority: typeof priority === 'string' ? priority : null,
+        optimisation: typeof optimisation === 'string' ? optimisation : null,
+      })
+    } catch (error) {
+      setInsights({ feasibility: null, priority: null, optimisation: null })
+    } finally {
+      setInsightsLoading(false)
     }
   }
 
@@ -70,6 +91,7 @@ export default function goals() {
     setTargetDate('')
     setActiveModal(null)
     loadGoals()
+    loadInsights()
   }
 
   async function handleCommit() {
@@ -91,6 +113,7 @@ export default function goals() {
   async function handleDelete(goal_id) {
     await deleteGoal(goal_id)
     loadGoals()
+    loadInsights()
   }
 
   function openCommit(goal) {
@@ -99,15 +122,35 @@ export default function goals() {
   }
 
   function renderInsights() {
-    if (!insights) {
-      return <Text style={styles.line}>AI insights will appear here once your data loads.</Text>
+    if (insightsLoading) {
+      return <Text style={styles.line}>Generating your AI insights…</Text>
     }
-    if (Array.isArray(insights)) {
-      return insights.map((item, i) => (
-        <Text key={i} style={styles.line}>{typeof item === 'string' ? item : item.text}</Text>
-      ))
+    const { feasibility, priority, optimisation } = insights
+    if (!feasibility && !priority && !optimisation) {
+      return <Text style={styles.line}>Add goals to get AI insights on feasibility, priority and savings.</Text>
     }
-    return <Text style={styles.line}>{insights}</Text>
+    return (
+      <>
+        {feasibility ? (
+          <>
+            <Text style={styles.insightLabel}>Feasibility</Text>
+            <Text style={styles.line}>{feasibility}</Text>
+          </>
+        ) : null}
+        {priority ? (
+          <>
+            <Text style={styles.insightLabel}>Priority</Text>
+            <Text style={styles.line}>{priority}</Text>
+          </>
+        ) : null}
+        {optimisation ? (
+          <>
+            <Text style={styles.insightLabel}>Saving Tips</Text>
+            <Text style={styles.line}>{optimisation}</Text>
+          </>
+        ) : null}
+      </>
+    )
   }
 
   return (
@@ -211,6 +254,7 @@ const styles = StyleSheet.create({
   heading: { fontSize: 24, fontWeight: '800', color: colours.pageHeader },
   sub: { fontSize: 13, color: '#7a8794', marginBottom: 16, marginTop: 4 },
   line: { fontSize: 13, color: '#3f4856', paddingVertical: 6, lineHeight: 18 },
+  insightLabel: { fontSize: 13, fontWeight: '700', color: colours.pageHeader, marginTop: 10, marginBottom: 2 },
   empty: { fontSize: 13, color: '#9aa3b0', paddingVertical: 6 },
   chartBox: { height: 280, borderRadius: 12, overflow: 'hidden' },
 
