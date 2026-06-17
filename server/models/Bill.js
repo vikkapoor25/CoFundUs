@@ -21,7 +21,7 @@ constructor({ household_id, bill_id, bill_name, account_id, bill_amount, bill_du
     static async getAllHouseholdBills(household_id) {
 
         // Runs SQL query: Gets all bills for a household by household_id
-        const response = await db.query("SELECT a.household_id, b.account_id, b.bill_id, b.bill_name, b.bill_amount, b.bill_due_date, b.category, b.category_type, b.repeat_bill, b.payment_frequency, b.bill_repeat_date, b.paid FROM bills b INNER JOIN accounts a ON (b.account_id = a.account_id) WHERE a.household_id = $1;", 
+        const response = await db.query("SELECT a.household_id, b.account_id, b.bill_id, b.bill_name, b.bill_amount, b.bill_due_date, b.category, b.category_type, b.repeat_bill, b.payment_frequency, b.bill_repeat_date, b.paid FROM bills b INNER JOIN accounts a ON (b.account_id = a.account_id) WHERE a.household_id = $1 AND b.paid='false';", 
             [household_id]);
         // Throws error household has no bills
         if (response.rows.length === 0) {

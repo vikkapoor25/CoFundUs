@@ -1,4 +1,4 @@
-import { BASE_URL } from '../constants/api'
+const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL
 
 // Calls the backend /goals router.
 

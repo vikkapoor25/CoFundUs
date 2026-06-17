@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { ScrollView, View, Text, StyleSheet } from 'react-native'
-import {useState, useEffect} from 'react'
+import { useFocusEffect } from '@react-navigation/native'
+import {useState, useEffect, useCallback } from 'react'
 import colours from '../../constants/colours'
 import Card from '../../components/Card'
 import TableCard from '../../components/Table'
@@ -29,6 +30,14 @@ export default function home() {
     if (householdId === null) return
     loadData()
   }, [householdId])
+
+  useFocusEffect(
+    useCallback(() => {
+      if (householdId === null) return
+
+      loadData()
+    }, [householdId])
+  )
 
   //get names from asyncstorage
   async function loadStorage() {
