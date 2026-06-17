@@ -67,6 +67,11 @@ export default function home() {
       console.log("Failed to get data:", error)
     }
   }
+
+  const goalAmount = Number(goal?.goal_amount) || 0
+  const goalCurrent = Number(goal?.current_value) || 0
+  const goalPct = goalAmount > 0 ? Math.min(100, Math.round((goalCurrent / goalAmount) * 100)) : 0
+
   return (
     <ScrollView
       style={styles.screen}
@@ -135,7 +140,9 @@ export default function home() {
               </Text>
             </View>
 
-            {/* add progress bar data */}
+            <View style={styles.track}>
+              <View style={[styles.fill, { width: `${goalPct}%` }]} />
+            </View>
 
             <Text style={styles.label}>
               Target date: {goal.target_date}
@@ -162,6 +169,8 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8 },
   label: { color: '#55626d' },
   value: { fontWeight: '700' },
+  track: { height: 12, borderRadius: 8, backgroundColor: '#e3e9f0', overflow: 'hidden', marginTop: 8, marginBottom: 4 },
+  fill: { height: '100%', backgroundColor: colours.cardTitle, borderRadius: 8 },
   tableHeader: {
   flexDirection: 'row',
   paddingVertical: 6,

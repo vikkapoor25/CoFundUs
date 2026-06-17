@@ -12,6 +12,29 @@ import { getFeasibility, getPriority, getOptimisation } from '../../api/goalInsi
 
 const GOALS_CHART_URL = 'https://vivid-abaft.metabaseapp.com/public/question/b2d671f5-1801-4fa0-b123-26a28f0a3b6d#titled=false'
 
+function InsightSection({ title, text }) {
+  const [expanded, setExpanded] = useState(false)
+  const blocks = (text || '').split(/\n\s*\n/).map((b) => b.trim()).filter(Boolean)
+  if (blocks.length === 0) return null
+  const shown = expanded ? blocks : blocks.slice(0, 3)
+  const hidden = blocks.length - 3
+  return (
+    <View style={styles.insightSection}>
+      <Text style={styles.insightLabel}>{title}</Text>
+      {shown.map((b, i) => (
+        <View key={i} style={styles.insightBlock}>
+          <Text style={styles.line}>{b}</Text>
+        </View>
+      ))}
+      {hidden > 0 ? (
+        <Pressable onPress={() => setExpanded(!expanded)}>
+          <Text style={styles.seeMore}>{expanded ? 'See less' : `See more (${hidden})`}</Text>
+        </Pressable>
+      ) : null}
+    </View>
+  )
+}
+
 export default function goals() {
   const [householdId, setHouseholdId] = useState(null)
   const [goals, setGoals] = useState([])
@@ -131,24 +154,9 @@ export default function goals() {
     }
     return (
       <>
-        {feasibility ? (
-          <>
-            <Text style={styles.insightLabel}>Feasibility</Text>
-            <Text style={styles.line}>{feasibility}</Text>
-          </>
-        ) : null}
-        {priority ? (
-          <>
-            <Text style={styles.insightLabel}>Priority</Text>
-            <Text style={styles.line}>{priority}</Text>
-          </>
-        ) : null}
-        {optimisation ? (
-          <>
-            <Text style={styles.insightLabel}>Saving Tips</Text>
-            <Text style={styles.line}>{optimisation}</Text>
-          </>
-        ) : null}
+        <InsightSection title="Priority" text={priority} />
+        <InsightSection title="Feasibility" text={feasibility} />
+        <InsightSection title="Saving Tips" text={optimisation} />
       </>
     )
   }
@@ -255,6 +263,9 @@ const styles = StyleSheet.create({
   sub: { fontSize: 13, color: '#7a8794', marginBottom: 16, marginTop: 4 },
   line: { fontSize: 13, color: '#3f4856', paddingVertical: 6, lineHeight: 18 },
   insightLabel: { fontSize: 13, fontWeight: '700', color: colours.pageHeader, marginTop: 10, marginBottom: 2 },
+  insightSection: { marginBottom: 6 },
+  insightBlock: { paddingVertical: 6, borderBottomWidth: 1, borderBottomColor: '#f0f3f7' },
+  seeMore: { fontSize: 13, fontWeight: '700', color: colours.cardTitle, marginTop: 8 },
   empty: { fontSize: 13, color: '#9aa3b0', paddingVertical: 6 },
   chartBox: { height: 280, borderRadius: 12, overflow: 'hidden' },
 

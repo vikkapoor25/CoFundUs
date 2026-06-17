@@ -25,7 +25,8 @@ const SECTIONS = [
   { key: false, title: 'One-Time Bills' },
 ]
 
-const CATEGORIES = ['Subscription', 'Entertainment', 'Beauty', 'Consumable', 'Negative', 'Leisure', 'Home Utility']
+const CATEGORIES = ['Essential', 'Luxury', 'Utilities', 'Other']
+const CATEGORY_TYPES = ['Subscription', 'Entertainment', 'Leisure', 'Debts', 'Home Utility', 'Consumable', 'Beauty', 'Negative']
 
 export default function bills() {
   const [householdId, setHouseholdId] = useState(null)
@@ -238,19 +239,20 @@ export default function bills() {
           />
 
 
-          <Text style={styles.typeLabel}>Category</Text>
-          <View style={styles.typeRow}>
-            {CATEGORIES.map((c) => (
-              <Pressable
-                key={c}
-                onPress={() => setCategory(c)}
-                style={[styles.chip, category === c && styles.chipActive]}
-              >
-                <Text style={[styles.chipText, category === c && styles.chipTextActive]}>{c}</Text>
-              </Pressable>
-            ))}
-          </View>
-          <Field label="Category Type" placeholder="e.g. Subscription" value={categoryType} onChangeText={setCategoryType} />
+          <SelectField
+            label="Category"
+            value={category}
+            onChange={setCategory}
+            placeholder="Select Category"
+            options={CATEGORIES.map((c) => ({ label: c, value: c }))}
+          />
+          <SelectField
+            label="More Info"
+            value={categoryType}
+            onChange={setCategoryType}
+            placeholder="Select More Info"
+            options={CATEGORY_TYPES.map((c) => ({ label: c, value: c }))}
+          />
           <DateField
             label="Due Date"
             value={dueDate}
