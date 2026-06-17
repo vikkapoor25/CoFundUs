@@ -1,0 +1,20 @@
+# Uses official Node.js image
+FROM node:20
+
+# Sets working directory inside container
+WORKDIR /app
+
+# Copies package files first
+COPY package*.json ./
+
+# Installs dependencies
+RUN npm install
+
+# Copies the rest of the project files
+COPY . .
+
+# Exposes the port the app runs on
+EXPOSE 3000
+
+# Starts the application
+CMD ["npm", "start"]
