@@ -106,6 +106,7 @@ export default function accounts() {
     })
     resetIncomeForm()
     await loadAccounts()
+    await loadBalance()
     setActiveModal(null)
   }
 

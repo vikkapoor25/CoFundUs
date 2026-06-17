@@ -270,7 +270,7 @@ export default function bills() {
           {recurring && (
             <>
               <SelectField
-                label="Category"
+                label="Frequency"
                 value={paymentFrequency}
                 onChange={setPaymentFrequency}
                 placeholder="Select Category"
