@@ -86,6 +86,18 @@ class Household {
     }
     
     static async create(data) {
+        try {
+            const { household_username, household_password, name_1, name_2, email_1, email_2 } = data;
+            const response = await db.query(
+                `INSERT INTO household (household_username, household_password, name_1, name_2, email_1, email_2)
+                VALUES ($1, $2, $3, $4, $5, $6)
+                RETURNING *;`,
+                [household_username, household_password, name_1, name_2, email_1, email_2]
+            );
+            return new Household(response.rows[0]);
+        } catch (err) {
+            throw new Error("Unable to create household: " + err.message);
+        }
         const { household_username, household_password, name_1, name_2, email_1, email_2, twofa_code, twofa_expires_at } = data;
         let response = await db.query("INSERT INTO household (household_username, household_password, name_1, name_2, email_1, email_2, twofa_code, twofa_expires_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING household_id;",
             [household_username, household_password, name_1, name_2, email_1, email_2, twofa_code, twofa_expires_at]);
@@ -94,5 +106,6 @@ class Household {
         return newHousehold;
     }
 }
+
 
 module.exports = Household;
