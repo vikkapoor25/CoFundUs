@@ -80,13 +80,16 @@ main
 assets
     |__ images
 client
-    |__ .claude
-    |__ .vscode
+    |__ __tests__
     |__ api
     |__ app
+         |__ (auth)
+         |__ (tabs)
     |__ assets
     |__ components
     |__ constants
+    |__ app.json
+    |__ package.json
 server
     |__ __tests__
     |       |__ integration
@@ -413,7 +416,7 @@ From here you can create table structures and insert data.
 | Authentication | `jsonwebtoken`, `bcrypt` |
 | AI Integration | Groq, `groq-sdk` |
 | Data Visualisation | Metabase |
-| Frontend | React Native |
+| Frontend | React Native, ExpoGo |
 | Testing | `jest`, `supertest` |
 | Deployment | AWS EC2, Docker |
 | Configuration | `dotenv` |
@@ -428,6 +431,31 @@ Video and process explaination on how to use the app below.
 # Deployment (**Thomas Fill in**)
 
 # Successes & Challenges (**Everyone Contribute**)
+
+## Challenges
+
+### AWS Security Groups for RDS Database
+
+Challenge: To access an AWS RDS database from a specific device, the associated security group must contain an inbound rule that allows traffic from the device's public IP address. Initially, the RDS instance was configured as publicly accessible, and we assumed this would allow connections from any device. However, access was still blocked because the security group's inbound rules had not been configured to permit traffic from our IP address.
+
+Resolution: The issue was resolved by adding an inbound rule to the security group, allowing PostgreSQL traffic from the required IP address.
+
+### Finding New Software (**Thomas & Frontend Expand**)
+
+### AI-Generated Incoherent Responses
+
+Challenge: When creating prompts for the `GoalInsight.js` model, responses received from Groq AI were inconsistent. Extra text was sometimes added, breaking the requested response format. Some outputs also repeated information unnecessarily or produced incorrect calculations.
+
+Resolution: To resolve this, the following steps were taken:
+* Prompt engineering was used to make the instructions clearer and more restrictive. This included:
+  * Defining the role of the AI as a financial advisor.
+  * Clearly stating what the AI should and should not include in its responses.
+  * Performing calculations before sending data to the AI, so the AI only needed to provide analysis rather than calculate values itself.
+* The temperature was set to `0` to reduce randomness and make responses more consistent.
+
+### Frontend Shifting Requriements e.g. Bills (**Tooba & Zehra Expand**)
+
+---
 
 ## Successes
 
@@ -455,33 +483,6 @@ Unit and integration tests were implemented using Jest and Supertest, increasing
 
 The application was successfully containerised using Docker and deployed to an AWS EC2 instance. This provided a consistent deployment environment and demonstrated the team's ability to move a solution from development into a live hosted environment.
 
-## Challenges
-
-### AWS Security Groups and RDS Database Access
-
-To access an AWS RDS database from a specific device, the associated security group must contain an inbound rule that allows traffic from the device's public IP address.
-
-Initially, the RDS instance was configured as publicly accessible, and we assumed this would allow connections from any device. However, access was still blocked because the security group's inbound rules had not been configured to permit traffic from our IP address.
-
-The issue was resolved by adding an inbound rule to the security group, allowing PostgreSQL traffic from the required IP address.
-
-### Finding Software to Generate Charts (**Thomas Expand**)
-
-### AI-Generated Incoherent Responses
-
-When creating prompts for the `GoalInsight.js` model, responses received from Groq AI were inconsistent. Extra text was sometimes added, breaking the requested response format. Some outputs also repeated information unnecessarily or produced incorrect calculations.
-
-To resolve this, the following steps were taken:
-
-* Prompt engineering was used to make the instructions clearer and more restrictive. This included:
-  * Defining the role of the AI as a financial advisor.
-  * Clearly stating what the AI should and should not include in its responses.
-  * Performing calculations before sending data to the AI, so the AI only needed to provide analysis rather than calculate values itself.
-* The temperature was set to `0` to reduce randomness and make responses more consistent.
-
-
-### Deleting Bills (**Tooba & Zehra Expand**)
-
 ---
 
 # Future Features (**Everyone Contribute**)
@@ -490,6 +491,18 @@ To resolve this, the following steps were taken:
 
 Track income, bills, goals, individual and shared bank account information in real time.
 
-### 
+Alternatively, could scrape info from banking statements
+
+### Adding Differing Numbers of People to a Household
+
+### AI Research into Credit Cards, Bank Accounts etc. GoCompare esque service
+
+### Supplementary functonality e.g. Profile Phtot of couple, background etc. forgot password
+
+### Which bills associated with which person in household
+
+### Take into account dependents (e.g. children ) in some way 
+
+### Financial literacy lessons ?
 
 
