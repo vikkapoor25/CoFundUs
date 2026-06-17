@@ -52,6 +52,14 @@ async function login(req, res) {
         demo_code: code,
         message: '2FA code generated for demo/testing.'
       });
+
+      console.log({
+        success: true,
+        twofa_required: true,
+        household_id: household.household_id,
+        demo_code: code,
+        message: '2FA code generated for demo/testing.'
+      })
     } else {
       throw new Error('Household could not be authenticated');
     }
