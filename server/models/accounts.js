@@ -16,8 +16,21 @@ class BankAccount {
   }
 
   static async deleteById(account_id) {
+    const incomeResult = await db.query(
+     `
+      DELETE FROM income
+      WHERE account_id = $1;`,[account_id]
+    );
+
+    const billsResults = await db.query(
+     `
+      DELETE FROM bills
+      WHERE account_id = $1;`,[account_id]
+    );
+
     const result = await db.query(
-      `DELETE FROM accounts
+      `
+      DELETE FROM accounts
       WHERE account_id = $1
       RETURNING *;`,
       [account_id]

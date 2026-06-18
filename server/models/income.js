@@ -79,9 +79,11 @@ class Income {
 
   static async createIncome(request_body) {
     const today = new Date().toLocaleDateString("en-CA");
+    
 
     const {
       account_id,
+      income_name,
       income_amount,
       payment_date = today,
       category,
@@ -90,6 +92,7 @@ class Income {
 
     let repeat_income = false;
     let income_repeat_date = null;
+    const amount = Number(income_amount);
 
     if (payment_frequency) {
       const normalisedFrequency = payment_frequency.trim().toLowerCase();
@@ -120,21 +123,33 @@ class Income {
       throw new Error("Unable to create income for account.");
     }
 
+    
     const response = await db.query(
       `INSERT INTO income
-      (account_id, income_amount, payment_date, category, repeat_income, payment_frequency, income_repeat_date)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
-      RETURNING *;`,
+      (account_id, income_name, income_amount, payment_date, category,
+      repeat_income, payment_frequency, income_repeat_date)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+      RETURNING *`,
       [
         account_id,
+        income_name,
         income_amount,
         payment_date,
         category,
         repeat_income,
         payment_frequency,
         income_repeat_date,
-      ]
-    );
+     ]
+   );
+
+   if (payment_date <= today) {
+      await db.query(
+        `UPDATE accounts
+        SET account_balance = account_balance + $1
+        WHERE account_id = $2`,
+        [amount, account_id]
+      );
+    }
 
     const householdResponse = await db.query(
       "SELECT household_id FROM accounts WHERE account_id = $1",

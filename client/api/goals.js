@@ -1,14 +1,14 @@
-import { BASE_URL } from '../constants/api'
+const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL
 
 // Calls the backend /goals router.
 
 export async function getGoals(householdId) {
-  const res = await fetch(`${BASE_URL}/goals/${householdId}`)
-  return res.json() // goals + AI insights
+  const res = await fetch(`${BASE_URL}/goals/household/${householdId}`)
+  return res.json() // goals (+ AI insights if the backend includes them)
 }
 
 export async function createGoal(body) {
-  // body: { household_id, goal_name, goal_balance, due_date }
+  // body: { household_id, goal_name, goal_amount, current_value, target_date }
   const res = await fetch(`${BASE_URL}/goals/new`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -18,7 +18,7 @@ export async function createGoal(body) {
 }
 
 export async function updateGoal(body) {
-  // body: { goal_id, account_id, amount_commited }
+  // body: { goal_id, goal_name, goal_amount, current_value, target_date }
   const res = await fetch(`${BASE_URL}/goals/update`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
@@ -33,5 +33,5 @@ export async function deleteGoal(goal_id) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ goal_id }),
   })
-  return res.json()
+  return res.status === 204 ? { success: true } : res.json()
 }
