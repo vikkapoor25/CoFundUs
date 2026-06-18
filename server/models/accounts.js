@@ -16,8 +16,21 @@ class BankAccount {
   }
 
   static async deleteById(account_id) {
+    const incomeResult = await db.query(
+     `
+      DELETE FROM income
+      WHERE account_id = $1;`,[account_id]
+    );
+
+    const billsResults = await db.query(
+     `
+      DELETE FROM bills
+      WHERE account_id = $1;`,[account_id]
+    );
+
     const result = await db.query(
-      `DELETE FROM accounts
+      `
+      DELETE FROM accounts
       WHERE account_id = $1
       RETURNING *;`,
       [account_id]
@@ -42,11 +55,13 @@ class BankAccount {
       LEFT JOIN (
         SELECT account_id, SUM(income_amount) AS total_income
         FROM income
+        WHERE payment_date <= CURRENT_DATE
         GROUP BY account_id
       ) i ON a.account_id = i.account_id
       LEFT JOIN (
         SELECT account_id, SUM(bill_amount) AS total_bills
         FROM bills
+        WHERE paid = true
         GROUP BY account_id
       ) b ON a.account_id = b.account_id
       WHERE a.household_id = $1

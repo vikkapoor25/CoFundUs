@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { View, Text, TextInput, Pressable, Image, ScrollView, StyleSheet } from 'react-native'
 import { useRouter } from 'expo-router'
 import Svg, { Path } from 'react-native-svg'
+import colours from '../../constants/colours'
 import { register as apiRegister } from '../../api/user'
 
 export default function register() {
@@ -43,14 +44,15 @@ export default function register() {
     <View style={styles.container}>
       <View style={styles.top}>
         <Image source={require('../../assets/images/logo.png')} style={styles.logo} />
-        <Text style={styles.tagline}>Track, Save, Grow Together</Text>
+        <Text style={styles.brand}>CoFund<Text style={styles.brandAccent}>Us</Text></Text>
+        <Text style={styles.tagline}>Track. Save. Grow Together.</Text>
       </View>
 
       <Svg width="100%" height={60} viewBox="0 0 1440 120" preserveAspectRatio="none" style={styles.wave}>
         <Path d="M0,120 L0,55 C400,120 1040,0 1440,55 L1440,120 Z" fill="#ffffff" />
       </Svg>
 
-      <ScrollView style={styles.bottom} contentContainerStyle={styles.bottomContent}>
+      <ScrollView style={styles.bottom} contentContainerStyle={styles.bottomContent} showsVerticalScrollIndicator={false} bounces={false}>
         <Text style={styles.heading}>Register</Text>
 
         <Text style={styles.label}>Partner 1 Name</Text>
@@ -93,9 +95,11 @@ export default function register() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#7e9fd6' },
+  container: { flex: 1, backgroundColor: '#4a7ec2' },
   top: { height: 190, alignItems: 'center', justifyContent: 'center', gap: 10 },
   logo: { width: 80, height: 80, resizeMode: 'contain' },
+  brand: { color: '#fff', fontSize: 26, fontWeight: '800', letterSpacing: 0.5 },
+  brandAccent: { color: '#bcd3f0' },
   tagline: { color: '#fff', fontSize: 14, fontWeight: '600' },
   wave: { marginBottom: -1 },
   bottom: { flex: 1, backgroundColor: '#fff' },
@@ -105,7 +109,7 @@ const styles = StyleSheet.create({
   input: { borderBottomWidth: 1, borderBottomColor: '#d7dee6', height: 42, marginBottom: 14, fontSize: 14 },
   error: { color: '#e5484d', fontSize: 13, marginBottom: 10 },
   success: { color: '#16a34a', fontSize: 13, marginBottom: 10, fontWeight: '600' },
-  btn: { backgroundColor: '#7e9fd6', borderRadius: 10, height: 48, alignItems: 'center', justifyContent: 'center', marginTop: 8 },
+  btn: { backgroundColor: '#4a7ec2', borderRadius: 10, height: 48, alignItems: 'center', justifyContent: 'center', marginTop: 8 },
   btnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
   linkWrap: { marginTop: 16, alignItems: 'center' },
   link: { color: '#4a7ec2', fontWeight: '600', fontSize: 13 },

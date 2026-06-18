@@ -1,8 +1,11 @@
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useState } from 'react'
 import { View, Text, TextInput, Pressable, Image, StyleSheet } from 'react-native'
 import { useRouter } from 'expo-router'
-import Svg, { Path } from 'react-native-svg'
-import { login as apiLogin } from '../../api/user'
+import Svg, { G, Path } from 'react-native-svg'
+import colours from '../../constants/colours'
+import { login as apilogin, verify } from '../../api/user'
+import AddModal from '../../components/AddModal'
 
 export default function login() {
   const router = useRouter()
@@ -10,29 +13,64 @@ export default function login() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [show2FA, setShow2FA] = useState(false)
+  const [householdId, setHouseholdId] = useState(null)
+  const [code, setCode] = useState("")
 
   async function handleLogin() {
-    setError('')
+    setError("")
     setLoading(true)
+
     try {
-      const data = await apiLogin(username, password)
-      if (data && data.jwt_token) {
-        router.replace('/')
-      } else {
-        setError(data?.error || 'Invalid login details')
+      const data = await apilogin(username, password)
+
+      if (data?.success) {
+        setHouseholdId(data.household_id)
+        setShow2FA(true)
+        return
       }
+      setError(data?.error || "Invalid login details")
     } catch (e) {
-      setError('Could not reach the server')
+      setError("Could not reach the server")
     } finally {
       setLoading(false)
     }
   }
 
+
+  async function handleVerify2FA() {
+    console.log("hit verify")
+    try {
+      const data = await verify(householdId, code)
+      console.log("data: ", data)
+      if (data?.success) {
+        await AsyncStorage.setItem("token", data.jwt_token)
+
+        await AsyncStorage.setItem(
+          "household",
+          JSON.stringify({
+            household_id: data.household_id,
+            name_1: data.name_1,
+            name_2: data.name_2,
+          })
+        )
+        setShow2FA(false)
+        router.replace("/")
+        return
+      }
+      setError("Invalid verification code")
+    } catch (e) {
+      setError("Verification failed")
+    }
+    
+  }
+  
   return (
     <View style={styles.container}>
       <View style={styles.top}>
         <Image source={require('../../assets/images/logo.png')} style={styles.logo} />
-        <Text style={styles.tagline}>Track, Save, Grow Together</Text>
+        <Text style={styles.brand}>CoFund<Text style={styles.brandAccent}>Us</Text></Text>
+        <Text style={styles.tagline}>Track. Save. Grow Together.</Text>
       </View>
 
       <Svg width="100%" height={70} viewBox="0 0 1440 120" preserveAspectRatio="none" style={styles.wave}>
@@ -77,14 +115,44 @@ export default function login() {
           </Pressable>
         </View>
       </View>
+      <AddModal
+        title="Two Factor Authentication"
+        visible={show2FA}
+        setVisible={(value) => {
+          if (!value) {
+            setCode("")
+            setError("")
+          }
+          setShow2FA(value)
+        }}
+      >
+        <Text style={styles.label}>
+          Enter the 6 digit code.
+        </Text>
+
+        <TextInput
+          style={styles.input}
+          value={code}
+          onChangeText={setCode}
+          keyboardType="numeric"
+          maxLength={6}
+          placeholder="e.g. 123456"
+        />
+
+        <Pressable style={styles.codeBtn} onPress={handleVerify2FA}>
+          <Text style={styles.codeText}>Verify</Text>
+        </Pressable>
+      </AddModal>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#7e9fd6' },
+  container: { flex: 1, backgroundColor: colours.navBackground },
   top: { height: 250, alignItems: 'center', justifyContent: 'center', gap: 12 },
   logo: { width: 90, height: 90, resizeMode: 'contain' },
+  brand: { color: '#fff', fontSize: 30, fontWeight: '800', letterSpacing: 0.5 },
+  brandAccent: { color: '#bcd3f0' },
   tagline: { color: '#fff', fontSize: 15, fontWeight: '600' },
   wave: { marginBottom: -1 },
   bottom: { flex: 1, backgroundColor: '#fff', paddingHorizontal: 28, paddingTop: 8 },
@@ -92,8 +160,23 @@ const styles = StyleSheet.create({
   label: { fontSize: 13, color: '#55626d', marginBottom: 6, fontWeight: '600' },
   input: { borderBottomWidth: 1, borderBottomColor: '#d7dee6', height: 44, marginBottom: 18, fontSize: 14 },
   error: { color: '#e5484d', fontSize: 13, marginBottom: 10 },
-  btn: { backgroundColor: '#7e9fd6', borderRadius: 10, height: 48, alignItems: 'center', justifyContent: 'center', marginTop: 8 },
+  btn: { backgroundColor: '#4a7ec2', borderRadius: 10, height: 48, alignItems: 'center', justifyContent: 'center', marginTop: 8 },
   btnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
   links: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 18 },
   link: { color: '#4a7ec2', fontWeight: '600', fontSize: 13 },
+  codeBtn: {
+    backgroundColor: '#4a7ec2',
+    paddingVertical: 8,
+    borderRadius: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 14,
+    marginBottom:5
+  },
+  codeText: {
+    color: '#ffffff',
+    fontWeight: '600',
+    fontSize: 15,
+    letterSpacing: 0.3,
+  },
 })
