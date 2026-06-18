@@ -2,9 +2,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useState } from 'react'
 import { View, Text, TextInput, Pressable, Image, StyleSheet } from 'react-native'
 import { useRouter } from 'expo-router'
-import Svg, { Path } from 'react-native-svg'
+import Svg, { G, Path } from 'react-native-svg'
 import colours from '../../constants/colours'
-import { login as apiLogin } from '../../api/user'
+import { login as apilogin, verify } from '../../api/user'
+import AddModal from '../../components/AddModal'
 
 export default function login() {
   const router = useRouter()
@@ -12,16 +13,39 @@ export default function login() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [show2FA, setShow2FA] = useState(false)
+  const [householdId, setHouseholdId] = useState(null)
+  const [code, setCode] = useState("")
 
   async function handleLogin() {
-    setError('')
+    setError("")
     setLoading(true)
-    try {
-      const data = await apiLogin(username, password)
-      if (data && data.jwt_token) {
 
-        //save data in storage
-        await AsyncStorage.setItem("token", data.jwt_token);
+    try {
+      const data = await apilogin(username, password)
+
+      if (data?.success) {
+        setHouseholdId(data.household_id)
+        setShow2FA(true)
+        return
+      }
+      setError(data?.error || "Invalid login details")
+    } catch (e) {
+      setError("Could not reach the server")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+
+  async function handleVerify2FA() {
+    console.log("hit verify")
+    try {
+      const data = await verify(householdId, code)
+      console.log("data: ", data)
+      if (data?.success) {
+        await AsyncStorage.setItem("token", data.jwt_token)
+
         await AsyncStorage.setItem(
           "household",
           JSON.stringify({
@@ -30,18 +54,17 @@ export default function login() {
             name_2: data.name_2,
           })
         )
-      
-        router.replace('/')
-      } else {
-        setError(data?.error || 'Invalid login details')
+        setShow2FA(false)
+        router.replace("/")
+        return
       }
+      setError("Invalid verification code")
     } catch (e) {
-      setError('Could not reach the server')
-    } finally {
-      setLoading(false)
+      setError("Verification failed")
     }
+    
   }
-
+  
   return (
     <View style={styles.container}>
       <View style={styles.top}>
@@ -92,6 +115,34 @@ export default function login() {
           </Pressable>
         </View>
       </View>
+      <AddModal
+        title="Two Factor Authentication"
+        visible={show2FA}
+        setVisible={(value) => {
+          if (!value) {
+            setCode("")
+            setError("")
+          }
+          setShow2FA(value)
+        }}
+      >
+        <Text style={styles.label}>
+          Enter the 6 digit code.
+        </Text>
+
+        <TextInput
+          style={styles.input}
+          value={code}
+          onChangeText={setCode}
+          keyboardType="numeric"
+          maxLength={6}
+          placeholder="e.g. 123456"
+        />
+
+        <Pressable style={styles.codeBtn} onPress={handleVerify2FA}>
+          <Text style={styles.codeText}>Verify</Text>
+        </Pressable>
+      </AddModal>
     </View>
   )
 }
@@ -113,4 +164,19 @@ const styles = StyleSheet.create({
   btnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
   links: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 18 },
   link: { color: '#4a7ec2', fontWeight: '600', fontSize: 13 },
+  codeBtn: {
+    backgroundColor: '#4a7ec2',
+    paddingVertical: 8,
+    borderRadius: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 14,
+    marginBottom:5
+  },
+  codeText: {
+    color: '#ffffff',
+    fontWeight: '600',
+    fontSize: 15,
+    letterSpacing: 0.3,
+  },
 })
