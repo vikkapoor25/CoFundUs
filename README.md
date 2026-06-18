@@ -1,8 +1,71 @@
-# Git Branching Strategy
+# CoFundUs (Group 3 - Library Labs)
+
+# Project Description
+
+## Problem Statement
+
+### What is the Problem?
+
+It can be difficult to manage & understand shared finances across multiple bank accounts.
+
+Many partners use a combination of individual and shared accounts, making it challenging to gain a clear view of their overall financial position.
+
+### Evidence
+
+* Only 23% of Britons passed a financial literacy assessment in 2025 ([The Intermediary](https://theintermediary.co.uk/2026/01/less-than-a-quarter-of-adults-can-pass-a-financial-literacy-test-shepherds-friendly-finds/?utm_source=chatgpt.com)).
+* Around 39% of UK adults do not feel confident managing their money ([Financial Capability](https://www.fincap.org.uk/en/articles/key-statistics-on-uk-financial-capability?utm_source=chatgpt.com)).
+* 26% of people in relationships manage their finances separately from their partner, equivalent to approximately 8.7 million people across the UK ([Legal & General](https://group.legalandgeneral.com/en/newsroom/press-releases/one-in-four-couples-are-in-a-financial-situationship-sharing-their-lives-but-not-their-bank-balances)).
+* Over half of UK couples living together fully combine their finances (55%), meaning a substantial proportion use either separate accounts or a hybrid approach to managing money ([Aegon](https://www.aegon.co.uk/media-centre/news/uk-couples-admit-differing-financial-priorities)).
+
+
+### Why does it Matter?
+
+Without a clear view of their finances, partners may find it harder to:
+* Budget effectively
+* Identify savings opportunities
+* Achieve shared financial goals
+
+---
+
+## Proposed Solution
+
+### How does the Solution Address the Problem?
+
+We propose developing CoFundUs, an accessable application that would enable couples to share and manage financial information in a way that's easy to understand.
+
+By providing a shared view of financial circumstances and objectives, the application aims to centralise household accounts and transactions in one place, making it easier for users to understand and manage their finances.
+
+### What Value does it Provide?
+
+* All of a couple's individual and shared bank accounts are located and accessable in one location.
+* Simplifies the management of household finances, enabling partners to make more informed financial decisions.
+* Provides an intuitive and easy-to-use interface, reducing mental load and financial stress.
+
+### How is Success Measured?
+
+The success of the application will be measured through user adoption and evidence of improved financial outcomes:
+
+* Higher reported savings levels among users would suggest that the application is helping users achieve their financial goals.
+* Increased adoption of the application indicates that partners are actively using it to manage their finances.
+
+---
+
+## Unique Selling Point
+
+Unlike traditional personal finance applications that focus primarily on individual money management, CoFundUs is designed specifically for partners.
+
+CoFundUs places shared financial management at the centre of the user experience, bringing together individual and shared accounts into a single view.
+
+This provides a clear picture of household finances, enabling users to track spending, monitor progress towards shared goals, and make informed financial decisions together.
+
+# Installation & Usage
+
+## Git Branching Strategy
 
 ```text
 main
  |__dev
+     |__dev-login
      |__frontend
             |__ frontend-login
             |__ frontend-login-test
@@ -11,25 +74,58 @@ main
             |__ backend-login-test
 ```
 
-Get remote repo
-```Bash
-git clone <git-URL>
+## File Structure Diagram **FONTEND ADJUST CLIENT**
+
+```text
+assets
+    |__ images
+client
+    |__ __tests__
+    |__ api
+    |__ app
+         |__ (auth)
+         |__ (tabs)
+    |__ assets
+    |__ components
+    |__ constants
+    |__ app.json
+    |__ package.json
+server
+    |__ __tests__
+    |       |__ integration
+    |       |__ unit
+    |             |__ controllers
+    |             |__ models
+    |__ controllers
+    |__ database
+    |__ middleware
+    |__ models
+    |__ routes
+    |__ app.js
+    |__ index.js
+    |__ package.json
+.gitignore
+.git 
+README    
 ```
 
-Get specific branch 
+## Git Setup
+
+The Git repository should be initialised from the project's root directory, which contains both the `client` and `server` folders.
+
+All commits for the project would be executed from this location.
+
+### Initialise Git Repositiory
+
 ```Bash
-git pull origin <branch-name>
+git init
 ```
 
-Push branch back into remote repo
-```Bash
-git push 
-```
+### Create `.gitignore` File
 
-# Git Setup
+The `.gitignore` file should be created in the same location as where the git repositiory was initilised (the same location as the `.git` folder). In our case, this would be the project's root directory.
 
-1. git init
-2. Create .gitignore
+The `.gitignore` should contain the following:
 
 ```
 node_modules
@@ -37,115 +133,376 @@ package-lock.json
 .env
 coverage
 ```
-# Javascript Setup
 
-0. npm init -y
+This prevents:
+- dependencies
+- environment variables
+- passwords
+- database credentials
+from being uploaded publically
 
-1. npm install -D nodemon 
+---
 
-2. npm install express cors pg dotenv
+## Frontend Setup (**FONRTEND FILL IN**)
 
-3. npm install jest@29.7.0 supertest@6.3.3
+## Backend Setup
 
-4. npm install jsonwebtoken bcrypt uuid node-fetch  
+### Create and Configure `package.json` File
 
-Breakdown:
-- jsonwebtoken => Used to create and verify JWTs
-- bcrypt => Used for hashing passwords before storing them in a database
-- uuid => Used to generate universally unique identifiers
-- node-fetch => Allows a Node.js application to make HTTP requests to other APIs.
+---
 
-5. package.json scripts
+This `package.json` file must be initialised in the server folder so that the packages outlined below could be utilised.
 
+### 1. Initialise Node Project 
+
+Create the `package.json` file:
+
+```Bash
+npm init -y
+```
+
+### 2. Install Development Dependencies 
+
+```Bash
+npm install -D nodemon jest@29.7.0 supertest@6.3.3
+```
+
+
+
+| Package | Purpose |
+| --- | --- |
+| `nodemon` | Automatically restarts the server during development.
+| `jest` | Runs automated tests |
+| `supertest` | Tests API endpoints and HTTP responses |
+
+### 3. Install Main Dependencies
+
+```Bash
+npm install express cors pg dotenv jsonwebtoken bcrypt uuid node-fetch
+```
+
+| Package | Purpose |
+|----------|---------|
+| `express` | Creates and manages the API server and routes |
+| `cors` | Enables communication between the frontend and backend across different origins |
+| `pg` | Connects the Node.js application to a PostgreSQL database |
+| `dotenv` | Loads environment variables from a `.env` file |
+| `jsonwebtoken` | Creates and verifies JSON Web Tokens (JWTs) for authentication |
+| `bcrypt` | Hashes and verifies user passwords securely |
+| `uuid` | Generates unique identifiers |
+| `node-fetch` | Makes HTTP requests to external APIs |
+| `groq-sdk` | Integrates with the Groq API to provide AI-powered features |
+
+
+### 4. Add Scripts to `package.json`
+
+```JSON
 "scripts": {
-    "test": "jest --watchAll --detectOpenHandles --runInBand --verbose",
-    "test-client": "jest client --watchAll --collectCoverage",
-    "unitTests": "jest --testPathPattern=/unit/ --watchAll --verbose",
-    "integrationTests": "jest --testPathPattern=/integration/ --watchAll --detectOpenHandles --runInBand --verbose",
-    "coverage": "jest --coverage --testPathPattern=/unit/",
-    "dev": "nodemon -L server/index.js",
-    "start": "node server/index.js",
-    "setup-db": "node ./server/database/setup.js"
+"test": "jest --testMatch \"**/*.test.js\" --watchAll --detectOpenHandles --runInBand --verbose",
+"test-client": "jest client --watchAll --collectCoverage",
+"unitTests": "jest --testMatch \"**/*.test.js\" --testPathPattern=/unit/ --watchAll --verbose",
+"integrationTests": "jest --testMatch \"**/*.test.js\" --testPathPattern=/integration/ --watchAll --detectOpenHandles --runInBand --verbose",
+"coverage": "jest --coverage --testPathPattern=/unit/",
+"dev": "nodemon -L ./index.js",
+"start": "node ./index.js",
+"setup-test-db": "NODE_ENV=test node ./database/setup.js",
+"setup-db": "node ./database/setup.js"
 }
+``` 
 
-# Python Setup
+Key add-ons include:
+* `\"**/*.test.js\"` for all testing scripts means when running `npm run test`, only the files ending in `.test` are run.
+* `NODE_ENV=test` is in `setup-test-db` script so that the testing database is used when in `connect.js`, rather the the main database during integration testing.
 
-1. Create .gitignore
+---
 
-```
-__pycache__/
-*.pyc
-.env
-.venv/
-venv/
-.coverage
-htmlcov/
-.pytest_cache/
-```
-where:
-`__pycache__` → Python compiled files
-`*.pyc` → Python bytecode
-`.env` → Environment variables
-`venv / .venv` → Virtual environment
-`.coverage` → Coverage reports
-`htmlcov` → Coverage HTML output
-`.pytest_cache` → Pytest cache
+### AWS RDS Database Setup
 
-2. Create Virtual Environment and activate
+---
 
-Create:
+### Phase 1 - Create AWS RDS Database
 
-```Bash
-python -m venv .venv
+---
+
+### 1. Create PostgreSQL Database
+
+Login into AWS as an IAM user and navigate to:
+
+```text
+AWS Console
+↓
+RDS
+↓
+Databases
+↓
+Create Database
 ```
 
-Activate (Linux/Mac)
+### 2. Database Settings
 
-```Bash
-source .venv/bin/activate
+Choose:
+
+```text
+Creation Method: Standard Create
+
+Engine: PostgreSQL
+
+Version: PostgreSQL 16
+
+Template: Free Tier
 ```
 
-3. Install Flask Dependencies
+### 3. Database Configuration
 
-```Bash
-pip install flask flask-cors python-dotenv
+Configure:
+
+```text
+DB Instance Identifier: cofundus-postgres-rds
+
+Master Username: CoFundUser
+
+Master Password: ********
 ```
 
-where:
-`flask` → Web framework (similar to Express)
-`flask-cors` → Allows requests from frontend applications
-`python-dotenv` → Loads environment variables from .env
+### 4. Instance Configuration
 
-4. Install Testing Libraries
+Choose:
 
-```Bash
-pip install pytest pytest-cov
+```text
+Instance Type: db.t3.micro
+
+Storage: 20 GB SSD
 ```
 
-where:
-`pytest` → Test framework (similar to Jest)
-`pytest-cov` → Coverage reporting
+### 5. Initial Database
 
-5. Install Gemini SDK
+Set:
 
-```Bash
-pip install google-genai
+```text
+Database Name: cofundus_db
 ```
 
-Allows our python application to communication with Google's Gemini AI without having to manually make HTTP requests
+### 6. Public Access
 
-6. Save Dependencies
+For development:
 
-Equivalent of `package.json`
-
-```Bash
-pip freeze > requirements.txt
+```text
+Public Access: Yes
 ```
 
-Anyone can install with:
+### Step 6 - Create Database
 
-```Bash
-pip install -r requirements.txt
+Click:
+
+```text
+Create Database
 ```
 
-7. Run project with `python server/app.py`
+Wait until:
+
+```text
+Status:
+Available
+```
+
+### Phase 2 - Configure Security
+
+### 1. Create a security group:
+
+```text
+cofundus-rds-sg
+```
+
+### 2. Set Inbound Rules
+
+Your IP address must be added to the inbound security group so that you can access the database.
+
+Inbound Rules:
+
+| Type | Port | Source |
+|--------|--------|--------|
+| PostgreSQL | 5432 | My IP |
+
+### 3. Set Outbound Rules
+
+Outbound Rules:
+
+```text
+Allow All
+```
+---
+
+### Phase 3 - Connect API
+
+---
+
+### 1. Obtain Connection Details
+
+Navigate to:
+
+```text
+RDS
+↓
+Databases
+↓
+cofundus-postgres-rds
+```
+
+Copy:
+
+```text
+Endpoint
+```
+
+Example:
+
+```text
+cofundus-postgres-rds.xxxxxx.eu-west-2.rds.amazonaws.com
+```
+
+Port:
+
+```text
+5432
+```
+
+**Note:** Before progressing, you can check the database is working as expected by connecting to pgAdmin4.
+
+### 2. Configure Environment Variables
+
+```env
+DB_URL=postgresql://cofundus_user:password@cofundus-postgres-rds.xxxxxx.eu-west-2.rds.amazonaws.com:5432/cofundus_db
+```
+
+**Note:** The `DB_URL` contains all the information required to connect to the PostgreSQL database, including:
+
+* Username (`cofundus_user`)
+* Password (`password`)
+* Endpoint (`cofundus-postgres-rds.xxxxxx.eu-west-2.rds.amazonaws.com`)
+* Port (`5432`)
+* Database name (`cofundus_db`)
+
+Storing these values in a single connection string simplifies database configuration and keeps connection details centralised within the `.env` file.
+
+
+### 3. Database Connection
+
+in `connect.js`, the database connection must be SSL encrypted
+
+```javascript
+require("dotenv").config();
+const { Pool } = require("pg");
+
+const db = new Pool({
+  connectionString: process.env.DB_URL,  
+  ssl:{
+        rejectUnauthorized: false,
+      },
+});
+
+module.exports = db;
+```
+
+From here you can create table structures and insert data.
+
+---
+
+# Technologies **FRONTEND FILL IN**
+
+| Area | Technology / Packages |
+|---------|----------------------|
+| Database | AWS RDS, PostgreSQL, pgAdmin 4, `pg` |
+| Backend API | JavaScript, `express` |
+| Authentication | `jsonwebtoken`, `bcrypt` |
+| AI Integration | Groq, `groq-sdk` |
+| Data Visualisation | Metabase |
+| Frontend | React Native, ExpoGo |
+| Testing | `jest`, `supertest` |
+| Deployment | AWS EC2, Docker |
+| Configuration | `dotenv` |
+| File Management | `fs` |
+
+---
+
+# Process (**FRONTEND FILL IN HOW TO USE APP OR ADD VIDEO**)
+
+Video and process explaination on how to use the app below.
+
+# Deployment (**Thomas Fill in**)
+
+# Successes & Challenges (**Everyone Contribute**)
+
+## Challenges
+
+### AWS Security Groups for RDS Database
+
+Challenge: To access an AWS RDS database from a specific device, the associated security group must contain an inbound rule that allows traffic from the device's public IP address. Initially, the RDS instance was configured as publicly accessible, and we assumed this would allow connections from any device. However, access was still blocked because the security group's inbound rules had not been configured to permit traffic from our IP address.
+
+Resolution: The issue was resolved by adding an inbound rule to the security group, allowing PostgreSQL traffic from the required IP address.
+
+### Finding New Software (**Thomas & Frontend Expand**)
+
+### AI-Generated Incoherent Responses
+
+Challenge: When creating prompts for the `GoalInsight.js` model, responses received from Groq AI were inconsistent. Extra text was sometimes added, breaking the requested response format. Some outputs also repeated information unnecessarily or produced incorrect calculations.
+
+Resolution: To resolve this, the following steps were taken:
+* Prompt engineering was used to make the instructions clearer and more restrictive. This included:
+  * Defining the role of the AI as a financial advisor.
+  * Clearly stating what the AI should and should not include in its responses.
+  * Performing calculations before sending data to the AI, so the AI only needed to provide analysis rather than calculate values itself.
+* The temperature was set to `0` to reduce randomness and make responses more consistent.
+
+### Frontend Shifting Requriements e.g. Bills (**Tooba & Zehra Expand**)
+
+---
+
+## Successes
+
+### Frontend Delivered a Professional User Experience
+
+The frontend was successfully developed with a clean, intuitive, and visually appealing user interface. The application presents complex financial information in a way that is easy for users to understand and navigate.
+
+### All Backend Routes Successfully Implemented
+
+All planned backend API routes were successfully implemented and tested. This enabled full CRUD functionality across the application and ensured reliable communication between the frontend, backend, and database.
+
+### AI Goal Insights Successfully Integrated
+
+The application successfully integrated Groq AI to generate personalised financial insights and recommendations. Through prompt engineering and response standardisation, consistent and useful outputs were achieved.
+
+### End-to-End Architecture Successfully Delivered
+
+The project successfully integrated React Native, Express, PostgreSQL, AWS RDS, Groq, and Metabase into a single working solution, demonstrating the team's ability to deliver a full-stack application.
+
+### Automated Testing Implemented
+
+Unit and integration tests were implemented using Jest and Supertest, increasing confidence in the reliability and stability of the backend.
+
+### Application Successfully Deployed to AWS
+
+The application was successfully containerised using Docker and deployed to an AWS EC2 instance. This provided a consistent deployment environment and demonstrated the team's ability to move a solution from development into a live hosted environment.
+
+---
+
+# Future Features (**Everyone Contribute**)
+
+### Connect With Banking Account in Real-Time
+
+Track income, bills, goals, individual and shared bank account information in real time.
+
+Alternatively, could scrape info from banking statements
+
+### Adding Differing Numbers of People to a Household
+
+### AI Research into Credit Cards, Bank Accounts etc. GoCompare esque service
+
+### Supplementary functonality e.g. Profile Phtot of couple, background etc. forgot password
+
+### Which bills associated with which person in household
+
+### Take into account dependents (e.g. children ) in some way 
+
+### Financial literacy lessons ?
+
+
