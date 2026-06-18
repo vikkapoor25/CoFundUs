@@ -176,16 +176,6 @@ export default function goals() {
           </View>
         </View>
 
-        <Card title="AI Insights">
-          {renderInsights()}
-        </Card>
-
-        <Card title="Goals Progress">
-          <View style={styles.chartBox}>
-            <WebView source={{ uri: GOALS_CHART_URL }} style={{ flex: 1 }} />
-          </View>
-        </Card>
-
         {goals.length === 0 ? (
           <Card title="Your Goals">
             <Text style={styles.empty}>No goals yet — add one to get started.</Text>
@@ -221,6 +211,12 @@ export default function goals() {
             )
           })
         )}
+
+        <Card title="AI Insights">
+          {renderInsights()}
+        </Card>
+
+        
       </ScrollView>
 
       <AddButton onPress={() => setActiveModal('add')} />

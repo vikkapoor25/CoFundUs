@@ -72,6 +72,7 @@ export default function accounts() {
   async function loadAccounts() {
     try {
       const data = await getAccounts(householdId)
+      console.log(data)
       setAccounts(data)
       setAccountAmount(data.length)
     } catch (error) {
