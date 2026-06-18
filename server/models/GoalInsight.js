@@ -24,7 +24,7 @@ class GoalInsight {
         }
 
         // Calculates Total Bills
-        const bills = await Bill.getAllHouseholdBills(household_id)
+        const bills = await Bill.getAllHouseholdBillsAI(household_id)
         let totalBills = 0
         for (const billItem of bills) {
             totalBills += Number(billItem.bill_amount)

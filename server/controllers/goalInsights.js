@@ -7,7 +7,7 @@ async function feasibility(req, res) {
         const feasibility = await GoalInsight.getFeasibility(req.params.household_id);
 
         // Sends success response (JSON Format With no Key)
-        res.status(200).json(feasibility);
+        // res.status(200).json(feasibility);
 
         // Sends success response (JSON Format with Key Insight)
         // res.status(200).json({
@@ -15,7 +15,7 @@ async function feasibility(req, res) {
         // })
 
         // Sends success response (In Text Format for Viewing Backend)
-        // res.type("text/plain").send(feasibility)
+        res.type("text/plain").send(feasibility)
 
     } catch (err) {
         // Sends server error response
