@@ -24,31 +24,72 @@ class GoalInsight {
         }
 
         // Calculates Total Bills
-        const bills = await Bill.getAllHouseholdBills(household_id)
+        const bills = await Bill.getAllHouseholdBillsAI(household_id)
         let totalBills = 0
-        for (const billItem of bill) {
+        for (const billItem of bills) {
             totalBills += Number(billItem.bill_amount)
         }
 
         // Calculates Disposable Income
         const disposableIncome = totalIncome - totalBills
 
-        // // Calculates amountRemaining until financial goal is achieved
-        // const goals = await Goal.getAllHouseholdGoals(household_id)
-        // const amountRemaining = goals.map((goal) => {
-        //     return {
-        //         goalName: goal.goal_name,
-        //         amountRemaining: goal.goal_amount - goal.current_value
-        //     }
-        // })
+        // Calculates amountRemaining (£) until financial goal is achieved
+        const goals = await Goal.getAllHouseholdGoals(household_id)
+        const amountRemaining = goals.map((goal) => {
+            return {
+                goal_name: goal.goal_name,
+                amount_remaining: goal.goal_amount - goal.current_value
+            }
+        })
 
-        // const monthsUntilTarget = goals.map((goal) => {
-        //     return {
-        //         goalName: goal.goal_name,
-        //         currentDate: date = new Date
+        // Calculates number of months until target date from today's date
+        const monthsUntilTarget = goals.map((goal) => {
+            const today = new Date()
+            const targetDate = new Date(goal.target_date)
+            const months = ((targetDate.getFullYear() - today.getFullYear()) * 12) + (targetDate.getMonth() - today.getMonth())
+            return {
+                goal_name: goal.goal_name,
+                months_until_target: months
+            }
+        })
 
-        //     }
-        // })
+        // The amount you would need to contribute to a goal each month to meet the target date
+        const monthlySavings = goals.map((goal) => {
+            const today = new Date()
+            const targetDate = new Date(goal.target_date)
+            const months = ((targetDate.getFullYear() - today.getFullYear()) * 12) + (targetDate.getMonth() - today.getMonth())
+            const amountRemaining = goal.goal_amount - goal.current_value
+            return {
+                goal_name: goal.goal_name,
+                monthly_savings: months > 0 ? amountRemaining / months : amountRemaining
+            }
+        })
+
+        // Calculates feasibility rating according to criteria
+        const feasibilityRating = goals.map((goal) => {
+            const today = new Date()
+            const targetDate = new Date(goal.target_date)
+            const months = ((targetDate.getFullYear() - today.getFullYear()) * 12) + (targetDate.getMonth() - today.getMonth())
+            const amountRemaining = goal.goal_amount - goal.current_value
+            const monthlySavings = months > 0 ? amountRemaining / months : amountRemaining
+            const feasibilityPercentage = monthlySavings / disposableIncome
+            let feasibilityRating
+            if (feasibilityPercentage <= 0.2) {
+                feasibilityRating = "Realistic" 
+            }
+            else if (feasibilityPercentage > 0.2 && feasibilityPercentage <= 0.5)
+                feasibilityRating = "Challenging"
+            else if (feasibilityPercentage > 0.5) {
+                feasibilityRating = "Unrealistic"
+            }
+            return {
+                goal_name: goal.goal_name,
+                feasibility_rating: feasibilityRating,
+                feasibility_percentage: feasibilityPercentage
+            }
+        })
+
+        return { disposableIncome, amountRemaining, monthsUntilTarget, monthlySavings, feasibilityRating }
     }
     
 
@@ -56,76 +97,59 @@ class GoalInsight {
     static async getFeasibility(household_id) {
         
         // Retrieves all goal, income and bill information for a given household
-        const goals = await Goal.getAllHouseholdGoals(household_id)
-        const income = await Income.getAllHouseholdIncome(household_id)
-        const bills = await Bill.getAllHouseholdBills(household_id)
-        const disposableIncome = await Home.getNetGainLoss(household_id)
+        const FeasibilityCalculations = await this.getFeasibilityCalculations(household_id)
 
         // Prompt that will be inputting into Groq
         // JSON.stringify converts JSON object into string
         const prompt = `
-        You are a financial planning assistant for a couple's personal finance app.
+        You are a financial planning assistant for a household finance application.
 
-        Analyse the feasibility of each household goal using only the data provided.
+        Your role is to explain how achievable each household savings goal appears based on the financial calculations provided.
 
-        Household Goals:
-        ${JSON.stringify(goals, null, 2)}
-
-        Household Income:
-        ${JSON.stringify(income, null, 2)}
-
-        Household Bills:
-        ${JSON.stringify(bills, null, 2)}
+        You must produce one financial assessment for each household goal.
 
         Household Disposable Income:
-        ${JSON.stringify(disposableIncome, null, 2)}
+        £${FeasibilityCalculations.disposableIncome}
 
-        Instructions:
-        1. Calculate total monthly household income.
-        2. Calculate total monthly household bills.
-        3. Calculate estimated monthly disposable income: Disposable Income = Total Income - Total Bills
-        4. For each goal:
-        - Calculate the amount remaining to save.
-        - Calculate the number of months until the target date.
-        - Calculate the estimated monthly savings required to reach the goal by target date.
-        - Compare the required monthly savings against disposable income.
-        - Assign one feasibility rating.
+        Monthly Savings Data:
+        ${JSON.stringify(FeasibilityCalculations.monthlySavings, null, 2)}
 
-        Feasibility Rating Rules:
-        - Realistic: Monthly savings required is less than 20% of disposable income.
-        - Challenging: Monthly savings required is between 20% and 50% of disposable income.
-        - Unrealistic: Monthly savings required is more than 50% of disposable income, disposable income is zero or negative, or the target date has already passed.
+        Feasibility Rating Data:
+        ${JSON.stringify(FeasibilityCalculations.feasibilityRating, null, 2)}
 
-        Strict Rules:
-        - Use GBP (£).
-        - Use only the supplied data.
-        - Do not invent missing values.
-        - Do not speculate about inflation, emergencies, job loss, future prices, or wider economic conditions.
-        - Do not show working out or calculations.
-        - Only show the final calculated values requested in the response format.
-        - Do not contradict the calculated rating.
-        - Keep explanations concise and practical.
-        - Write in plain English.
-        - Do not include notes, summaries, disclaimers, headings, or extra comments.
+        Output Rules:
+
+        - Output exactly one block per goal in Monthly Savings Data.
+        - Use each goal_name exactly as provided.
+        - Use each monthly_savings value as the Estimated Monthly Savings Required.
+        - Use each feasibility_rating exactly as provided.
+        - Do not create new goals.
+        - Do not repeat goals.
+        - Do not mention missing goals.
+        - Do not perform calculations.
+        - Do not add any introduction, summary, recommendation, note, disclaimer, heading, or conclusion.
+        - Stop immediately after the final Explanation line.
 
         Response Format:
 
-        Estimated Household Disposable Income: £X
+        Estimated Household Disposable Income: £${FeasibilityCalculations.disposableIncome}
 
-        Goal: [Goal Name]
-        Estimated Monthly Savings Required: £X
-        Feasibility Rating: Realistic | Challenging | Unrealistic
-        Explanation: [One concise sentence explaining the rating.]
+        Goal: [goal_name]
+        Estimated Monthly Savings Required: £[monthly_savings]
+        Feasibility Rating: [feasibility_rating]
+        Explanation: [One concise sentence explaining why this feasibility rating was assigned using the financial calculations provided.]
 
-        Goal: [Goal Name]
-        Estimated Monthly Savings Required: £X
-        Feasibility Rating: Realistic | Challenging | Unrealistic
-        Explanation: [One concise sentence explaining the rating.]
-
-        <NOTHING MORE>
+        Explanation Rules:
+        - Base the explanation on the financial calculations provided.
+        - Interpret the financial impact rather than repeating calculation values.
+        - Explain what the rating means for the household in practical terms.
+        - Avoid quoting percentages, formulas, or raw calculation values unless necessary.
+        - Keep explanations concise, professional, and easy to understand.
+        - Do not make assumptions about personal motivations, emotions, or lifestyle choices.
 
         Formatting Rules:
-        - Add one blank line between goals.
+
+        - Add exactly one blank line between goal blocks.
         - Do not include anything outside the response format.
         `
 
@@ -133,6 +157,8 @@ class GoalInsight {
         const response = await groq.chat.completions.create({
             // AI model used to generate the response
             model: "llama-3.1-8b-instant",
+            // Makes AI as predictable/deterministic as possible
+            temperature: 0,
             // Conversation sent to the AI model
             messages: [
                 {
@@ -145,6 +171,91 @@ class GoalInsight {
         })
         // Returns the AI generated response text
         return response.choices[0].message.content
+    }
+
+
+    // AI Helper Function for Priority (Do Calculations before generating AI Responses)
+    static async getPriorityCalculations(household_id) {
+        // Calculates Total Income
+        const income = await Income.getAllHouseholdIncome(household_id)
+        let totalIncome = 0
+        for (const incomeItem of income) {
+            totalIncome += Number(incomeItem.income_amount)
+        }
+
+        // Calculates Total Bills
+        const bills = await Bill.getAllHouseholdBills(household_id)
+        let totalBills = 0
+        for (const billItem of bills) {
+            totalBills += Number(billItem.bill_amount)
+        }
+
+        // Calculates Disposable Income
+        const disposableIncome = totalIncome - totalBills
+
+        // Calculates amountRemaining (£) until financial goal is achieved
+        const goals = await Goal.getAllHouseholdGoals(household_id)
+        const amountRemaining = goals.map((goal) => {
+            return {
+                goal_name: goal.goal_name,
+                amount_remaining: goal.goal_amount - goal.current_value
+            }
+        })
+
+        // Calculates number of months until target date from today's date
+        const monthsUntilTarget = goals.map((goal) => {
+            const today = new Date()
+            const targetDate = new Date(goal.target_date)
+            const months = ((targetDate.getFullYear() - today.getFullYear()) * 12) + (targetDate.getMonth() - today.getMonth())
+            return {
+                goal_name: goal.goal_name,
+                months_until_target: months
+            }
+        })
+
+        // The amount you would need to contribute to a goal each month to meet the target date
+        const monthlySavings = goals.map((goal) => {
+            const today = new Date()
+            const targetDate = new Date(goal.target_date)
+            const months = ((targetDate.getFullYear() - today.getFullYear()) * 12) + (targetDate.getMonth() - today.getMonth())
+            const amountRemaining = goal.goal_amount - goal.current_value
+            return {
+                goal_name: goal.goal_name,
+                monthly_savings: months > 0 ? amountRemaining / months : amountRemaining
+            }
+        })
+
+        // Calculates priority rating according to criteria
+        const priorityRating = goals.map((goal) => {
+            const today = new Date()
+            const targetDate = new Date(goal.target_date)
+            const months = ((targetDate.getFullYear() - today.getFullYear()) * 12) + (targetDate.getMonth() - today.getMonth())
+            const amountRemaining = goal.goal_amount - goal.current_value
+            const monthlySavings = months > 0 ? amountRemaining / months : amountRemaining
+            const savingsPressure = monthlySavings / disposableIncome
+            let priorityRating
+            // months, feasibility percentage 
+            if (disposableIncome <= 0 || months <= 0) {
+                priorityRating = "High Priority" 
+            }
+            else if (months <= 6 || savingsPressure > 0.5) {
+                priorityRating = "High Priority" 
+            }
+            else if (months < 12 || savingsPressure > 0.2)
+                priorityRating = "Medium Priority"
+            else {
+                priorityRating = "Low Priority"
+            }
+            return {
+                goal_name: goal.goal_name,
+                priority_rating: priorityRating,
+                months_until_target: months,
+                monthly_savings_required: monthlySavings,
+                savings_pressure: savingsPressure
+            }
+        })
+
+        return { disposableIncome, amountRemaining, monthsUntilTarget, monthlySavings, priorityRating }
     }
 
 
@@ -152,101 +263,72 @@ class GoalInsight {
     static async getPriority(household_id) {
         
         // Retrieves all goal, income and bill information for a given household
-        const goals = await Goal.getAllHouseholdGoals(household_id)
-        const income = await Income.getAllHouseholdIncome(household_id)
-        const bills = await Bill.getAllHouseholdBills(household_id)
+        const priorityCalculations = await this.getPriorityCalculations(household_id)
 
         // Prompt that will be inputting into Groq
         // JSON.stringify converts JSON object into string
-                const prompt = `
-        You are a financial planning assistant for a couple's personal finance app.
+        const prompt = `
+        You are a financial adviser inside a household finance app.
 
-        Analyse the priority of each household goal using only the data provided.
+        Your role is to help the household understand which savings goals should be prioritised first.
 
-        Household Goals:
-        ${JSON.stringify(goals, null, 2)}
+        The priority ratings have already been calculated using the financial data provided. Do not recalculate or change the ratings.
 
-        Household Income:
-        ${JSON.stringify(income, null, 2)}
+        Priority Data:
+        ${JSON.stringify(priorityCalculations.priorityRating, null, 2)}
 
-        Household Bills:
-        ${JSON.stringify(bills, null, 2)}
+        Output Rules:
 
-        Instructions:
-        1. Calculate total monthly household income.
-        2. Calculate total monthly household bills.
-        3. Calculate estimated monthly disposable income: Disposable Income = Total Income - Total Bills
-        4. For each goal:
-        - Calculate the amount remaining to save.
-        - Calculate the number of months until the target date.
-        - Calculate the estimated monthly savings required.
-        - Compare the monthly savings required against disposable income.
-        - Consider whether multiple goals compete for the same disposable income.
-        5. Rank every goal from highest priority to lowest priority.
-
-        When determining rankings, prioritise:
-        1. Urgency of the target date.
-        2. Estimated monthly savings required.
-        3. Amount remaining to save.
-        4. Competition for available disposable income.
-
-        Priority Rating Rules:
-
-        High Priority:
-        - The target date is near.
-        - The goal requires a significant monthly savings commitment relative to disposable income.
-        - Delaying action increases the likelihood of missing the target date.
-
-        Medium Priority:
-        - The goal requires regular savings but remains achievable without immediate action.
-        - The goal competes moderately with other goals for available disposable income.
-
-        Low Priority:
-        - The target date is distant.
-        - The required monthly savings are relatively low.
-        - The goal can reasonably be delayed while higher-priority goals are funded.
-
-        Strict Rules:
-        - Currency is GBP (£).
-        - Use only the supplied data.
-        - Do not make assumptions beyond the supplied data.
-        - Do not speculate about personal preferences, emotional value, lifestyle choices, future economic conditions, inflation, job loss, emergencies, or unexpected expenses.
-        - Do not invent reasons that are not supported by the data.
-        - Do not show calculations or working out.
-        - Use calculations only to determine rankings.
-        - Do not contradict your calculations.
-        - Verify calculations before assigning rankings.
-        - Rankings must be consistent with the calculated urgency and savings requirements.
-        - Keep explanations concise and practical.
-        - Write in plain English for non-technical users.
-        - Keep the response compact.
-        - Do not include notes, summaries, recommendations, disclaimers, introductions, conclusions, or extra comments.
+        - Output exactly one block per item in Priority Data.
+        - Sort the goals by priority before outputting them.
+        - Show High Priority goals first, then Medium Priority goals, then Low Priority goals.
+        - Within the same priority rating, place goals with fewer months_until_target first.
+        - Assign Priority Rank after sorting.
+        - Priority Rank must start at 1 for the first goal shown and increase by 1 for each following goal.
+        - Use each goal_name exactly as provided.
+        - Use each priority_rating exactly as provided.
+        - Do not create new goals.
+        - Do not repeat goals.
+        - Do not perform calculations.
+        - Do not add an introduction, summary, recommendation section, note, disclaimer, heading, or conclusion.
+        - Stop immediately after the final Explanation line.
 
         Response Format:
 
-        Priority Ranking: X
-        Goal: [Goal Name]
-        Priority Rating: High Priority | Medium Priority | Low Priority
-        Explanation: [One concise sentence explaining the ranking.]
+        Priority Rank: [priority_rank]
+        Goal: [goal_name]
+        Priority Rating: [priority_rating]
+        Explanation: [One concise sentence explaining the financial planning reason this goal has this priority position.]
 
-        Priority Ranking: X
-        Goal: [Goal Name]
-        Priority Rating: High Priority | Medium Priority | Low Priority
-        Explanation: [One concise sentence explaining the ranking.]
+        Explanation Rules:
 
-        <NOTHING MORE>
+        - Sound like a calm, professional financial adviser.
+        - Explain the practical planning reason for the goal's priority position.
+        - Focus on prioritisation, not affordability.
+        - Use the priority rating, time remaining, savings pressure, and required saving commitment as context.
+        - Interpret the data in plain English rather than listing calculations.
+        - Use exact figures only if they make the advice clearer.
+        - Do not simply define High Priority, Medium Priority, or Low Priority.
+        - Do not repeat the same explanation for multiple goals.
+        - Do not describe the goal itself.
+        - Do not explain the personal purpose or emotional value of the goal.
+        - Do not comment on whether the goal is important, worthwhile, enjoyable, expensive, significant, or beneficial.
+        - Do not invent personal motivations, lifestyle details, family intentions, or future outcomes.
+        - Do not speak from the household's perspective.
+        - Do not use "we", "our", "us", "I", or "you".
+        - Keep the explanation practical, natural, and easy to understand.
 
         Formatting Rules:
-        - List goals from highest priority to lowest priority.
-        - Rankings must be unique.
-        - Add exactly one blank line between goals.
-        - Do not include any content outside the response format.
-        `
 
+        - Add exactly one blank line between goal blocks.
+        - Do not include anything outside the response format.
+        `
         // Sends the prompt to Groq's AI model and waits for a response
         const response = await groq.chat.completions.create({
             // AI model used to generate the response
             model: "llama-3.1-8b-instant",
+            // Makes AI as predictable/deterministic as possible
+            temperature: 0,
             // Conversation sent to the AI model
             messages: [
                 {
@@ -262,112 +344,135 @@ class GoalInsight {
     }
 
 
+    // AI Helper Function for Optimisation (Do Calculations before generating AI Responses)
+    static async getOptimisationCalculations(household_id) {
+        const bills = await Bill.getAllHouseholdBills(household_id)
+        // Calculates total bills each month
+        let totalBills = 0
+        for (const billItem of bills) {
+            totalBills += billItem.bill_amount
+        }
+
+        // Calculates total bills each year
+        const annualBillCost = bills.map((bill) => {
+            return {
+                bill_name: bill.bill_name,
+                annual_bill_cost: bill.bill_amount * 12
+            }
+        })
+
+        // Calculates of the total bill amount each month, the proportion that each bill takes up
+        const percentageOfBills = bills.map((bill) => {
+            return {
+                bill_name: bill.bill_name,
+                percentage_of_bills: bill.bill_amount / totalBills
+            }
+        })
+
+        // How much the change would save 
+        const estimatedAnnualSavings = bills.map((bill) => {
+            const annualCost = bill.bill_amount * 12
+
+            return {
+                bill_name: bill.bill_name,
+                estimated_annual_savings: annualCost * 0.25
+            }
+        })
+
+        // Priority based on proportion bill takes of total bill amount
+        const optimisationPriority = bills.map((bill) => {
+            const percentageOfBills = bill.bill_amount / totalBills
+            let priority
+            if (percentageOfBills >= 0.1) {
+                priority = "High Priority"
+            }
+            else if (percentageOfBills >= 0.05) {
+                priority = "Medium Priority"
+            }
+            else {
+                priority = "Low Priority"
+            }
+            return {
+                bill_name: bill.bill_name,
+                optimisation_priority: priority,
+                monthly_bill_amount: bill.bill_amount,
+                percentage_of_bills: percentageOfBills,
+                estimated_annual_savings: bill.bill_amount * 12 * 0.25
+            }
+        })
+
+        return { totalBills, annualBillCost, percentageOfBills, estimatedAnnualSavings, optimisationPriority }
+    }
+
+
     // Provides response breaking down ways to optimise resolving the goal
     static async getOptimisation(household_id) {
         
         // Retrieves all goal, income and bill information for a given household
-        const goals = await Goal.getAllHouseholdGoals(household_id)
-        const income = await Income.getAllHouseholdIncome(household_id)
-        const bills = await Bill.getAllHouseholdBills(household_id)
+        const optimisationCalculations = await this.getOptimisationCalculations(household_id)
 
         // Prompt that will be inputting into Groq
         // JSON.stringify converts JSON object into string
         const prompt = `
-        You are a financial planning assistant for a couple's personal finance app.
+        You are a financial adviser inside a household finance application.
 
-        Analyse the household's spending and identify opportunities to reduce expenditure and free up money for financial goals.
+        Your role is to identify the spending categories that may offer the greatest opportunities for savings.
 
-        Use only the data provided.
+        Optimisation priorities and estimated annual savings have already been calculated using household financial data. Do not recalculate them.
 
-        Household Goals:
-        ${JSON.stringify(goals, null, 2)}
+        Optimisation Data:
+        ${JSON.stringify(optimisationCalculations.optimisationPriority, null, 2)}
 
-        Household Income:
-        ${JSON.stringify(income, null, 2)}
+        Output Rules:
 
-        Household Bills:
-        ${JSON.stringify(bills, null, 2)}
-
-        Instructions:
-
-        1. Calculate total monthly household income.
-        2. Calculate total monthly household bills.
-        3. Calculate estimated monthly disposable income: Disposable Income = Total Income - Total Bills
-        4. Review all household bills and recurring spending.
-        5. Identify opportunities to reduce spending.
-        6. Prioritise opportunities based on:
-        - Potential savings.
-        - Ease of implementation.
-        - Likelihood of immediate financial impact.
-        7. Rank opportunities from highest priority to lowest priority.
-
-        Priority Rating Rules:
-
-        High Priority:
-        - The opportunity can be implemented immediately.
-        - The opportunity is likely to generate significant savings.
-        - The opportunity has a clear and direct financial benefit.
-
-        Medium Priority:
-        - The opportunity provides moderate savings.
-        - The opportunity may require some effort or changes to existing services.
-        - The opportunity has a noticeable but less significant financial impact.
-
-        Low Priority:
-        - The opportunity provides relatively small savings.
-        - The opportunity requires substantial effort or long-term changes.
-        - The financial impact is limited.
-
-        Strict Rules:
-        - Currency is GBP (£).
-        - Use only the supplied data.
-        - Do not make assumptions beyond the supplied data.
-        - Do not speculate about personal preferences, emotional value, lifestyle choices, future economic conditions, inflation, job loss, emergencies, or unexpected expenses.
-        - Only recommend alternatives when there is a clear and reasonable basis from the bill information provided.
-        - Do not invent products, services, subscriptions, or savings figures that are unsupported by the data.
-        - If no suitable alternative can be identified, state "No specific alternative identified".
-        - Do not show calculations or working out.
-        - Use calculations only to determine rankings and estimated savings.
-        - Do not contradict your calculations.
-        - Verify calculations before assigning rankings.
-        - Keep explanations concise and practical.
-        - Write in plain English for non-technical users.
-        - Keep the response compact.
-        - Do not include introductions, conclusions, notes, summaries, or extra commentary.
-
-        For each opportunity provide:
-        1. Priority Rating
-        2. Spending Reduction Opportunity
-        3. Alternative Products & Services
-        4. Estimated Annual Savings
+        - Output exactly one block per item in Optimisation Data.
+        - Use each bill_name exactly as provided.
+        - Use each optimisation_priority exactly as provided.
+        - Use each estimated_annual_savings exactly as provided.
+        - Assign Priority Rank based on the order of output.
+        - Priority Rank must start at 1 and increase by 1 for each following bill.
+        - Do not create new bills.
+        - Do not repeat bills.
+        - Do not perform calculations.
+        - Do not invent specific products, brands, providers, tariffs, or prices.
+        - Do not add an introduction, summary, disclaimer, heading, or conclusion.
 
         Response Format:
 
-        Disclaimer: Suggested alternatives and savings estimates are suggestions only. They may not be practical for your situation. Please check pricing and product details before taking action.
+        Priority Rank: [priority_rank]
+        Bill: [bill_name]
+        Priority Rating: [optimisation_priority]
+        Recommendation: [One concise sentence explaining the savings opportunity and a practical next step.]
+        Estimated Annual Savings: £[estimated_annual_savings]
 
-        Priority Rating: High Priority | Medium Priority | Low Priority
-        Spending Reduction Opportunity: [One concise sentence describing the opportunity.]
-        Alternative Products & Services: [One concise sentence describing a suitable alternative or "No specific alternative identified".]
-        Estimated Annual Savings: £X
+        Advice Style:
 
-        Priority Rating: High Priority | Medium Priority | Low Priority
-        Spending Reduction Opportunity: [One concise sentence describing the opportunity.]
-        Alternative Products & Services: [One concise sentence describing a suitable alternative or "No specific alternative identified".]
-        Estimated Annual Savings: £X
-
-        <NOTHING MORE>
+        - Sound like a professional financial adviser.
+        - Focus on identifying practical savings opportunities.
+        - Explain why the bill may be worth reviewing.
+        - Suggest a realistic next step.
+        - Interpret the financial impact in plain English rather than repeating calculations.
+        - Do not judge spending choices.
+        - Do not use words such as "unnecessary", "wasteful", "bad", or "excessive".
+        - Do not comment on personal lifestyle choices.
+        - Do not speak from the household's perspective.
+        - Do not use "we", "our", "us", "I", or "you".
+        - Keep recommendations concise, practical, and easy to understand.
 
         Formatting Rules:
-        - List opportunities from highest priority to lowest priority.
-        - Do not add blank lines within an opportunity.
-        - Add exactly one blank line between opportunities.
-        - Do not include any content outside the response format.
-        `
 
+        - Show High Priority bills first.
+        - Then show Medium Priority bills.
+        - Then show Low Priority bills.
+        - Within each priority group, show larger estimated annual savings first.
+        - Add exactly one blank line between bill blocks.
+        - Do not include anything outside the response format.
+        `
         // Sends the prompt to Groq's AI model and waits for a response
         const response = await groq.chat.completions.create({
             // AI model used to generate the response
             model: "llama-3.1-8b-instant",
+            temperature: 0,
             // Conversation sent to the AI model
             messages: [
                 {

@@ -6,6 +6,7 @@ const householdRouter = Router();
 
 householdRouter.post("/register", householdController.register);
 householdRouter.post("/login", householdController.login);
+householdRouter.post("/verify-2fa", householdController.verifyTwoFactorLogin);
 
 // Import authentication middleware
 const authenticator = require('../middleware/authenticator');

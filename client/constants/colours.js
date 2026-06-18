@@ -1,9 +1,16 @@
 export default {
-  background: '#eef2f7',
-  pageHeader: '#2f4f7a',
-  cardBackground: '#ffffff',
-  cardTitle: '#4a7ec2',
-  navBackground: '#ffffff',
-  inactiveTab: '#9aa3b0',
-  activeTab: '#4a7ec2',
-}
+  background: "#eef2f7",
+  pageHeader: "#2f4f7a",
+  cardTitle: "#4a7ec2",
+  cardBackground: "#fff",
+  navBackground: "#4a7ec2",
+  inactiveTab: "#A9B7C6",
+  activeTab: "#07305a",
+  buttonBackground: "#4a7ec2",
+  buttonText: "#fff",
+  red: "#dc2626",
+  green: "#16a34a",
+  softRed: "#fecaca",
+  softGreen: "#bbf7d0",
+  accountCards: "#7AB3ED"
+};
