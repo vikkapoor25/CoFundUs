@@ -1,5 +1,6 @@
-import { render, fireEvent } from '@testing-library/react-native'
+import { render, fireEvent, waitFor } from '@testing-library/react-native'
 import Register from '../../app/(auth)/register'
+import { register as apiRegister } from '../../api/user'
 
 const mockReplace = jest.fn()
 const mockPush = jest.fn()
@@ -7,41 +8,38 @@ const mockPush = jest.fn()
 jest.mock('expo-router', () => ({
   useRouter: () => ({ replace: mockReplace, push: mockPush }),
 }))
+jest.mock('../../api/user', () => ({ login: jest.fn(), register: jest.fn() }))
 
 describe('Register screen', () => {
   beforeEach(() => {
     mockReplace.mockClear()
     mockPush.mockClear()
+    apiRegister.mockReset()
   })
 
-  test('renders the heading and the inputs', async () => {
+  test('renders the heading and the fields', async () => {
     const { getAllByText, getByPlaceholderText } = await render(<Register />)
     expect(getAllByText('Register').length).toBeGreaterThan(0)
-    expect(getByPlaceholderText('Enter your email')).toBeTruthy()
-    expect(getByPlaceholderText('Enter your password')).toBeTruthy()
+    expect(getByPlaceholderText('choose a unique username')).toBeTruthy()
+    expect(getByPlaceholderText('choose a password')).toBeTruthy()
   })
 
-  test('lets the user type into the email and password fields', async () => {
-    const { getByPlaceholderText } = await render(<Register />)
-    const email = getByPlaceholderText('Enter your email')
-    const password = getByPlaceholderText('Enter your password')
-
-    await fireEvent.changeText(email, 'alex@test.com')
-    await fireEvent.changeText(password, 'secret123')
-
-    expect(email.props.value).toBe('alex@test.com')
-    expect(password.props.value).toBe('secret123')
-  })
-
-  test('navigates to login when the Register button is pressed', async () => {
-    const { getAllByText } = await render(<Register />)
+  test('submits the form to the register api', async () => {
+    apiRegister.mockResolvedValue({})
+    const { getAllByText, getByPlaceholderText } = await render(<Register />)
+    await fireEvent.changeText(getByPlaceholderText('e.g. Alex'), 'Alex')
+    await fireEvent.changeText(getByPlaceholderText('choose a unique username'), 'the-smiths')
+    await fireEvent.changeText(getByPlaceholderText('choose a password'), 'secret123')
     await fireEvent.press(getAllByText('Register')[1])
-    expect(mockReplace).toHaveBeenCalledWith('/login')
+    await waitFor(() => expect(apiRegister).toHaveBeenCalled())
   })
 
-  test('navigates to login when Already have an account is pressed', async () => {
-    const { getByText } = await render(<Register />)
-    await fireEvent.press(getByText('Already have an account?'))
-    expect(mockPush).toHaveBeenCalledWith('/login')
+  test('shows a success message after registering', async () => {
+    apiRegister.mockResolvedValue({})
+    const { getAllByText, getByText, getByPlaceholderText } = await render(<Register />)
+    await fireEvent.changeText(getByPlaceholderText('choose a unique username'), 'x')
+    await fireEvent.changeText(getByPlaceholderText('choose a password'), 'y')
+    await fireEvent.press(getAllByText('Register')[1])
+    await waitFor(() => expect(getByText(/Registered successfully/)).toBeTruthy())
   })
 })

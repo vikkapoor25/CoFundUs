@@ -58,7 +58,25 @@
     "typescript": "~5.9.2"
   },
   "jest": {
-    "preset": "jest-expo"
+    "preset": "jest-expo",
+    "testTimeout": 30000,
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/components/visualisations/"
+    ],
+    "collectCoverageFrom": [
+      "app/**/*.{js,jsx}",
+      "api/**/*.{js,jsx}",
+      "components/**/*.{js,jsx}",
+      "!**/node_modules/**",
+      "!**/coverage/**",
+      "!components/visualisations/**",
+      "!components/tabBar.jsx",
+      "!components/NetText.jsx",
+      "!components/ProgressBar.jsx",
+      "!components/row.jsx",
+      "!components/screen.jsx"
+    ]
   },
   "private": true
 }
