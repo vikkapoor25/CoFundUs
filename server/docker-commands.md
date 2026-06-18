@@ -10,6 +10,5 @@ docker run \
   -e BCRYPT_SALT_ROUNDS=20 \
   -e SECRET_TOKEN=(YOUR_SECRET_TOKEN_PHRASE) \
   -e GROQ_API_KEY=(YOUR_GROK_API_KEY) \
-  -e DB_URL=(YOUR_DB_URL) \
   doordiver/cofundus-api:latest
   ```

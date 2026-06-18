@@ -92,5 +92,63 @@ describe('POST /user/login', () => {
     });
 
 });
+
+describe('POST /user/verify-2fa', () => {
+  it('should verify 2FA and return jwt token with status code 200', async () => {
+    const newHousehold = {
+      household_username: 'Stark',
+      household_password: 'RedWedding',
+      name_1: 'Rob',
+      name_2: 'Catalyn',
+      email_1: 'rob@mail.com',
+      email_2: 'catalyn@mail.com'
+    };
+
+    await request(api).post('/user/register').send(newHousehold);
+
+    const loginResponse = await request(api).post('/user/login').send({
+      household_username: 'Stark',
+      household_password: 'RedWedding'
+    });
+
+    const response = await request(api).post('/user/verify-2fa').send({
+      household_id: loginResponse.body.household_id,
+      code: loginResponse.body.demo_code
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.jwt_token).toEqual(expect.any(String));
+    expect(response.body.household_id).toBe(loginResponse.body.household_id);
+    expect(response.body.name_1).toBe('Rob');
+    expect(response.body.name_2).toBe('Catalyn');
+  });
+
+  it('should return an error for invalid 2FA code with status code 401', async () => {
+    const newHousehold = {
+      household_username: 'Stark',
+      household_password: 'RedWedding',
+      name_1: 'Rob',
+      name_2: 'Catalyn',
+      email_1: 'rob@mail.com',
+      email_2: 'catalyn@mail.com'
+    };
+
+    await request(api).post('/user/register').send(newHousehold);
+
+    const loginResponse = await request(api).post('/user/login').send({
+      household_username: 'Stark',
+      household_password: 'RedWedding'
+    });
+
+    const response = await request(api).post('/user/verify-2fa').send({
+      household_id: loginResponse.body.household_id,
+      code: '000000'
+    });
+
+    expect(response.status).toBe(401);
+    expect(response.body).toEqual({ error: 'Invalid 2FA code.' });
+  });
+});
   
 })

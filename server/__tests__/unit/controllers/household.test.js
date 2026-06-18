@@ -122,4 +122,56 @@ describe('Household Controller', () => {
       });
     });
 
+    describe('verifyTwoFactorLogin', () => {
+  it('should verify 2FA, clear code, and return jwt token with status 200', async () => {
+    const mockReq = { body: { household_id: 1, code: '123456' } };
+    const mockHousehold = {
+      household_id: 1,
+      household_username: 'Doe',
+      name_1: 'John',
+      name_2: 'Alice'
+    };
+
+    jest.spyOn(Household, 'verifyTwoFactorCode').mockResolvedValue(mockHousehold);
+    jest.spyOn(Household, 'clearTwoFactorCode').mockResolvedValue({
+      ...mockHousehold,
+      twofa_code: null,
+      twofa_expires_at: null
+    });
+    jest.spyOn(jwt, 'sign').mockImplementation((payload, secret, options, callback) => {
+      callback(null, 'fakeJwtToken');
+    });
+
+    await householdController.verifyTwoFactorLogin(mockReq, mockRes);
+
+    expect(Household.verifyTwoFactorCode).toHaveBeenCalledWith(1, '123456');
+    expect(Household.clearTwoFactorCode).toHaveBeenCalledWith(1);
+    expect(jwt.sign).toHaveBeenCalledWith(
+      { household_username: 'Doe' },
+      process.env.SECRET_TOKEN,
+      { expiresIn: 3600 },
+      expect.any(Function)
+    );
+    expect(mockStatus).toHaveBeenCalledWith(200);
+    expect(mockJson).toHaveBeenCalledWith({
+      success: true,
+      jwt_token: 'fakeJwtToken',
+      household_id: 1,
+      name_1: 'John',
+      name_2: 'Alice'
+    });
+  });
+
+  it('should return error 401 when 2FA verification fails', async () => {
+    const mockReq = { body: { household_id: 1, code: '000000' } };
+
+    jest.spyOn(Household, 'verifyTwoFactorCode').mockRejectedValue(new Error('Invalid 2FA code.'));
+
+    await householdController.verifyTwoFactorLogin(mockReq, mockRes);
+
+    expect(Household.verifyTwoFactorCode).toHaveBeenCalledWith(1, '000000');
+    expect(mockStatus).toHaveBeenCalledWith(401);
+    expect(mockJson).toHaveBeenCalledWith({ error: 'Invalid 2FA code.' });
+  });
+});
 })
