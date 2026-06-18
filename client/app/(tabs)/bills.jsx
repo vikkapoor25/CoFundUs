@@ -13,9 +13,9 @@ import { getAccounts } from '../../api/bank-accounts'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const CHARTS = [
+  'https://vivid-abaft.metabaseapp.com/public/question/44b1f5d8-71ee-459e-a071-7d121ebbdf50#titled=false',
   'https://vivid-abaft.metabaseapp.com/public/question/d73c0b97-8c7c-4883-b571-c2a286e8fb76#titled=false',
   'https://vivid-abaft.metabaseapp.com/public/question/044c35dc-1275-421e-98f0-98b4cf1528b5#titled=false',
-  'https://vivid-abaft.metabaseapp.com/public/question/a66e81c3-fe91-4fae-bf40-381eaf2328a1#titled=false',
 ]
 
 const SLIDE_W = Dimensions.get('window').width - 32

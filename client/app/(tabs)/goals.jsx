@@ -131,6 +131,7 @@ export default function goals() {
     setSelectedGoal(null)
     setActiveModal(null)
     loadGoals()
+    await loadInsights()
   }
 
   async function handleDelete(goal_id) {
