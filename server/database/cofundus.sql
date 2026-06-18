@@ -99,7 +99,7 @@ INSERT INTO income (account_id, income_amount, income_name, payment_date, catego
  INSERT INTO bills (account_id, bill_amount, bill_name,     bill_due_date, category,    category_type,         repeat_bill, payment_frequency, bill_repeat_date, paid)
   VALUES
                     ( 1,         200,    'Cable TV',        '2026-06-15', 'Luxury',     'Entertainment',        TRUE,       'Monthly',          '2026-07-15', TRUE),
-                    ( 1,         50,    'Phone Bill',       '2026-06-20', 'Essential',  'Subscription',         TRUE,       'Monthly',          '2026-07-20', FALSE),
+                    ( 1,         50,    'Phone Bill',       '2026-06-29', 'Essential',  'Subscription',         TRUE,       'Monthly',          '2026-07-20', FALSE),
                     ( 1,         30,    'Duff Beer',        '2026-06-21', 'Luxury',     'Leisure',              TRUE,       'Monthly',          '2026-07-21', FALSE),
                     ( 1,         300,    'Insurance',       '2026-06-30', 'Essential',  'Subscription',         TRUE,       'Annually',         '2027-07-31', FALSE),
                     ( 1,         2000,    'Mortgage',        '2026-06-16', 'Essential',  'Debts',               TRUE,       'Monthly',          '2026-07-15', TRUE),
@@ -110,7 +110,7 @@ INSERT INTO income (account_id, income_amount, income_name, payment_date, catego
 
 INSERT INTO bills (account_id, bill_amount, bill_name,     bill_due_date, category,    category_type,         repeat_bill, paid)
   VALUES
-                    ( 1,         50,'Bart Grafitti fine',   '2026-06-29', 'Other',      'Negative',             FALSE, FALSE),
+                    ( 1,         50,'Bart Grafitti fine',   '2026-06-20', 'Other',      'Negative',             FALSE, FALSE),
                     ( 1,         25,    'Car Repairs',      '2026-06-22', 'Other',      'Negative',             FALSE, FALSE),
                     ( 1,         60,    'Kwik-E-Mart',         '2026-06-02', 'Essential',  'Consumable',           FALSE, TRUE),
                     ( 1,         80,    'Hairdressers',     '2026-06-12', 'Luxury',     'Beauty',               FALSE, TRUE),
