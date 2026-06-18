@@ -12,7 +12,8 @@
     "all-tests": "jest",
     "component-tests": "jest __tests__/components",
     "app-tests": "jest __tests__/app",
-    "api-tests": "jest __tests__/api"
+    "api-tests": "jest __tests__/api",
+    "coverage": "jest --coverage "
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
