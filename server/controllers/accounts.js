@@ -23,13 +23,36 @@ async function deleteBankAccount(req, res) {
     });
   } catch (err) {
     if (err.message.includes("violates foreign key constraint")) {
-  return res.status(400).json({
-    error: "This account cannot be deleted because it still has income or bills assigned to it.",
-  });
-}
+      return res.status(400).json({
+        error: "This account cannot be deleted because it still has income or bills assigned to it.",
+      });
     }
 
     res.status(500).json({ error: err.message });
   }
+}
 
-module.exports = { createBankAccount, deleteBankAccount };
+async function getAccountsByHousehold(req, res) {
+  try {
+    const accounts = await BankAccount.getByHouseholdId(req.params.household_id);
+    res.status(200).json(accounts);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
+async function getBalanceByHousehold(req, res) {
+  try {
+    const balance = await BankAccount.getBalanceByHouseholdId(req.params.household_id);
+    res.status(200).json(balance);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
+module.exports = {
+  createBankAccount,
+  deleteBankAccount,
+  getAccountsByHousehold,
+  getBalanceByHousehold,
+};

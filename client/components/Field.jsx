@@ -1,6 +1,6 @@
 import { View, Text, TextInput, StyleSheet } from 'react-native'
 
-export default function Field({ label, value, onChangeText, placeholder, secureTextEntry, keyboardType }) {
+export default function Field({ label, value, onChangeText, placeholder, keyboardType }) {
   return (
     <View style={styles.wrap}>
       {label ? <Text style={styles.label}>{label}</Text> : null}
@@ -10,7 +10,6 @@ export default function Field({ label, value, onChangeText, placeholder, secureT
         onChangeText={onChangeText}
         placeholder={placeholder}
         placeholderTextColor="#9aa3b0"
-        secureTextEntry={secureTextEntry}
         keyboardType={keyboardType}
         autoCapitalize="none"
       />

@@ -1,4 +1,5 @@
-import { BASE_URL } from '../constants/api'
+const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
+
 
 // Calls the backend /user router.
 
@@ -16,6 +17,15 @@ export async function register(details) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(details),
+  })
+  return res.json()
+}
+
+export async function verify(household_id, code) {
+  const res = await fetch(`${BASE_URL}/user/verify-2fa`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ household_id, code }),
   })
   return res.json()
 }
