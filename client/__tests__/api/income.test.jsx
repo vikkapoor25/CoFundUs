@@ -52,7 +52,7 @@ describe('api/income', () =>{
         expect(options.method).toBe('DELETE')
         expect(options.headers['Content-Type']).toBe('application/json')
         expect(JSON.parse(options.body)).toEqual({
-          bill_id: 5,
+          income_id: 5,
         })
         expect(data.success).toBe(true)
       })

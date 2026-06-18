@@ -18,8 +18,6 @@ describe('api/bank-accounts', () => {
       account_id: 1,
       income_amount: 500,
     }
-
-
     const data = await addIncome(body)
     expect(fetch).toHaveBeenCalledTimes(1)
     const [url, options] = fetch.mock.calls[0]
