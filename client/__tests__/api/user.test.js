@@ -20,8 +20,8 @@ describe('api/user', () => {
     expect(options.method).toBe('POST')
     expect(options.headers['Content-Type']).toBe('application/json')
     expect(JSON.parse(options.body)).toEqual({
-      household_name: 'the-smiths',
-      password: 'secret123',
+      household_username: 'the-smiths',
+      household_password: 'secret123',
     })
     expect(data.jwt_token).toBe('fake-token')
   })
