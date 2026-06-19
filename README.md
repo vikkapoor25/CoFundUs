@@ -424,9 +424,192 @@ From here you can create table structures and insert data.
 
 ---
 
-# Process (**FRONTEND FILL IN HOW TO USE APP OR ADD VIDEO**)
+# Process 
 
-Video and process explaination on how to use the app below.
+## Page 1 - Register
+
+Purpose: Allows you to create an account 
+
+Register Contains:
+Partner 1 Name 
+Partner 1 Email (For 2FA)
+Partner 2 Name 
+Partner 2 Email (For 2FA)
+Household Username (needs to be unique)
+Household Password
+
+Links to Pages:
+Login (on successful account creation)
+---
+
+## Page 2 - Login
+
+Purpose: Allows you to login to the application
+
+Login Contains:
+Shared Username
+Shared Password
+Login Button
+
+Links to Pages:
+Register (if account isn't yet created)
+Home/Dashboard (on successful login)
+
+---
+
+## Page 3 - Home / Dashboard
+
+Purpose: Summarises the overall state of all bank accounts combined (for the month)
+
+Home Contains:
+Overall Account Balance
+Bar Chart Comparing Overall Income & Bills
+Overall Net Gain/Loss (e.g. +£500 is coloured green, -£500 is coloured red)
+Overall Upcoming Bills (Anything due within the week e.g. Annual, Monthly, One-Time Bill)
+Overall Financial Goals (closest to target date)
+NOTE: Dashboard calculated by the month
+
+Links to Pages:
+Login (to logout)
+Account List (to view specific accounts in more detail)
+Upcoming Bills (to view full detail of upcoming bills)
+Goals AI1
+---
+
+## Page 4 - Bank Accounts List
+
+Purpose: Summarises the state of each bank account (for the month)
+
+Home Contains:
+Account Balance
+Bar Chart Comparing Income & Bills
+Net Gain/Loss (e.g. +£500 is coloured green, -£500 is coloured red)
+Add Bank Account Button
+Add Income Button
+
+Links to Pages:
+Login (to logout)
+Home
+Add Bank Account (embed in accounts list or a new page)
+Add income transaction (embed in accounts list or a new page)
+
+---
+
+## Page 5 - Upcoming Bills List
+
+Purpose: List of all upcoming bills (due within the month)
+
+Upcoming Bills Contains:
+Upcoming Bills (Total Amount)
+Subscriptions (should all be visible to see)
+Annual
+Monthly
+One-Time Bills 
+
+Links to Pages:
+Login (to logout)
+Home/Dashboard
+Add Bill (embed in bills list or a new page)
+
+---
+
+## Sub-Page 6 - Add Bank Account (or Embed in Account List - Page 4)
+
+Purpose: Adds a bank account to the application in which you can view summaries and add income transactions to.
+
+Add Bank Account Contains:
+Account Name: Input
+Account Type: Dropdown (e.g. personal, shared)
+Starting Balance: Input (account_balance)
+Add Account Button
+
+Links to Pages:
+Account List (redirected after clicking add account button)
+
+---
+
+## Sub-Page 7 - Add Income (or Embed in Account List - Page 4)
+
+Purpose: To log incomes in specific accounts
+
+Add Income Contains:
+Select Account: Dropdown (e.g. Partner 1, Partner 2, Shared etc.)
+Payment Frequency: Dropdown (e.g. Immediate, One-Time, Monthly, Annually)
+Amount: Input
+Category: Dropdown (Stretch Goal)
+Date: YYYY/MM/DD
+Add Income Button
+
+NOTE: Income categories would be Earned Income, Profit Income, Passive Income etc.
+NOTE: repeat to be used in conjunction with payment_frequency in backend
+
+Links to Pages:
+Account List (redirected after clicking add income button)
+
+---
+
+## Sub-Page 8 - Add Bill (or Embed in Bills List - Page 5)
+
+Purpose: To log bills in specific accounts
+
+Add Bill Contains:
+Select Account: Dropdown (e.g. Partner 1, Partner 2, Shared etc.)
+Payment Frequency: Dropdown (e.g. Immediate, One-Time, Monthly, Annually)
+Amount: Input
+Category: Dropdown (Stretch Goal)
+Date: YYYY/MM/DD
+Add Bill Button
+
+NOTE: For Bills it would be Essential (e.g. Housing, utilities etc.), Discretionary(e.g. Clothes shopping, eating out etc.), Transport, Health/Fitness etc.
+
+NOTE: The term Bills = Expenditure (anything coming out of your account)
+
+Links to Pages:
+Bills List (redirected after clicking add bill button)
+
+---
+
+## Page 9 - Goals AI
+
+Purpose: To get AI generated advice regarding reaching added goal
+
+AI Goals Contains:
+Show Created Goal / Progress Bar (see Tooba wireframe)
+AI comment regarding reaching your goal (advice)
+Recommendations on cost cutting for various bills
+Cheaper subscriptions / questions if subscription is being used
+Update Goal (Allows you to contribute from account balances to goal)
+
+Links to Pages:
+Login (to logout)
+Home/Dashboard
+Add Goal (embed in bills list or a new page)
+
+NOTE: Try one goal for MVP, if easy, do for multiple
+NOTE: Goals are to save for a specific thing / item e.g. an iPhone
+NOTE: All financial goals are shared goals
+
+---
+## Sub-Page 10 - Add Goal (or Embed in AI - Page 9)
+
+Purpose: Add a goal for a specific account
+
+Add Goal Contains:
+Goal Name: Input (e.g. iPhone)
+Amount: Input
+Target Date: YYYY/MM/DD
+Add Goal Button
+
+NOTE: Goals are to save for a specific thing / item e.g. an iPhone
+NOTE: All financial goals are shared goals
+
+Links to Pages:
+AI Page (after clicking add goal button)
+
+
+Navbar Contains: Home | Account | Bills | Goals
+
+---
 
 # Deployment (**Thomas Fill in**)
 
