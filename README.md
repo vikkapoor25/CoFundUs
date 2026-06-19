@@ -438,8 +438,8 @@ Partner 2 Email (For 2FA)
 Household Username (needs to be unique)
 Household Password
 
-Links to Pages:
-Login (on successful account creation)
+Links to Pages: Login (on successful account creation)
+
 ---
 
 ## Page 2 - Login
@@ -469,11 +469,8 @@ Overall Upcoming Bills (Anything due within the week e.g. Annual, Monthly, One-T
 Overall Financial Goals (closest to target date)
 NOTE: Dashboard calculated by the month
 
-Links to Pages:
-Login (to logout)
-Account List (to view specific accounts in more detail)
-Upcoming Bills (to view full detail of upcoming bills)
-Goals AI1
+Links to Pages: Login (to logout), Account List (to view specific accounts in more detail), Upcoming Bills (to view full detail of upcoming bills), Goals AI1
+
 ---
 
 ## Page 4 - Bank Accounts List
