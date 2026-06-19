@@ -407,7 +407,7 @@ From here you can create table structures and insert data.
 
 ---
 
-# Technologies **FRONTEND FILL IN**
+# Technologies
 
 | Area | Technology / Packages |
 |---------|----------------------|
